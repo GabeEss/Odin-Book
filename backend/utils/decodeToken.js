@@ -1,9 +1,14 @@
 const jwt = require('jsonwebtoken');
 
-function decodeToken(authHeader) {
-    const token = authHeader.split(' ')[1];
-    const decodedToken = jwt.decode(token);
-    return decodedToken.sub; // 'sub' contains the user ID in Auth0
+const decodeToken = async (authHeader) => {
+    if (!authHeader || !authHeader.includes(' ')) {
+        throw new Error('Invalid authorization header');
+    }
+    const accessToken = authHeader.split(" ")[1];
+
+    const response = jwt.decode(accessToken, process.env.AUTH_SECRET);
+
+    return response;
 }
 
 module.exports = decodeToken;

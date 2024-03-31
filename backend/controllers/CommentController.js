@@ -1,13 +1,14 @@
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const User = require("../models/user");
+const Guest = require("../models/guest");
 const Notification = require("../models/notification");
 
 const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
 const getUserInfo = require("../utils/getUserInfo");
-const decodeToken = require("../utils/decodeToken");
+const decodeToken = require("../utils/decodeTokenApiCall");
 
 exports.comment_create_post = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: Comment create POST");

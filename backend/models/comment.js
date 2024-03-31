@@ -35,7 +35,6 @@ const CommentSchema = new Schema({
             ref: 'User',
         }],
         required: true,
-        validate: [arrayLimit, '{PATH} must have at least one value']
     }
 })
 

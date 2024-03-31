@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+const post_controller = require("../controllers/PostController");
+const comment_controller = require("../controllers/CommentController");
+const notification_controller = require("../controllers/NotificationController");
+const user_controller = require("../controllers/UserController");
+const event_controller = require("../controllers/EventController");
 
 /// HEALTH ROUTE ///
 
@@ -42,16 +42,19 @@ router.put("/notification/:id", notification_controller.notification_update);
 
 /// USER ROUTES ///
 
-router.post("/user/register", user_controller.user_create_post);
+router.post("/user/register", user_controller.user_register_post);
 router.get("/user", user_controller.user_detail);
 router.get("/user/friends", user_controller.user_friends_get);
 router.put("/user/friends/add", user_controller.user_friend_add);
 router.put("/user/friends/remove", user_controller.user_friend_remove);
 router.get("/user/notifications", user_controller.user_notifications_get);
 router.put("/user/notifications/read", user_controller.user_notifications_read);
-router.put("/user/notifications/unread", user_controller.user_notifications_unread);
 router.put("/user/update", user_controller.user_update);
 router.delete("/user", user_controller.user_delete);
+
+/// GUEST ROUTES ///
+
+/// ^^ NOT IMPLEMENTED YET ///
 
 /// EVENT ROUTES ///
 
