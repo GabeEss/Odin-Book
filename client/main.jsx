@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import App from './src/App.jsx'
 import { Auth0Provider } from '@auth0/auth0-react'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -9,8 +9,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       domain={import.meta.env.VITE_AUTH_DOMAIN}
       clientId={import.meta.env.VITE_AUTH_CLIENT_ID}
       redirectUri={window.location.origin}
-      audience={import.meta.env.VITE_AUTH_AUDIENCE}
-      scope="openid profile email"
+      // Commenting this out will generate an opaque token rather than a JWT
+      authorizationParams={{
+        audience: import.meta.env.VITE_AUTH_AUDIENCE,
+        scope: "current_user",
+      }}
     >
       <App />
     </Auth0Provider>
