@@ -3,35 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { makeAuthenticatedRequest } from '../auth/makeAuthRequest';
 import { useAuth0 } from '@auth0/auth0-react';
 
-function LoginForm () {
+function LoginComponent () {
     const [error, setError] = useState(null);
 
     const {
         loginWithPopup,
         isAuthenticated,
-        getAccessTokenSilently
+        getAccessTokenSilently,
     } = useAuth0();
 
-    const navigate = useNavigate();
+    const navigate = useNavigate();    
 
-    // Check if user exists in database, then log in the user with auth0
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
+    const handleLogin = () => {
             loginWithPopup().then(async () => {
                 try {
                     const response = await makeAuthenticatedRequest(
                         getAccessTokenSilently,
                         'post',
                         `${import.meta.env.VITE_API_URL}/user/register`,
-                        {},
                         {}
                     );
                     if(response.data.firstTimeLogin === true && response.data.success === true) {
                         navigate('/signup');
                     } else if (response.data.success === true) {
-                        console.log(response);
-                        // navigate('/home');
+                        navigate('/home');
                     } else {
                         setError(error.response.data.message);
                     }
@@ -40,9 +35,7 @@ function LoginForm () {
                 }
                 
             });
-        } catch (error) {
-            console.error('error', error);
-        }
+        
     }
 
     const handleSignUp = () => {
@@ -51,8 +44,8 @@ function LoginForm () {
     }
 
     return (
-    <form className='login-form form' onSubmit={handleLogin}>
-            <button className='login-button' type='submit'>Log in</button>
+        <div className='login-component section'>
+            <button className='login-button' onClick={handleLogin}>Log in</button>
             <button className='forgot-password-button'>Forgot Password?</button>
             <button
             className='new-account-button'
@@ -60,8 +53,8 @@ function LoginForm () {
                     Create New Account
             </button>
             <p className="error-message">{error}</p>
-    </form>
+        </div>
     )
 }
 
-export default LoginForm;
+export default LoginComponent;

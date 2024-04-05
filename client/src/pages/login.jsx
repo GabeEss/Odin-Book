@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import LoginForm from '../features/user/login-form';
+import LoginComponent from '../features/user/login-component';
 
 function LoginPage() {
     const {
@@ -10,25 +9,18 @@ function LoginPage() {
     } = useAuth0();
 
     const navigate = useNavigate();
-    
-    // useEffect(() => {
-    //     if(isAuthenticated)
-    //         navigate('/home');
-    // }, [isAuthenticated]);
 
     const handleHome = () => {
         if(isAuthenticated)
             navigate('/home');
     }
 
-    
-
     return(
         <div className='login-page page'>
             <h1 className='login-heading'>Welcome to Name Book</h1>
             {!isAuthenticated ? 
                 <div className='login-section section'>
-                    <LoginForm/>
+                    <LoginComponent/>
                 </div>
             : 
                 <div className='welcome-section section'>

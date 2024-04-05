@@ -15,10 +15,23 @@ function HomePage () {
         <p>Welcome to the home page!</p>
         { isAuthenticated ? 
         <div>
-            <button className='logout-button' onClick={() => logout({ returnTo: window.location.origin })}>
-                Log out
-            </button>
-            <button className='login-button' onClick={() => nav('/')}>Back to login</button>
+            
+            <div className="home-page page">
+            <div className="header">
+                <div className="header-dropdown">
+                    <div className="dropdown-content">
+                    <button className='logout-nav' onClick={() => logout({ returnTo: window.location.origin })}>
+                        Log out
+                    </button>
+                    <button className='login-nav' onClick={() => nav('/')}>Back to login</button>
+                    <button className='signup-nav' onClick={() => nav('/signup')}>Sign Up</button>
+                    </div>
+                </div>
+            </div>
+            <div className="sidebar-left sidebar"></div>
+            <div className="main-component"></div>
+            <div className="sidebar-right sidebar"></div>
+        </div>
         </div>
          : null
         }

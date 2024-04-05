@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       // Commenting this out will generate an opaque token rather than a JWT
       authorizationParams={{
         audience: import.meta.env.VITE_AUTH_AUDIENCE,
-        scope: "current_user",
+        scope: "current_user openid profile email",
       }}
     >
       <App />

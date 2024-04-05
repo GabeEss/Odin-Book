@@ -9,7 +9,7 @@ export async function makeAuthenticatedRequest(getAccessTokenSilently, method, u
         url,
         data,
         headers: {
-            authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`
         }
     });
 
