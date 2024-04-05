@@ -50,6 +50,7 @@ router.put("/user/friends/remove", user_controller.user_friend_remove);
 router.get("/user/notifications", user_controller.user_notifications_get);
 router.put("/user/notifications/read", user_controller.user_notifications_read);
 router.put("/user/update", user_controller.user_update);
+router.get("/user/update", user_controller.user_update_get);
 router.delete("/user", user_controller.user_delete);
 
 /// GUEST ROUTES ///

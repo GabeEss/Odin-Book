@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+// Get info from a jwt
 const decodeToken = async (authHeader) => {
     if (!authHeader || !authHeader.includes(' ')) {
         throw new Error('Invalid authorization header');

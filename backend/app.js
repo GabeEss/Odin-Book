@@ -40,7 +40,7 @@ const verifyJwt = jwt({
   audience: process.env.AUTH_AUDIENCE,
   issuer: process.env.AUTH_ISSUER,
   algorithms: ['RS256'],
-});
+}).unless({ path: ['/'] });
 
 app.use((req, res, next) => {
   verifyJwt(req, res, (err) => {

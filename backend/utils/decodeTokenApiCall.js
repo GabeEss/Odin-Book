@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-// Get info from an opaque token, call Auth0 API
+// Get info from either an opaque token or an auth0 jwt, calls Auth0 API
 const decodeTokenApi = async (authHeader) => {
     if (!authHeader || !authHeader.includes(' ')) {
         throw new Error('Invalid authorization header');
