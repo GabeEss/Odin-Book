@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const Guest = require("../models/guest");
 const Notification = require("../models/notification");
 const Event = require("../models/event");
 

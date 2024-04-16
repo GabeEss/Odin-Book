@@ -43,6 +43,7 @@ router.put("/notification/:id", notification_controller.notification_update);
 /// USER ROUTES ///
 
 router.post("/user/register", user_controller.user_register_post);
+router.post("/user/guest/register", user_controller.guest_register_post);
 router.get("/user", user_controller.user_detail);
 router.get("/user/friends", user_controller.user_friends_get);
 router.put("/user/friends/add", user_controller.user_friend_add);
@@ -52,10 +53,6 @@ router.put("/user/notifications/read", user_controller.user_notifications_read);
 router.put("/user/update", user_controller.user_update);
 router.get("/user/update", user_controller.user_update_get);
 router.delete("/user", user_controller.user_delete);
-
-/// GUEST ROUTES ///
-
-/// ^^ NOT IMPLEMENTED YET ///
 
 /// EVENT ROUTES ///
 

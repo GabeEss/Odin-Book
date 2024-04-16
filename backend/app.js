@@ -47,7 +47,7 @@ app.use((req, res, next) => {
     if (err && err.name === 'TokenExpiredError') {
       return res.status(401).send('Token expired');
     }
-    console.log('JWT validated');
+    // console.log('JWT validated');
     next();
   });
 });

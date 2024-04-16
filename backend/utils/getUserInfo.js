@@ -1,8 +1,13 @@
 const User = require('../models/user');
 
-// Function to get user info from Mongo using the 'X-User' header
+// Function to get user info from MongoDB
 const getUserInfo = async (userId) => {
-    const mongoUser = await User.findOne({ auth0id: userId }).exec(); // MongoDB user
+    if(!userId) {
+        return null;
+    }
+
+    let mongoUser = await User.findOne({ userId: userId }).exec();
+
     return mongoUser;
 }
 

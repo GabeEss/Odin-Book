@@ -1,7 +1,6 @@
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const User = require("../models/user");
-const Guest = require("../models/guest");
 const Notification = require("../models/notification");
 const Event = require("../models/event");
 
