@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
-import { makeAuthenticatedRequest } from '../auth/makeAuthRequest';
+import { useState, useEffect, useContext } from 'react';
+import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { GuestInitializeContext } from '../guest/guest-initialize-context';
+import { GuestContext } from '../guest/guestid-context';
 
 function SignUpForm () {
     const {
         getAccessTokenSilently,
-        isAuthenticated,
     } = useAuth0();
     const [isLoading, setIsLoading] = useState(true);
+    const { guestInit } = useContext(GuestInitializeContext);
+    const { guest } = useContext(GuestContext);
 
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
@@ -31,14 +34,23 @@ function SignUpForm () {
         }
 
         renderUserInfo();
-    }, [isAuthenticated]);
+    }, []);
 
     const getUserInfo = async () => {
         try {
+            let guestId = "";
+
+            if(guestInit) {
+                guestId = guest;
+            }
+
             const response = await makeAuthenticatedRequest(
                 getAccessTokenSilently,
                 'get',
-                `${import.meta.env.VITE_API_URL}/user/update`
+                `${import.meta.env.VITE_API_URL}/user/update`,
+                {},
+                guestId,
+                guestInit
             );
             if(response.data.success === true) {
                 setPlaceholderUsername(response.data.username);

@@ -1,7 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import Modal from 'react-modal'
 import App from './src/App.jsx'
 import { Auth0Provider } from '@auth0/auth0-react'
+
+Modal.setAppElement('#root');
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

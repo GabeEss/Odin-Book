@@ -1,17 +1,34 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { GuestProvider } from './features/guest/guestid-context';
+import { GuestInitializeProvider } from './features/guest/guest-initialize-context';
+import { useAuth0 } from '@auth0/auth0-react';
+import { default as PR } from './features/auth/protected-route';
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import SignUpPage from './pages/sign-up';
+import LoadingPage from './pages/loading';
+import ErrorPage from './pages/error';
 
 function App() {
+  const { isLoading } = useAuth0();
 
+  if(isLoading) {
+    return <LoadingPage/>
+  }
+
+  // PR stands for Protected Route
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LoginPage/>}/>
-        <Route path='/home' element={<HomePage/>}/>
-        <Route path='/signup' element={<SignUpPage/>}/>
-      </Routes>
+        <GuestProvider>
+          <GuestInitializeProvider>
+            <Routes>
+              <Route path="/" element={<LoginPage/>}/>
+              <Route path='/error' element={<ErrorPage/>}/>
+              <Route path='/home' element={<PR><HomePage/></PR>}/>
+              <Route path='/signup' element={<PR><SignUpPage/></PR>}/>
+            </Routes>
+          </GuestInitializeProvider>
+        </GuestProvider>
     </Router>
   )
 }
