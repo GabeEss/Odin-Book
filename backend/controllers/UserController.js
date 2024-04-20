@@ -7,10 +7,10 @@ const Event = require("../models/event");
 const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
-const decodeToken = require("../utils/decodeToken");
 const decodeTokenApiCall = require("../utils/decodeTokenApiCall");
 const getUserInfo = require("../utils/getUserInfo");
 const determineUserType = require("../utils/determineUserType");
+const searchUserCollection = require("../utils/searchUserCollection");
 
 exports.user_register_post = asyncHandler(async (req, res, next) => {
     try {
@@ -154,6 +154,24 @@ exports.user_detail = asyncHandler(async (req, res, next) => {
         livesIn,
         from,
         signupPrompt: false,
+    })
+});
+
+exports.user_list = asyncHandler(async (req, res, next) => {
+    const mongoUser = await determineUserType(req);
+
+    if(!mongoUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    const users = await searchUserCollection(req.query.search);
+
+    return res.status(200).json({
+        success: true,
+        users,
     })
 });
 

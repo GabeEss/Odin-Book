@@ -45,6 +45,7 @@ router.put("/notification/:id", notification_controller.notification_update);
 router.post("/user/register", user_controller.user_register_post);
 router.post("/user/guest/register", user_controller.guest_register_post);
 router.get("/user", user_controller.user_detail);
+router.get("/users", user_controller.user_list);
 router.get("/user/friends", user_controller.user_friends_get);
 router.put("/user/friends/add", user_controller.user_friend_add);
 router.put("/user/friends/remove", user_controller.user_friend_remove);
@@ -57,7 +58,7 @@ router.delete("/user", user_controller.user_delete);
 /// EVENT ROUTES ///
 
 router.post("/event", event_controller.event_create_post);
-router.get("/event", event_controller.event_list);
+router.get("/events", event_controller.event_list);
 router.get("/event/:id", event_controller.event_detail);
 router.put("/event/:id", event_controller.event_update);
 router.delete("/event/:id", event_controller.event_delete);
