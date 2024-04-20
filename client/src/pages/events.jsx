@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
-function FriendListDisplay() {
+function EventsPage() {
     return(
-        <div>
-
+        <div className='events-page page'>
+            
         </div>
     )
 }
 
-export default FriendListDisplay;
+export default EventsPage;

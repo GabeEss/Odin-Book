@@ -13,6 +13,7 @@ function LoginPage() {
         isAuthenticated,
         getAccessTokenSilently
     } = useAuth0();
+    // const [loading, setLoading] = useState(false);
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const [isRegistered, setIsRegistered] = useState(false);
@@ -39,7 +40,9 @@ function LoginPage() {
                 )
                 if(response.data.success) {
                     setIsRegistered(true);
-                } else logout({ returnTo: window.location.origin });
+                } else { 
+                    logout({ returnTo: window.location.origin });
+                }
             } catch (error) {
                 console.error('error', error);
             }
@@ -55,6 +58,8 @@ function LoginPage() {
             navigate('/home');
         }
     }, [isAuthenticated, isRegistered]);
+
+    // if(loading) return <div>Loading...</div>;
 
     return(
         <div className='login-page page'>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import InfoDisplay from "../features/user/info-display";
+import SearchbarComponent from "../features/searchbar/searchbar-component";
 
 function HomePage () {
     const {
@@ -46,12 +47,14 @@ function HomePage () {
         <div>
             <div className="home-page page">
             <div className="header">
+                <SearchbarComponent/>
                 <div className="header-dropdown">
+                    <button className="friends-nav" onClick={() => nav('friends')}>Friends</button>
                     <div className="dropdown-content">
-                    <button className='logout-nav' onClick={handleLogout}>
-                        Log out
-                    </button>
-                    <button className='signup-nav' onClick={() => nav('/signup')}>Update User</button>
+                        <button className='logout-nav' onClick={handleLogout}>
+                            Log out
+                        </button>
+                        <button className='signup-nav' onClick={() => nav('/signup')}>Update User</button>
                     </div>
                 </div>
             </div>
