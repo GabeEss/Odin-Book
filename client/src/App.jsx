@@ -6,7 +6,7 @@ import { default as PR } from './features/auth/protected-route';
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import SignUpPage from './pages/sign-up';
-import FriendsPage from './pages/friends';
+import UserPage from './pages/user';
 import EventsPage from './pages/events';
 import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
@@ -28,7 +28,7 @@ function App() {
               <Route path='/error' element={<ErrorPage/>}/>
               <Route path='/home' element={<PR><HomePage/></PR>}/>
               <Route path='/signup' element={<PR><SignUpPage/></PR>}/>
-              <Route path='/friends' element={<PR><FriendsPage/></PR>}/>
+              <Route path='/user/:id' element={<PR><UserPage/></PR>}/>
               <Route path='/events' element={<PR><EventsPage/></PR>}/>
             </Routes>
           </GuestInitializeProvider>

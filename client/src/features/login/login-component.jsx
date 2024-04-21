@@ -28,6 +28,9 @@ function LoginComponent () {
                     )
                     if(response.data.success) {
                         console.log(response.data.message);
+                        // If user is logging in for the first time, reload the page to redirect to sign up
+                        if(response.data.firstTimeLogin)
+                            window.location.reload();
                     } else {
                         console.log("Login failed.");
                         setError('Login failed');

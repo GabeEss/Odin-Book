@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import getEvents from './get-events';
 import getUsers from './get-users';
@@ -14,6 +15,7 @@ function SearchbarComponent() {
     const { guestInit } = useContext(GuestInitializeContext);
     const { guest } = useContext(GuestContext);
     const { getAccessTokenSilently } = useAuth0();
+    const navigate = useNavigate();
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -34,7 +36,7 @@ function SearchbarComponent() {
     }
 
     const handleUser = (id) => {
-        console.log('User:', id);
+        navigate(`/user/${id}`);
     }
 
     const handleEvent = (id) => {

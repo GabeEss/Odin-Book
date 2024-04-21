@@ -16,12 +16,13 @@ function LoginPage() {
     // const [loading, setLoading] = useState(false);
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
+    const [sendToSignup, setSendToSignup] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
 
     const navigate = useNavigate();
 
     const handleHome = () => {
-        if(isAuthenticated && isRegistered || guestInit)
+        if(isAuthenticated || guestInit)
             navigate('/home');
     }
 
@@ -39,7 +40,9 @@ function LoginPage() {
                     guestInit
                 )
                 if(response.data.success) {
-                    setIsRegistered(true);
+                    if(response.data.worksAt === '' || response.data.livesIn === '' || response.data.from === '') {
+                        setSendToSignup(true);
+                    } else setIsRegistered(true);
                 } else { 
                     logout({ returnTo: window.location.origin });
                 }
@@ -52,12 +55,16 @@ function LoginPage() {
 }, [isAuthenticated, guestInit]);
 
     // If user is authenticated and registered, navigate to home page
+    // If the user needs information updated, navigate to signup page
     useEffect(() => {
         if(isAuthenticated && isRegistered) {
             setGuestInit(false);
             navigate('/home');
+        } else if(isAuthenticated && sendToSignup) {
+            setGuestInit(false);
+            navigate('/signup');
         }
-    }, [isAuthenticated, isRegistered]);
+    }, [isAuthenticated, isRegistered, sendToSignup]);
 
     // if(loading) return <div>Loading...</div>;
 

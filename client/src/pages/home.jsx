@@ -1,9 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import ReactModal from 'react-modal';
 import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
-import InfoDisplay from "../features/user/info-display";
 import SearchbarComponent from "../features/searchbar/searchbar-component";
 
 function HomePage () {
@@ -12,7 +10,6 @@ function HomePage () {
         isAuthenticated,
     } = useAuth0();
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
-    const [showSignupPrompt, setShowSignupPrompt] = useState(false); // show signup prompt
     
     const nav = useNavigate();
 
@@ -29,18 +26,6 @@ function HomePage () {
     
     return(
     <div className="home-page page">
-        <ReactModal
-        isOpen={showSignupPrompt}
-        onRequestClose={() => setShowSignupPrompt(false)}
-        >
-        <h2>User Update Prompt</h2>
-        <p>Some of your information is not up to date. Would you like to update your information?</p>
-        <button onClick={() => {
-            setShowSignupPrompt(false);
-            nav('/signup');
-        }}>Yes</button>
-        <button onClick={() => setShowSignupPrompt(false)}>No, thanks</button>
-        </ReactModal>
         <h1>Home Page</h1>
         { guestInit ? <p>Guest user initialized</p> : null}
         { isAuthenticated || guestInit ? 
@@ -60,7 +45,6 @@ function HomePage () {
             </div>
             <div className="sidebar-left sidebar">
                 <div className="sidebar-content">
-                    <InfoDisplay setShowSignupPrompt={setShowSignupPrompt}/>
                 </div>
             </div>
             <div className="main-component"></div>

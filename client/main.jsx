@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import Modal from 'react-modal'
 import App from './src/App.jsx'
 import { Auth0Provider } from '@auth0/auth0-react'
+import './src/styles/index.css'
 
 Modal.setAppElement('#root');
 

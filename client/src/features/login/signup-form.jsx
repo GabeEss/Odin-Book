@@ -23,20 +23,22 @@ function SignUpForm () {
     const [placeholderWorksAt, setPlaceholderWorksAt] = useState('Works At');
     const [placeholderLivesIn, setPlaceholderLivesIn] = useState('Lives In');
     const [placeholderFrom, setPlaceholderFrom] = useState('From');
+    const [displayColor, setDisplayColor] = useState('blue');
+    const [coverColor, setCoverColor] = useState('yellow');
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const renderUserInfo = async () => {
             setIsLoading(true);
-            await getUserInfo();
+            await getCurrentUserInfo();
             setIsLoading(false);
         }
 
         renderUserInfo();
     }, []);
 
-    const getUserInfo = async () => {
+    const getCurrentUserInfo = async () => {
         try {
             let guestId = "";
 
@@ -57,6 +59,8 @@ function SignUpForm () {
                 setPlaceholderWorksAt(response.data.worksAt);
                 setPlaceholderLivesIn(response.data.livesIn);
                 setPlaceholderFrom(response.data.from);
+                setDisplayColor(response.data.displayColor);
+                setCoverColor(response.data.coverColor);
             }
         } catch (error) {
             console.log(error.response.data.message);
@@ -74,7 +78,9 @@ function SignUpForm () {
                         username,
                         worksAt,
                         livesIn,
-                        from
+                        from,
+                        displayColor,
+                        coverColor
                     }
                 );
                 if(response.data.success === true) {
@@ -130,6 +136,26 @@ function SignUpForm () {
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
                 />
+            </label>
+            <label>
+                Profile Color:
+                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value)}>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="red">Red</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="purple">Purple</option>
+                </select>
+            </label>
+            <label>
+                Cover Color:
+                <select value={coverColor} onChange={(e) => setCoverColor(e.target.value)}>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="red">Red</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="purple">Purple</option>
+                </select>
             </label>
                 <button className='signup-button' type='submit'>Sign Up</button>
                 <button className='skip-button' onClick={handleSkip}>Skip</button>
