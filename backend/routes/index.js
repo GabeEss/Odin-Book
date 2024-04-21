@@ -46,6 +46,7 @@ router.post("/user/register", user_controller.user_register_post);
 router.post("/user/guest/register", user_controller.guest_register_post);
 router.get("/user", user_controller.user_detail);
 router.get("/users", user_controller.user_list);
+router.get("/users/:id", user_controller.user_find_by_id);
 router.get("/user/friends", user_controller.user_friends_get);
 router.put("/user/friends/add", user_controller.user_friend_add);
 router.put("/user/friends/remove", user_controller.user_friend_remove);

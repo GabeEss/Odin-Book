@@ -32,6 +32,16 @@ const UserSchema = new Schema({
         type: String,
         maxLength: 64
     },
+    displayColor: {
+        type: String,
+        enum: ['blue', 'red', 'green', 'yellow', 'purple',],
+        default: "blue"
+    },
+    coverColor: {
+        type: String,
+        enum: ['blue', 'red', 'green', 'yellow', 'purple',],
+        default: "yellow"
+    },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
     sentRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],

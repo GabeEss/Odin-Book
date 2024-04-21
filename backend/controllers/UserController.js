@@ -43,6 +43,8 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
                 worksAt: "",
                 livesIn: "",
                 from: "",
+                displayColor: "blue",
+                coverColor: "yellow",
                 friends: [],
                 friendRequests: [],
                 sentRequests: [],
@@ -102,6 +104,8 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
     //         worksAt: "Guest Factory",
     //         livesIn: "Guestro City, Guestland",
     //         from: "Guestville, Guestland",
+    //         displayColor: "green",
+    //         coverColor: "purple",
     //         friends: [],
     //         friendRequests: [],
     //         sentRequests: [],
@@ -123,8 +127,10 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.user_detail = asyncHandler(async (req, res, next) => {
-    const mongoUser = await determineUserType(req);
+    // Check current user first
+    let mongoUser = await determineUserType(req);
 
+    // Make sure the request is coming from a user
     if(!mongoUser) {
         return res.status(404).json({
             success: false,
@@ -136,24 +142,48 @@ exports.user_detail = asyncHandler(async (req, res, next) => {
     const worksAt = mongoUser.worksAt;
     const livesIn = mongoUser.livesIn;
     const from = mongoUser.from;
+    const displayColor = mongoUser.displayColor;
+    const coverColor = mongoUser.coverColor;
 
-    if(!worksAt || !livesIn || !from) {
-        return res.status(200).json({
-            success: true,
-            username,
-            worksAt,
-            livesIn,
-            from,
-            signupPrompt: true,
-        })
-    }
     return res.status(200).json({
         success: true,
         username,
         worksAt,
         livesIn,
         from,
-        signupPrompt: false,
+        displayColor,
+        coverColor,
+    })
+});
+
+exports.user_find_by_id = asyncHandler(async (req, res, next) => {
+    // Find user through the url parameter
+    if(!req.params.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    const mongoUser = await User.findOne({_id: req.params.id}).exec();
+
+    const username = mongoUser.username;
+    const worksAt = mongoUser.worksAt;
+    const livesIn = mongoUser.livesIn;
+    const from = mongoUser.from;
+    const displayColor = mongoUser.displayColor;
+    const coverColor = mongoUser.coverColor;
+    const friends = mongoUser.friends;
+
+    return res.status(200).json({
+        success: true,
+        username,
+        worksAt,
+        livesIn,
+        from,
+        displayColor,
+        coverColor,
+        friends,
     })
 });
 
@@ -208,6 +238,8 @@ exports.user_update_get = asyncHandler(async (req, res, next) => {
     const worksAt = mongoUser.worksAt;
     const livesIn = mongoUser.livesIn;
     const from = mongoUser.from;
+    const displayColor = mongoUser.displayColor;
+    const coverColor = mongoUser.coverColor;
 
     return res.status(200).json({
         success: true,
@@ -215,8 +247,10 @@ exports.user_update_get = asyncHandler(async (req, res, next) => {
         worksAt,
         livesIn,
         from,
+        displayColor,
+        coverColor,
     })
-})
+});
 
 exports.user_update = asyncHandler(async (req, res, next) => {
     const mongoUser = await determineUserType(req);
@@ -228,7 +262,7 @@ exports.user_update = asyncHandler(async (req, res, next) => {
         })
     }
 
-    let { username, worksAt, livesIn, from } = req.body;
+    let { username, worksAt, livesIn, from, displayColor, coverColor } = req.body;
 
     // Don't allow empty strings to replace existing values
     if(username === "") {
@@ -247,8 +281,25 @@ exports.user_update = asyncHandler(async (req, res, next) => {
         from = mongoUser.from;
     }
 
+    const colorOptions = ["blue", "green", "red", "yellow", "purple"];
+
+    // Make sure the color is a valid option
+    if(!colorOptions.includes(displayColor)) {
+        displayColor = mongoUser.displayColor;
+    }
+
+    if(!colorOptions.includes(coverColor)) {
+        coverColor = mongoUser.coverColor;
+    }
+
     try {
-        await User.findOneAndUpdate({userId: mongoUser.userId}, {username, worksAt, livesIn, from}).exec();
+        await User.findOneAndUpdate({userId: mongoUser.userId}, {
+            username,
+            worksAt,
+            livesIn,
+            from,
+            displayColor,
+            coverColor}).exec();
 
         return res.status(200).json({
             success: true,
