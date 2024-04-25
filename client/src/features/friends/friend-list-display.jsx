@@ -1,10 +1,25 @@
-import { useState, useEffect, useContext } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom'; ;
 
-function FriendListDisplay() {
+function FriendListDisplay({friends}) {
+    const navigate = useNavigate();
+
     return(
-        <div>
-
+        <div className='friend-list'>
+            <h2>Friends</h2>
+            {friends && friends.length === 0 ? <p>No friends found</p>
+            :
+                friends.map((friend) => {
+                    return (
+                        <button 
+                            key={friend._id} 
+                            className='user-nav friend-list-item'
+                            onClick={() => navigate(`/user/${friend._id}`)}
+                            >
+                            <p>{friend.username}</p>
+                        </button>
+                    )
+                })
+            }
         </div>
     )
 }

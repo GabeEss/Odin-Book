@@ -34,7 +34,9 @@ function HomePage () {
             <div className="header">
                 <SearchbarComponent/>
                 <div className="header-dropdown">
-                    <button className="friends-nav" onClick={() => nav('friends')}>Friends</button>
+                    <button className="friends-nav">Friends</button>
+                    <button className="events-nav">Events</button>
+                    <button className="notifications-nav">Notifications</button>
                     <div className="dropdown-content">
                         <button className='logout-nav' onClick={handleLogout}>
                             Log out

@@ -3,10 +3,12 @@ import { GuestProvider } from './features/guest/guestid-context';
 import { GuestInitializeProvider } from './features/guest/guest-initialize-context';
 import { useAuth0 } from '@auth0/auth0-react';
 import { default as PR } from './features/auth/protected-route';
+
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import SignUpPage from './pages/sign-up';
 import UserPage from './pages/user';
+import FriendsPage from './pages/friends';
 import EventsPage from './pages/events';
 import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
@@ -18,7 +20,6 @@ function App() {
     return <LoadingPage/>
   }
 
-  // PR stands for Protected Route
   return (
     <Router>
         <GuestProvider>
@@ -30,6 +31,7 @@ function App() {
               <Route path='/signup' element={<PR><SignUpPage/></PR>}/>
               <Route path='/user/:id' element={<PR><UserPage/></PR>}/>
               <Route path='/events' element={<PR><EventsPage/></PR>}/>
+              <Route path='/friends' element={<PR><FriendsPage/></PR>}/>
             </Routes>
           </GuestInitializeProvider>
         </GuestProvider>

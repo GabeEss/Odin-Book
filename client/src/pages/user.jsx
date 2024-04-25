@@ -8,6 +8,7 @@ import getUserProfile from "../features/user/get-user-profile";
 import InfoDisplay from '../features/user/info-display';
 import ProfileDisplay from '../features/user/profile-display';
 import CoverDisplay from '../features/user/cover-display';
+import UserOptions from '../features/user/user-options-component';
 
 function UserPage() {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -15,8 +16,10 @@ function UserPage() {
     const { guestInit } = useContext(GuestInitializeContext);
     const { guest } = useContext(GuestContext);
     const [user, setUser] = useState('');
+    const [self, setSelf] = useState(false);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [friendChange, setFriendChange] = useState(false);
 
     const navigate = useNavigate();
 
@@ -38,6 +41,7 @@ function UserPage() {
                         guestInit
                     );
                     if(userInfo.success) {
+                        setSelf(userInfo.self);
                         setUser(userInfo);
                     }
                 }
@@ -49,7 +53,7 @@ function UserPage() {
             setError('Failed to fetch user information');
             setLoading(false);
         }
-    }, []);
+    }, [friendChange]);
 
     if(loading) {
         return(
@@ -61,6 +65,7 @@ function UserPage() {
 
     return(
         <div className='user-page page'>
+            {self ? <p>This is your profile</p> : null}
             {error ? <p>{error}</p> : null}
             <div className='profile-header'>
                 <div className='cover-background'>
@@ -69,9 +74,15 @@ function UserPage() {
                 <div className='cover-foreground'>
                     <ProfileDisplay user={user}/>
                     <div className ="user-buttons">
-                        <button>Send message</button>
-                        <button>Send friend request</button>
-                        <button>Options</button>
+                        {self ? <button>Current User Options Go Here</button> :
+                         <UserOptions 
+                            id={id} 
+                            sentRequest={user.sentRequest} 
+                            receivedRequest={user.receivedRequest} 
+                            isFriend={user.isFriend}
+                            setFriendChange={setFriendChange}
+                            friendChange={friendChange}
+                        />}
                         <button onClick={handleHome}>Home</button>
                     </div>
                 </div>

@@ -1,10 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+
 import LoginComponent from '../features/login/login-component';
 import CreateGuestComponent from '../features/guest/create-guest-component';
+
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
 import { GuestContext } from '../features/guest/guestid-context';
+
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 
 function LoginPage() {
