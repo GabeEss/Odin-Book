@@ -144,39 +144,11 @@ exports.user_detail = asyncHandler(async (req, res, next) => {
     const from = mongoUser.from;
     const displayColor = mongoUser.displayColor;
     const coverColor = mongoUser.coverColor;
-
-    return res.status(200).json({
-        success: true,
-        username,
-        worksAt,
-        livesIn,
-        from,
-        displayColor,
-        coverColor,
-    })
-});
-
-exports.user_find_by_id = asyncHandler(async (req, res, next) => {
-    // Find user through the url parameter
-    if(!req.params.id) {
-        return res.status(400).json({
-            success: false,
-            message: 'No user ID provided',
-        })
-    }
-
-    const mongoUser = await User.findOne({_id: req.params.id}).exec();
-
-    const username = mongoUser.username;
-    const worksAt = mongoUser.worksAt;
-    const livesIn = mongoUser.livesIn;
-    const from = mongoUser.from;
-    const displayColor = mongoUser.displayColor;
-    const coverColor = mongoUser.coverColor;
     const friends = mongoUser.friends;
 
     return res.status(200).json({
         success: true,
+        self: true,
         username,
         worksAt,
         livesIn,
@@ -184,6 +156,65 @@ exports.user_find_by_id = asyncHandler(async (req, res, next) => {
         displayColor,
         coverColor,
         friends,
+    })
+});
+
+exports.user_find_by_id = asyncHandler(async (req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    // If no user ID is provided in the url
+    if(!req.params.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    // User being viewed
+    const mongoUser = await User.findOne({_id: req.params.id}).exec();
+
+    let self = false;
+
+    let isFriend = false;
+    let sentRequest = false;
+    let receivedRequest = false;
+
+    // Check if the user being viewed is the current user
+    if(mongoUser._id.toString() === currentUser._id.toString()) {
+        self = true;
+    } else {
+        // Determine if the user being viewed is a friend, has sent a request, or has received a request
+        isFriend = currentUser.friends.includes(mongoUser._id);
+        sentRequest = currentUser.sentRequests.includes(mongoUser._id);
+        receivedRequest = currentUser.friendRequests.includes(mongoUser._id);
+    }
+
+    const username = mongoUser.username;
+    const worksAt = mongoUser.worksAt;
+    const livesIn = mongoUser.livesIn;
+    const from = mongoUser.from;
+    const displayColor = mongoUser.displayColor;
+    const coverColor = mongoUser.coverColor;
+
+    return res.status(200).json({
+        success: true,
+        self,
+        username,
+        worksAt,
+        livesIn,
+        from,
+        displayColor,
+        coverColor,
+        isFriend,
+        sentRequest,
+        receivedRequest,
     })
 });
 
@@ -206,16 +237,241 @@ exports.user_list = asyncHandler(async (req, res, next) => {
 });
 
 exports.user_friends_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User friends get");
+    const mongoUser = await determineUserType(req);
+
+    if(!mongoUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    const friends = mongoUser.friends;
+    const friendRequests = mongoUser.friendRequests;
+    const sentRequests = mongoUser.sentRequests;
+
+    return res.status(200).json({
+        success: true,
+        friends,
+        friendRequests,
+        sentRequests,
+    })
 });
 
-exports.user_friend_add = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User friend add");
+exports.user_friend_request = asyncHandler(async (req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    // If no user ID is provided in the url
+    if(!req.body.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    // User being requested
+    const requestedUser = await User.findOne({_id: req.body.id}).exec();
+
+    // Check if the user is already friends
+    if(currentUser.friends.includes(requestedUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Already friends',
+        })
+    }
+
+    // Check if the current user has already sent a request
+    if(currentUser.sentRequests.includes(requestedUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Request already sent',
+        })
+    }
+
+    // Check if the current user has already received a request from the other user
+    if(currentUser.friendRequests.includes(requestedUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Request already received by the other user. Need to reject or accept request.',
+        })
+    }
+
+    requestedUser.friendRequests.push(currentUser._id);
+    currentUser.sentRequests.push(requestedUser._id);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const options = { session, new: true }; // return modified document instead of original
+        await User.findOneAndUpdate({_id: currentUser._id}, {sentRequests: currentUser.sentRequests}, options).exec();
+        await User.findOneAndUpdate({_id: requestedUser._id}, {friendRequests: requestedUser.friendRequests}, options).exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Friend request sent successfully',
+        })
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error sending friend request',
+        })
+    }
 });
 
-exports.user_friend_remove = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User friend remove");
+exports.user_friend_accept = asyncHandler(async (req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found'
+        })
+    }
+
+    if(!req.body.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    const requestingUser = await User.findOne({_id: req.body.id}).exec();
+
+    // Check if the user is already friends
+    if(currentUser.friends.includes(requestingUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Already friends',
+        })
+    }
+
+    // Check if the current user was the one who sent the request
+    if(currentUser.sentRequests.includes(requestingUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Request sent by the user. Request cannot be accepted.',
+        })
+    }
+
+    requestingUser.sentRequests.pull(currentUser._id);
+    currentUser.friendRequests.pull(requestingUser._id);
+    requestingUser.friends.push(currentUser._id);
+    currentUser.friends.push(requestingUser._id);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const options = { session, new: true }; // return modified document instead of original
+        await User.findOneAndUpdate({_id: requestingUser._id}, {sentRequests: requestingUser.sentRequests, friends: requestingUser.friends}, options).exec();
+        await User.findOneAndUpdate({_id: currentUser._id}, {friendRequests: currentUser.friendRequests, friends: currentUser.friends}, options).exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Friend request accepted successfully',
+        })
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error accepting friend request',
+        })
+    }
 });
+
+exports.user_friend_reject = asyncHandler(async (req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    // If no user ID is provided in the url
+    if(!req.body.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    // User requesting to become friends with the current user
+    const requestingUser = await User.findOne({_id: req.body.id}).exec();
+
+    // Check if the user is already friends
+    if(currentUser.friends.includes(requestingUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Already friends, choose remove friend option instead.',
+        })
+    }
+
+    // Check if the current user has already sent a request
+    if(currentUser.sentRequests.includes(requestingUser._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Request was sent by current user. Request cannot be rejected.',
+        })
+    }
+
+    requestingUser.sentRequests.pull(currentUser._id);
+    currentUser.friendRequests.pull(requestingUser._id);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const options = { session, new: true }; // return modified document instead of original
+        await User.findOneAndUpdate({_id: requestingUser._id}, {sentRequests: requestingUser.sentRequests}, options).exec();
+        await User.findOneAndUpdate({_id: currentUser._id}, {friendRequests: currentUser.friendRequests}, options).exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Friend request rejected successfully',
+        })
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error rejecting friend request',
+        })
+    }
+});
+
+// Remove a user as a friend
+exports.user_remove = asyncHandler(async (req, res, next) => {
+    res.send("NOT IMPLEMENTED: User remove as friend");
+});
+
+// Block a user for the current user
+exports.user_block = asyncHandler(async(req, res, next) => {
+    res.send("NOT IMPLEMENTED: User block");
+})
 
 exports.user_notifications_get = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: User notifications get");
