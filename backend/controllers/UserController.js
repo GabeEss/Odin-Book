@@ -237,7 +237,7 @@ exports.user_list = asyncHandler(async (req, res, next) => {
 });
 
 exports.user_friends_get = asyncHandler(async (req, res, next) => {
-    const mongoUser = await determineUserType(req);
+    let mongoUser = await determineUserType(req);
 
     if(!mongoUser) {
         return res.status(404).json({
@@ -245,6 +245,11 @@ exports.user_friends_get = asyncHandler(async (req, res, next) => {
             message: 'User not found',
         })
     }
+
+    mongoUser = await User.findById(mongoUser._id)
+                           .populate('friends', 'username displayColor')
+                           .populate('friendRequests', 'username displayColor')
+                           .exec();
 
     const friends = mongoUser.friends;
     const friendRequests = mongoUser.friendRequests;
