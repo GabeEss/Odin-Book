@@ -1,3 +1,4 @@
+import RemoveFriendComponent from "../friends/remove-friend-component";
 import SendFriendRequest from "../friends/send-friend-request-component";
 import HandleRequestComponent from "../friends/handle-request-component";
 
@@ -5,7 +6,10 @@ function UserOptions({id, sentRequest, receivedRequest, isFriend, setFriendChang
     return (
         <div>
             <button>Send message</button>
-            {isFriend ? <button>Unfriend</button> : 
+            {isFriend ? <RemoveFriendComponent
+                id={id}
+                setFriendChange={setFriendChange}
+                friendChange={friendChange}/> : 
             sentRequest ? <p>Friend request sent</p> : 
             receivedRequest ? 
             <HandleRequestComponent

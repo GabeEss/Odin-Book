@@ -1,13 +1,6 @@
-import { useContext } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
-import { GuestInitializeContext } from '../guest/guest-initialize-context';
-import { GuestContext } from '../guest/guestid-context';
+import HandleRequestComponent from './handle-request-component';
 
 function FriendRequestList({friendRequests, setGetRequests, getRequests}) {
-    const { getAccessTokenSilently } = useAuth0();
-    const { guestInit } = useContext(GuestInitializeContext);
-    const { guest } = useContext(GuestContext);
 
     return(
         <div className="friend-request-list">
@@ -19,6 +12,11 @@ function FriendRequestList({friendRequests, setGetRequests, getRequests}) {
                         <div key={request._id}>
                             {/* {request.displayColor} */}
                             {request.username}
+                            <HandleRequestComponent 
+                                id={request}
+                                setFriendChange={setGetRequests}
+                                friendChange={getRequests}
+                            />
                         </div>
                     )
                 })}
