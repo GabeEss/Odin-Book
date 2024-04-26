@@ -15,7 +15,8 @@ function FriendListDisplay({friends}) {
                             className='user-nav friend-list-item'
                             onClick={() => navigate(`/user/${friend._id}`)}
                             >
-                            <p>{friend.username}</p>
+                            {/* {friend.displayColor} */}
+                            {friend.username}
                         </button>
                     )
                 })

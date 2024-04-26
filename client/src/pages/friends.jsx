@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect, useContext } from "react";
+import {useNavigate} from 'react-router-dom';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
 import { makeAuthenticatedRequest } from "../features/auth/make-authenticated-request";
@@ -13,6 +14,8 @@ function FriendsPage() {
     const { getAccessTokenSilently } = useAuth0();
     const { guestInit } = useContext(GuestInitializeContext);
     const { guest } = useContext(GuestContext);
+
+    const nav = useNavigate();
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -34,7 +37,12 @@ function FriendsPage() {
             }
         }
         fetchFriends();
-    }, [friends, friendRequests, getRequests]);
+    }, [getRequests]);
+
+    const handleHome = () => {
+        nav('/home');
+    }
+
 
   return (
     <div>
@@ -45,6 +53,9 @@ function FriendsPage() {
         />
         <br />
         <FriendListDisplay friends={friends} />
+        <br />
+        <br />
+        <button onClick={handleHome}>Home</button>
     </div>
   );
 }
