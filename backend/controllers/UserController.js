@@ -470,10 +470,65 @@ exports.user_friend_reject = asyncHandler(async (req, res, next) => {
 
 // Remove a user as a friend
 exports.user_remove = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User remove as friend");
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    // If no user ID is provided in the url
+    if(!req.body.id) {
+        return res.status(400).json({
+            success: false,
+            message: 'No user ID provided',
+        })
+    }
+
+    const userToRemove = await User.findOne({_id: req.body.id}).exec();
+
+    // Check if the user is already friends
+    if(!currentUser.friends.includes(userToRemove._id)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Users are not friends',
+        })
+    }
+
+    userToRemove.friends.pull(currentUser._id);
+    currentUser.friends.pull(userToRemove._id);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const options = { session, new: true }; // return modified document instead of original
+        await User.findOneAndUpdate({_id: userToRemove._id}, {friends: userToRemove.friends}, options).exec();
+        await User.findOneAndUpdate({_id: currentUser._id}, {friends: currentUser.friends}, options).exec();
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Friend removed successfully',
+        })
+    }
+    catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error removing friend',
+        })
+    }
 });
 
 // Block a user for the current user
+// Might be too much scope creep for this project
 exports.user_block = asyncHandler(async(req, res, next) => {
     res.send("NOT IMPLEMENTED: User block");
 })
