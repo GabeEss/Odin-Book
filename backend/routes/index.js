@@ -63,8 +63,11 @@ router.delete("/user", user_controller.user_delete);
 
 router.post("/event", event_controller.event_create_post);
 router.get("/events", event_controller.event_list);
+router.get("/events/all", event_controller.event_list_all);
 router.get("/event/:id", event_controller.event_detail);
 router.put("/event/:id", event_controller.event_update);
 router.delete("/event/:id", event_controller.event_delete);
+router.put("/event/:id/join", event_controller.event_join);
+router.put("/event/:id/leave", event_controller.event_leave);
 
 module.exports = router;
