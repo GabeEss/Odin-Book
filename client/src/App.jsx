@@ -9,6 +9,7 @@ import HomePage from './pages/home';
 import SignUpPage from './pages/sign-up';
 import UserPage from './pages/user';
 import FriendsPage from './pages/friends';
+import EventPage from './pages/event';
 import EventsPage from './pages/events';
 import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
@@ -30,6 +31,7 @@ function App() {
               <Route path='/home' element={<PR><HomePage/></PR>}/>
               <Route path='/signup' element={<PR><SignUpPage/></PR>}/>
               <Route path='/user/:id' element={<PR><UserPage/></PR>}/>
+              <Route path='/event/:id' element={<PR><EventPage/></PR>}/>
               <Route path='/events' element={<PR><EventsPage/></PR>}/>
               <Route path='/friends' element={<PR><FriendsPage/></PR>}/>
             </Routes>

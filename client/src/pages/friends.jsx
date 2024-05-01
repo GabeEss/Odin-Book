@@ -45,7 +45,7 @@ function FriendsPage() {
 
 
   return (
-    <div>
+    <div className="friends-page page">
         <FriendRequestList 
             friendRequests={friendRequests} 
             setGetRequests={setGetRequests} 

@@ -27,6 +27,10 @@ function HomePage () {
     const handleFriends = () => {
         nav('/friends');
     }
+
+    const handleEvents = () => {
+        nav('/events');
+    }
     
     return(
     <div className="home-page page">
@@ -39,7 +43,7 @@ function HomePage () {
                 <SearchbarComponent/>
                 <div className="header-dropdown">
                     <button className="friends-nav" onClick={handleFriends}>Friends</button>
-                    <button className="events-nav">Events</button>
+                    <button className="events-nav" onClick={handleEvents}>Events</button>
                     <button className="notifications-nav">Notifications</button>
                     <div className="dropdown-content">
                         <button className='logout-nav' onClick={handleLogout}>

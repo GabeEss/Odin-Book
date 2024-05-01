@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children }) => {
         if (isAuthenticated && guestInit === true) {
             setGuestInit(false);
         }
-    }, [isAuthenticated, guestInit]);
+    }, [isAuthenticated]);
 
     // If checking backend connection or auth0, display loading page
     if (isCheckingConnection || isLoading) {
