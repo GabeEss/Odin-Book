@@ -1,6 +1,7 @@
 import OwnerOptionsComponent from './owner-options-component';
 import JoinEventComponent from './join-event-component';
 import LeaveEventComponent from './leave-event-component';
+import AttendanceDisplayContainer from './attendance-display-container';
 
 function EventDisplay({ event, isOwner, isMember, setGetEvent, getEvent }) {
     return(
@@ -12,9 +13,8 @@ function EventDisplay({ event, isOwner, isMember, setGetEvent, getEvent }) {
             <p>Description: {event.description}</p>
             <p>Date: {new Date(event.date).toISOString().split('T')[0]} at {event.time}</p>
             <p>Location: {event.location}</p>
-            {event.members.map((member) => (
-                <p key={member._id}>{member.username}</p>
-            ))}
+            {isMember ? <AttendanceDisplayContainer event={event} setGetEvent={setGetEvent} getEvent={getEvent} isOwner={isOwner}/> :
+            null }
         </div>
     )
 }
