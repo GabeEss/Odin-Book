@@ -37,8 +37,15 @@ const EventSchema = new Schema({
     },
     members: {
         type: [{
+            user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
+            },
+            status: {
+                type: String,
+                enum: ['going', 'notGoing', 'maybe', 'pending'],
+                default: 'pending',
+            },
         }],
         required: true,
     },

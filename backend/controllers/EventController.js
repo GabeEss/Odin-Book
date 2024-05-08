@@ -27,7 +27,10 @@ exports.event_create_post = asyncHandler(async (req, res, next) => {
         time,
         location,
         description,
-        members: [mongoUser._id],
+        members: [{
+            user: mongoUser._id,
+            status: 'going',
+        }],
     });
 
     const savedEvent = await newEvent.save();
@@ -48,7 +51,9 @@ exports.event_detail = asyncHandler(async (req, res, next) => {
         })
     }
 
-    const event = await Event.findById(req.params.id).populate('members', 'username displayColor').exec();
+    const event = await Event.findById(req.params.id)
+    .populate('members.user', 'username displayColor')
+    .exec();
 
     if(!event) {
         return res.status(404).json({
@@ -76,7 +81,7 @@ exports.event_detail = asyncHandler(async (req, res, next) => {
 
     isMember = await Event.findOne({
         _id: event._id,
-        'members': mongoUser._id
+        'members.user': mongoUser._id.toString(),
     });
 
     if(isMember) {
@@ -119,7 +124,7 @@ exports.event_list_all = asyncHandler(async (req, res, next) => {
         })
     }
 
-    const events = await Event.find({}).populate('members', 'username displayColor').exec();
+    const events = await Event.find({}).populate('members.user', 'username displayColor').exec();
 
     return res.status(200).json({
         success: true,
@@ -156,10 +161,12 @@ exports.event_update = asyncHandler(async (req, res, next) => {
     let { event, date, time, location, description, members } = req.body;
 
     // Remove the owner from the members to be removed
-    const filteredMembers = members.filter(member => member !== mongoUser._id.toString());
+    const filteredMembers = members.filter(member => member.user !== mongoUser._id.toString());
 
     // Create an array with the members that are not in the filteredMembers array
-    const newMembers = currentEvent.members.filter(member => !filteredMembers.includes(member.toString()));
+    const newMembers = currentEvent.members.filter(member => 
+        !filteredMembers.some(filteredMember => filteredMember.user === member.user.toString())
+    );
 
     // Don't allow empty strings to replace existing values
     if(event === "") {
@@ -264,14 +271,14 @@ exports.event_join = asyncHandler(async (req, res, next) => {
         })
     }
 
-    if(event.members.includes(mongoUser._id)) {
+    if(event.members.some(member => member.user.toString() === mongoUser._id.toString())) {
         return res.status(400).json({
             success: false,
             message: 'User is already a member of this event',
         })
     }
 
-    event.members.push(mongoUser._id);
+    event.members.push({user: mongoUser._id, status: 'pending'});
 
     await event.save();
 
@@ -300,19 +307,67 @@ exports.event_leave = asyncHandler(async (req, res, next) => {
         })
     }
 
-    if(!event.members.includes(mongoUser._id)) {
+    if(!event.members.some(member => member.user.toString() === mongoUser._id.toString())) {
         return res.status(400).json({
             success: false,
             message: 'User is not a member of this event',
         })
     }
 
-    event.members = event.members.filter(member => member.toString() !== mongoUser._id.toString());
+    // Remove the user from the members array
+    event.members = event.members.filter(member => member.user.toString() !== mongoUser._id.toString());
 
     await event.save();
 
     return res.status(200).json({
         success: true,
         message: 'User left event',
+    })
+});
+
+exports.event_respond = asyncHandler(async (req, res, next) => {
+    const mongoUser = await determineUserType(req);
+
+    if(!mongoUser) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        })
+    }
+
+    const event = await Event.findById(req.params.id).exec();
+
+    if(!event) {
+        return res.status(404).json({
+            success: false,
+            message: 'Event not found',
+        })
+    }
+
+    const { attendanceResponse: status } = req.body;
+    
+    if(!status) {
+        return res.status(400).json({
+            success: false,
+            message: 'Status is required',
+        })
+    }
+
+    const member = event.members.find(member => member.user.toString() === mongoUser._id.toString());
+
+    if(!member) {
+        return res.status(400).json({
+            success: false,
+            message: 'User is not a member of this event',
+        })
+    }
+
+    member.status = status;
+
+    await event.save();
+
+    return res.status(200).json({
+        success: true,
+        message: 'User responded to event',
     })
 });

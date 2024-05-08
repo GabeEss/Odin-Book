@@ -69,5 +69,6 @@ router.put("/event/:id", event_controller.event_update);
 router.delete("/event/:id", event_controller.event_delete);
 router.put("/event/:id/join", event_controller.event_join);
 router.put("/event/:id/leave", event_controller.event_leave);
+router.put("/event/:id/respond", event_controller.event_respond);
 
 module.exports = router;
