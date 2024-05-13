@@ -5,7 +5,7 @@ import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
 import { GuestContext } from "../guest/guestid-context";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 
-function AttendanceResponeComponent({setGetEvent, getEvent}) {
+function AttendanceResponeComponent({event, setGetEvent, getEvent}) {
     const { guest } = useContext(GuestContext);
     const { guestInit } = useContext(GuestInitializeContext);
     const { getAccessTokenSilently } = useAuth0();

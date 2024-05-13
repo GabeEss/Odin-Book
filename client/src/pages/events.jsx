@@ -31,7 +31,7 @@ function EventsPage() {
                 if(response.data.success) {
                     setEvents(response.data.events);
                     setLoading(false);
-                }
+                } else console.log(response.data.message);
             } catch (error) {
                 console.error('error', error);
             }

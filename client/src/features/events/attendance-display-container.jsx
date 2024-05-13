@@ -9,6 +9,7 @@ function AttendanceDisplayContainer({event, setGetEvent, getEvent, isOwner}) {
     return(
         <div className='attendance-display-container'>
             {isOwner ? null : <AttendanceResponseComponent
+                event={event}
                 setGetEvent={setGetEvent}
                 getEvent={getEvent}
             />}

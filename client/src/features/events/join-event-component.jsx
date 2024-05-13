@@ -26,7 +26,7 @@ function JoinEventComponent({setGetEvent, getEvent}) {
                 console.log('Event joined successfully');
                 setGetEvent(!getEvent);
             } else {
-                console.error(response.data.message);
+                console.log(response.data.message);
             }
         } catch (error) {
             console.error('error', error);

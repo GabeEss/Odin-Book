@@ -22,7 +22,7 @@ function HandleRequestComponent({ id, setFriendChange, friendChange }) {
             if (response.data.success) {
                 setFriendChange(!friendChange);
                 console.log("Friend request accepted.");
-            }
+            } else console.log(response.data.message);
         } catch (error) {
             console.error('error', error);
         }

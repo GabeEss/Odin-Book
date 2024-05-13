@@ -27,7 +27,7 @@ function DeleteEventComponent() {
                 console.log('Event deleted successfully');
                 nav('/home');
             } else {
-                console.error(response.data.message);
+                console.log(response.data.message);
             }
         } catch (error) {
             console.error('error', error);

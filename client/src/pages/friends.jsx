@@ -31,7 +31,7 @@ function FriendsPage() {
                 if(response.data.success) {
                     setFriends(response.data.friends);
                     setFriendRequests(response.data.friendRequests);
-                }
+                } else console.log(response.data.message);
             } catch (error) {
                 console.error('error', error);
             }

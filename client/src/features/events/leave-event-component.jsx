@@ -26,7 +26,7 @@ function LeaveEventComponent({setGetEvent, getEvent}) {
                 console.log('Event left successfully');
                 setGetEvent(!getEvent);
             } else {
-                console.error(response.data.message);
+                console.log(response.data.message);
             }
         } catch (error) {
             console.error('error', error);

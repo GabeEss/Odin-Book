@@ -39,7 +39,7 @@ function CreateEventComponent() {
                 console.log('Event created');
                 setModalIsOpen(false);
                 nav(`/event/${response.data.event._id}`);
-            }
+            } else console.log(response.data.message);
         } catch (error) {
             console.error('error', error);
             setError('Error creating event');

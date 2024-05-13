@@ -14,6 +14,7 @@ async function getEvents(search, getAccessTokenSilently, guest, guestInit) {
             return response.data.events;
         } else {
             console.log('Failed to get events');
+            console.log(response.data.message);
             return [];
         }
     } catch (error) {

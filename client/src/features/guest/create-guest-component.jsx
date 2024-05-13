@@ -30,7 +30,7 @@ function CreateGuestComponent() {
                     if(response.data.firstTimeLogin === true) {
                         nav('/signup');
                     } else nav('/home');
-                }
+                } else console.log(response.data.message);
             } catch(error) {
                 console.error('error', error);
             }

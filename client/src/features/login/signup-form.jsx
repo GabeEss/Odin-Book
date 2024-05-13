@@ -61,9 +61,9 @@ function SignUpForm () {
                 setPlaceholderFrom(response.data.from);
                 setDisplayColor(response.data.displayColor);
                 setCoverColor(response.data.coverColor);
-            }
+            } else console.log(response.data.message);
         } catch (error) {
-            console.log(error.response.data.message);
+            console.error('error', error);
         }
     }
 

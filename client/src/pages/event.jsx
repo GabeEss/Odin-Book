@@ -36,7 +36,7 @@ function EventPage() {
                     setIsOwner(response.data.isOwner);
                     setIsMember(response.data.isMember);
                     setLoading(false);
-                }
+                } else console.log(response.data.message);
             } catch (error) {
                 console.error('error', error);
             }

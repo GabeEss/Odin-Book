@@ -25,6 +25,7 @@ function SendFriendRequest({id, setFriendChange, friendChange}) {
                 console.log("Friend request sent. Notifaction sent to user.");
             } else {
                 console.log("Friend request failed.");
+                console.log(response.data.message);
             }
         } catch (error) {
             console.error('error', error);

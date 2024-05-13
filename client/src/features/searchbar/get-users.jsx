@@ -14,6 +14,7 @@ async function getUsers(search, getAccessTokenSilently, guest, guestInit) {
             return response.data.users;
         } else {
             console.log('Failed to get users');
+            console.log(response.data.message);
             return [];
         }
     } catch (error) {

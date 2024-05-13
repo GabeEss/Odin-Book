@@ -34,6 +34,7 @@ function LoginComponent () {
                     } else {
                         console.log("Login failed.");
                         setError('Login failed');
+                        console.log(response.data.message);
                         handleLogout();
                     }
                 } catch (error) {

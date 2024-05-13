@@ -22,7 +22,7 @@ function RemoveFriendComponent({ id, setFriendChange, friendChange }) {
             if (response.data.success) {
                 setFriendChange(!friendChange);
                 console.log("Friend removed.");
-            }
+            } else console.log(response.data.message);
         } catch (error) {
             console.error('error', error);
         }
