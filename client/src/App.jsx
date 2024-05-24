@@ -3,16 +3,20 @@ import { GuestProvider } from './features/guest/guestid-context';
 import { GuestInitializeProvider } from './features/guest/guest-initialize-context';
 import { useAuth0 } from '@auth0/auth0-react';
 import { default as PR } from './features/auth/protected-route';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import LoginPage from './pages/login';
 import HomePage from './pages/home';
 import SignUpPage from './pages/sign-up';
 import UserPage from './pages/user';
 import FriendsPage from './pages/friends';
+import MessagingPage from './pages/messages';
 import EventPage from './pages/event';
 import EventsPage from './pages/events';
 import LoadingPage from './pages/loading';
 import ErrorPage from './pages/error';
+
+const queryClient = new QueryClient();
 
 function App() {
   const { isLoading } = useAuth0();
@@ -23,6 +27,7 @@ function App() {
 
   return (
     <Router>
+      <QueryClientProvider client={queryClient}>
         <GuestProvider>
           <GuestInitializeProvider>
             <Routes>
@@ -34,9 +39,11 @@ function App() {
               <Route path='/event/:id' element={<PR><EventPage/></PR>}/>
               <Route path='/events' element={<PR><EventsPage/></PR>}/>
               <Route path='/friends' element={<PR><FriendsPage/></PR>}/>
+              <Route path='/messages/:id' element={<PR><MessagingPage/></PR>}/>
             </Routes>
           </GuestInitializeProvider>
         </GuestProvider>
+      </QueryClientProvider>
     </Router>
   )
 }
