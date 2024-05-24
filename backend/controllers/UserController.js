@@ -95,8 +95,9 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
 
     //     console.log("Creating guest");
 
-    //     const guestId = await generateGuestID();
-    //     const guestName = "guest" + guestId;
+    //     const guestNum = await generateGuestID();
+    //     const guestId = "guest" + guestNum;
+    //     const guestName = "guest" + guestNum;
 
     //     const newGuest = new User({
     //         userId: guestId,

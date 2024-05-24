@@ -6,6 +6,7 @@ const comment_controller = require("../controllers/CommentController");
 const notification_controller = require("../controllers/NotificationController");
 const user_controller = require("../controllers/UserController");
 const event_controller = require("../controllers/EventController");
+const message_controller = require("../controllers/MessageController");
 
 /// HEALTH ROUTE ///
 
@@ -70,5 +71,9 @@ router.delete("/event/:id", event_controller.event_delete);
 router.put("/event/:id/join", event_controller.event_join);
 router.put("/event/:id/leave", event_controller.event_leave);
 router.put("/event/:id/respond", event_controller.event_respond);
+
+/// MESSAGE ROUTES ///
+
+router.get("/messages", message_controller.message_get);
 
 module.exports = router;

@@ -8,6 +8,15 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 var socketIo = require('socket.io');
+const Message = require('../models/message');
+const User = require('../models/user');
+const cors = require('cors');
+app.use(cors());
+
+// Cache for users
+const userCache = new Map();
+// Socket cache for users
+const socketCache = new Map();
 
 /**
  * Get port from environment and store in Express.
@@ -26,13 +35,130 @@ var server = http.createServer(app);
  * Create Socket.IO server.
  */
 
-var io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: process.env.API_CLIENT || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  console.log('New client connected: ', socket.id);
+
+  socket.on('userJoined', async (userId) => {
+    let user = await User.findOne({ userId: userId });
+    if(!user) {
+      console.error("User not found in database.");
+      return;
+    }
+
+    userCache.set(userId, user);
+    socketCache.set(userId, socket.id);
+    console.log('User joined');
+    // console.log('User joined:', user._id);
+  });
+
+  socket.on('sendMessage', async (data) => {
+    try {
+      let sender;
+      if (data.from.startsWith('guest')) {
+        console.log("Guest user message");
+        if (userCache.has(data.from)) {
+          // The user is in the cache
+          sender = userCache.get(data.from);
+        } else {
+          // The user is not in the cache, check the userId in the database
+          let user = await User.findOne({ userId: data.from });
+          if (!user) {
+            console.error("Guest user not found in database.");
+            return;
+          }
+          userCache.set(data.from, user);
+        }
+      } else {
+          console.log("Authenticated user message");
+          let userId = data.from;
+          console.log("User ID:", userId);
+          if(userCache.has(userId)) {
+            // The user is in the cache
+            sender = userCache.get(userId);
+          } else {
+            // The user is not in the cache, check the userId in the database
+            let user = await User.findOne({ userId: userId });
+            if (!user) {
+              console.error("User not found in database:", userId);
+              return;
+            }
+            sender = user;
+            userCache.set(userId, user);
+          }
+      }
+
+      // The user is not in the cache, check the userId in the database
+      let receiver = await User.findOne({ _id: data.to });
+      if (!receiver) {
+        console.error("Receiver user not found in database:", data.to);
+        return;
+      }
+
+      if(!data.message) {
+        console.error("Invalid message data.");
+        return;
+      }
+
+      // Store message in database
+      const message = new Message({
+        sender: sender,
+        receiver: receiver, 
+        message: data.message,
+        timestamp: new Date(), 
+      });
+
+      try {
+          await message.save();
+          console.log("Message inserted");
+
+          // Send message to recipient via socket
+          if (socketCache.has(data.to)) {
+            io.to(socketCache.get(data.to)).emit('message', message);
+          }
+
+          // Also send message to sender
+          if (socketCache.has(data.from)) {
+            io.to(socketCache.get(data.from)).emit('message', message);
+          }
+      } catch (err) {
+          console.error("Error inserting message:", err);
+      }
+    } catch (error) {
+      console.error("Error handling 'sendMessage' event:", error);
+    }
+  });
+
+  socket.on('userLeft', (userId) => {
+    userCache.delete(userId);
+    socketCache.delete(userId);
+    console.log('User left:', userId);
+  });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected');
+
+    // Find the user associated with the disconnected socket and remove them from the caches
+    for (let [userId, socketId] of socketCache.entries()) {
+      if (socketId === socket.id) {
+        userCache.delete(userId);
+        socketCache.delete(userId);
+        console.log('User left');
+        // console.log('User left:', userId);
+        break;
+      }
+    }
+  });
+
+  socket.on('error', (error) => {
+    console.error('An error occurred with the socket:', error);
   });
 });
 
