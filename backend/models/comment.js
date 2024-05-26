@@ -9,9 +9,9 @@ const CommentSchema = new Schema({
         required: true,
         maxLength: 200
     }, 
-    timestamp: {
-        type: Date,
-        default: () => DateTime.now().toJSDate(),
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     post: {
@@ -19,15 +19,10 @@ const CommentSchema = new Schema({
         ref: "Post",
         required: true,
     },
-    senderId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
+    date_created: {
+        type: Date,
+        default: () => DateTime.now().toJSDate(),
         required: true,
-    },
-    username: {
-        type: String,
-        required: true,
-        maxLength: 64
     },
     likes: {
         type: [{

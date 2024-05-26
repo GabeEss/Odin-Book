@@ -14,6 +14,17 @@ const PostSchema = new Schema({
         ref: "User",
         required: true,
     },
+    posted_to: {
+        id: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
+        model: {
+            type: String,
+            required: true,
+            enum: ['User', 'Event'],
+        }
+    },
     comments: {
         type: [{
             type: Schema.Types.ObjectId,

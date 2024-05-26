@@ -8,8 +8,13 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 var socketIo = require('socket.io');
+
 const Message = require('../models/message');
 const User = require('../models/user');
+const Event = require('../models/event');
+const Post = require('../models/post');
+const Comment = require('../models/comment');
+
 const cors = require('cors');
 app.use(cors());
 
@@ -43,6 +48,8 @@ const io = socketIo(server, {
   }
 });
 
+
+/// NEW CONNECTION ///
 io.on('connection', (socket) => {
   console.log('New client connected: ', socket.id);
 
@@ -59,43 +66,46 @@ io.on('connection', (socket) => {
     // console.log('User joined:', user._id);
   });
 
+  /// USE THE MONGO _ID FOR CHATROOMS ///
+
+  /// USER JOINS POSTED-TO CHATROOM ///
+  socket.on('userJoinsPostedTo', async (postedToId) => {
+    socket.join(`postedTo-${postedToId}`);
+  });
+
+  /// USER LEAVES POSTED-TO CHATROOM ///
+  socket.on('userLeavesPostedTo', async (postedToId) => {
+    socket.leave(`postedTo-${postedToId}`);
+  });
+
+  /// USER JOINS A SPECIFIC POST CHATROOM ///
+  socket.on('userJoinsPost', async (postId) => {
+    socket.join(`post-${postId}`);
+  });
+
+  /// USER LEAVES A SPECIFIC POST CHATROOM ///
+  socket.on('userLeavesPost', async (postId) => {
+    socket.leave(`post-${postId}`);
+  });
+
+  /// SEND MESSAGE ///
   socket.on('sendMessage', async (data) => {
     try {
       let sender;
-      if (data.from.startsWith('guest')) {
-        console.log("Guest user message");
-        if (userCache.has(data.from)) {
-          // The user is in the cache
-          sender = userCache.get(data.from);
-        } else {
+      if (userCache.has(data.from)) {
+        sender = userCache.get(data.from);
+      } else {
           // The user is not in the cache, check the userId in the database
           let user = await User.findOne({ userId: data.from });
           if (!user) {
-            console.error("Guest user not found in database.");
-            return;
-          }
-          userCache.set(data.from, user);
-        }
-      } else {
-          console.log("Authenticated user message");
-          let userId = data.from;
-          console.log("User ID:", userId);
-          if(userCache.has(userId)) {
-            // The user is in the cache
-            sender = userCache.get(userId);
-          } else {
-            // The user is not in the cache, check the userId in the database
-            let user = await User.findOne({ userId: userId });
-            if (!user) {
-              console.error("User not found in database:", userId);
+              console.error("Sender user not found in database:", data.from);
               return;
-            }
-            sender = user;
-            userCache.set(userId, user);
           }
+          sender = user;
+          userCache.set(data.from, user);
       }
 
-      // The user is not in the cache, check the userId in the database
+      // Get the recipient user
       let receiver = await User.findOne({ _id: data.to });
       if (!receiver) {
         console.error("Receiver user not found in database:", data.to);
@@ -110,9 +120,9 @@ io.on('connection', (socket) => {
       // Store message in database
       const message = new Message({
         sender: sender,
-        receiver: receiver, 
+        receiver: receiver,
         message: data.message,
-        timestamp: new Date(), 
+        timestamp: new Date(),
       });
 
       try {
@@ -136,10 +146,118 @@ io.on('connection', (socket) => {
     }
   });
 
+  // SEND POST ///
+  socket.on('sendPost', async (data) => {
+    try {
+      let sender;
+      if (userCache.has(data.from)) {
+        sender = userCache.get(data.from);
+      } else {
+          // The user is not in the cache, check the userId in the database
+          let user = await User.findOne({ userId: data.from });
+          if (!user) {
+              console.error("Sender user not found in database:", data.from);
+              return;
+          }
+          sender = user;
+          userCache.set(data.from, user);
+      }
+
+      // Get the recipient user/event
+      let receivingModel = 'User';
+      let receiver = await User.findOne({ _id: data.to });
+      if (!receiver) {
+        receivingModel = 'Event';
+        receiver = await Event.findOne({ _id: data.to });
+        if(!receiver) {
+          console.error("Receiver user/event not found in database:", data.to);
+          return;
+        }
+      }
+
+      if(!data.post) {
+        console.error("Invalid post data.");
+        return;
+      }
+
+      const post = new Post({
+        post: data.post,
+        owner: sender,
+        posted_to: { id: data.to, model: receivingModel },
+        date_created: new Date(),
+        comments: [],
+        likes: [],
+      });
+
+      try {
+          await post.save();
+          console.log("Post inserted");
+
+          // Send to all users
+          io.to('postedTo-' + data.to).emit('post', post);
+      } catch (err) {
+          console.error("Error inserting post:", err);
+      }
+    } catch (error) {
+      console.error("Error handling 'sendPost' event:", error);
+    }
+  });
+
+  // SEND COMMENT ///
+  socket.on('sendComment', async (data) => {
+    try {
+      let sender;
+      if (userCache.has(data.from)) {
+        sender = userCache.get(data.from);
+      } else {
+          // The user is not in the cache, check the userId in the database
+          let user = await User.findOne({ userId: data.from });
+          if (!user) {
+              console.error("Sender user not found in database:", data.from);
+              return;
+          }
+          sender = user;
+          userCache.set(data.from, user);
+      }
+
+      let post = await Post.findOne({ _id: data.to });
+
+      if(!post) {
+        console.error("Post not found in database:", data.to);
+        return;
+      }
+
+      if(!data.comment) {
+        console.error("Invalid comment data.");
+        return;
+      }
+
+      const comment = new Comment({
+        comment: data.comment,
+        owner: sender,
+        post: post,
+        date_created: new Date(),
+        likes: [],
+      });
+
+      try {
+        await comment.save();
+        console.log("Comment inserted");
+
+        // Send to all users
+        io.to('post-' + data.to).emit('comment', comment);
+      } catch (err) {
+        console.error("Error inserting comment:", err);
+      }
+    } catch (error) {
+      console.error("Error handling 'sendComment' event:", error);
+    }
+  })
+
   socket.on('userLeft', (userId) => {
     userCache.delete(userId);
     socketCache.delete(userId);
-    console.log('User left:', userId);
+    console.log('User left.');
   });
 
   socket.on('disconnect', () => {
@@ -151,7 +269,6 @@ io.on('connection', (socket) => {
         userCache.delete(userId);
         socketCache.delete(userId);
         console.log('User left');
-        // console.log('User left:', userId);
         break;
       }
     }
