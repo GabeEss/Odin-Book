@@ -6,6 +6,7 @@ function MessageList({messages, user, guest}) {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
 
+    // Load more messages when scrolling to top
     const handleScroll = (e) => {
         const { scrollTop } = e.target;
         if(scrollTop === 0 && !isLoading && Math.abs(numItems) < messages.length) {
@@ -17,6 +18,7 @@ function MessageList({messages, user, guest}) {
         }
     };
 
+    // Scroll to bottom of messages
     useEffect(() => {
         if(messagesEndRef.current) 
             messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;

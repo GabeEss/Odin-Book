@@ -9,6 +9,7 @@ import InfoDisplay from '../features/user/info-display';
 import ProfileDisplay from '../features/user/profile-display';
 import CoverDisplay from '../features/user/cover-display';
 import UserOptions from '../features/user/user-options-component';
+import PostListDisplay from '../features/posts/post-list-display';
 
 function UserPage() {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -91,9 +92,7 @@ function UserPage() {
                 <InfoDisplay user={user}/>
             </div>
             <div className='main-content'>
-                <div className='posts'>
-                    <p>Posts go here.</p>
-                </div>
+                <PostListDisplay/>
             </div>
         </div>
     )

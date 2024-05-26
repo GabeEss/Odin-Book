@@ -12,6 +12,16 @@
     cursor: pointer;
 }
 
+.messages-page {
+
+}
+
 .messages-container {
+    overflow-y: auto;
+    max-height: 20em;
+    flex-grow: 1;
+}
+
+.posts-container {
     overflow-y: auto;
 }

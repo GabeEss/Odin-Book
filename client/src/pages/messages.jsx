@@ -4,8 +4,9 @@ import { useState, useEffect, useContext } from "react";
 import {useNavigate,useParams} from 'react-router-dom';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
-import { useMessages } from "../features/messages/useMessagesHook";
+import { useMessages } from "../features/messages/use-messages-hook";
 import MessageList from "../features/messages/message-list-display";
+import handleSendMessage from "../features/messages/create-message";
 // import MessageModal from "../features/messages/message-modal";
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
@@ -71,17 +72,8 @@ function MessagingPage() {
         setMessage(event.target.value);
     }
 
-    const handleSendMessage = async (event) => {
-        event.preventDefault();
-        const messageData = {
-            from: currentUser,
-            to: id,
-            message: message
-        }
-        console.log("Message sent");
-        socket.emit('sendMessage', messageData);
-        setMessage('');
-    }
+    const sendMessage = (event) => 
+        handleSendMessage(event, socket, setMessage, currentUser, id, message);
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -92,7 +84,7 @@ function MessagingPage() {
     }
 
     return(
-        <div>
+        <div className='messages-page page'>
             <button onClick={handleHome}>Home</button>
             <MessageList messages={messages} user={user} guest={guest}/>
             {/* <MessageModal
@@ -100,7 +92,7 @@ function MessagingPage() {
                 onRequestClose={closeModal}
                 messages={data.userMessages || []}
             /> */}
-            <form onSubmit={handleSendMessage}>
+            <form onSubmit={sendMessage}>
                 <input type="text" value={message} onChange={handleMessageChange} />
                 <button type="submit">Send Message</button>
             </form>
