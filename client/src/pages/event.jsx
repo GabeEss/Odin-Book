@@ -7,6 +7,7 @@ import { GuestContext } from "../features/guest/guestid-context";
 
 import EventDisplay from '../features/events/event-display';
 import CreateEventComponent from '../features/events/create-event-component';
+import PostListDisplay from '../features/posts/post-list-display';
 
 function EventPage() {
     const { getAccessTokenSilently } = useAuth0();
@@ -58,6 +59,9 @@ function EventPage() {
                     getEvent={getEvent}
                 />
             }
+            <div className='main-content'>
+                <PostListDisplay/>
+            </div>
         </div>
     )
 }

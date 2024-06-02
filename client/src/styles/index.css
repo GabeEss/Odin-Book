@@ -25,3 +25,7 @@
 .posts-container {
     overflow-y: auto;
 }
+
+.post-container {
+    border: black solid 1px;
+}

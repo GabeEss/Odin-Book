@@ -24,19 +24,22 @@ function MessagingPage() {
 
     const nav = useNavigate();
 
-    // Set up user for socket, handle user joining and leaving
+    // Set up user for socket, handle user joining and leaving message chatroom
     useEffect(() => {
         if(!currentUser) return;
 
         socket.emit('userJoined', currentUser);
+        // Send recipient id and sender id
+        socket.emit('userJoinsMessageChat', id, currentUser);
 
         return () => {
             socket.emit('userLeft', currentUser);
+            socket.emit('userLeavesMessageChat', id, currentUser)
             socket.off('message');
         }
     }, [currentUser]);
 
-    // Fetches previous messages
+    // // Fetches previous messages
     useEffect(() => {
         if(data) {
             setMessages(data.userMessages);

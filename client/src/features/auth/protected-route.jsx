@@ -14,10 +14,12 @@ const ProtectedRoute = ({ children }) => {
     const [isCheckingConnection, setIsCheckingConnection] = useState(true);
     const { guestInit, setGuestInit } = useContext(GuestInitializeContext);
 
-    // Check mongo connection
+    // Check backend connection when loading a new page.
+    // Note: this will not check mongo.
     useEffect(() => {
       const checkConnection = async () => {
           try {
+            //   console.log('Checking connection to backend.');
               const response = await axios.get(`${import.meta.env.VITE_API_URL}/health`);
               setIsConnected(response.status === 200);
           } catch (error) {
@@ -26,11 +28,12 @@ const ProtectedRoute = ({ children }) => {
               setIsConnected(false);
           } finally {
               setIsCheckingConnection(false);
+            //   console.log("Connection check complete.");
           }
       };
 
       checkConnection();
-    }, []);
+    }, [location]);
 
     // Make sure guestInit is set to false if user is authenticated
     useEffect(() => {
