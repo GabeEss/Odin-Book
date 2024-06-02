@@ -55,18 +55,6 @@ exports.post_list = asyncHandler(async (req, res, next) => {
     });
 });
 
-exports.post_delete = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Post delete");
-});
-
-exports.post_detail = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Post detail");
-});
-
-exports.post_update = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Post update");
-});
-
 exports.post_like = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: Post like");
 });

@@ -15,20 +15,16 @@ router.get("/health", (req, res) => {
 });
 
 /// POST ROUTES ///
-/// POSTS CREATED VIA SOCKET ///
+/// POSTS CREATED, UPDATED, AND DELETED VIA SOCKET ///
 
 router.get("/posts", post_controller.post_list);
-router.delete("/post/:id", post_controller.post_delete);
-router.get("/post/:id", post_controller.post_detail);
-router.put("/post/:id/edit", post_controller.post_update);
 router.put("/post/:id/like", post_controller.post_like);
 router.put("/post/:id/unlike", post_controller.post_unlike);
 
 /// COMMENT ROUTES ///
-/// COMMENTS CREATED VIA SOCKET ///
+/// COMMENTS CREATED AND DELETED VIA SOCKET ///
 
-router.delete("/post/:id/comment", comment_controller.comment_delete);
-router.put("/post/:id/comment", comment_controller.comment_update);
+router.get("/post/:id/comments", comment_controller.comment_list);
 router.put("/post/:id/comment/:id/like", comment_controller.comment_like);
 router.put("/post/:id/comment/:id/unlike", comment_controller.comment_unlike);
 

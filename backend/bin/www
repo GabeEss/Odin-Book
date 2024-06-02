@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 var socketIo = require('socket.io');
+const mongoose = require("mongoose");
 
 const Message = require('../models/message');
 const User = require('../models/user');
@@ -54,19 +55,46 @@ io.on('connection', (socket) => {
   console.log('New client connected: ', socket.id);
 
   socket.on('userJoined', async (userId) => {
-    let user = await User.findOne({ userId: userId });
-    if(!user) {
-      console.error("User not found in database.");
-      return;
+    if(!userCache.has(userId)) {
+      let user = await User.findOne({ userId: userId });
+      if(!user) {
+        console.error("User not found in database.");
+        return;
+      }
+      userCache.set(userId, user);
+      console.log("User data cached.");
+    } else {
+      console.log("User data exists in cache.");
     }
-
-    userCache.set(userId, user);
     socketCache.set(userId, socket.id);
-    console.log('User joined');
-    // console.log('User joined:', user._id);
+    console.log("Socket cached.");
   });
 
   /// USE THE MONGO _ID FOR CHATROOMS ///
+  /// USER JOINS MESSAGE CHATROOM ///
+  socket.on("userJoinsMessageChat", async (recipientId, userId) => {
+    console.log("User joins message chat.")
+    let user = userCache.get(userId);
+    if (!user) {
+      user = await User.findOne({ userId: userId });
+    }
+    // Sort the ids so the chatroom ID will be the same regardless of who is logged in
+    const chatroomId = [recipientId, user._id].sort().join('-');
+    console.log(chatroomId);
+    socket.join(`message-${chatroomId}`);
+  })
+
+  /// USER LEAVES MESSAGE CHATROOM ///
+  socket.on("userLeavesMessageChat", async(recipientId, userId) => {
+    console.log("User leaves message chat.");
+    let user = await userCache.get(userId);
+    if (!user) {
+      user = await User.findOne({ userId: userId });   
+    }
+    // Sort the ids so the chatroom ID will be the same regardless of who is logged in
+    const chatroomId = [recipientId, user._id].sort().join('-');
+    socket.join(`message-${chatroomId}`);
+  })
 
   /// USER JOINS POSTED-TO CHATROOM ///
   socket.on('userJoinsPostedTo', async (postedToId) => {
@@ -129,15 +157,9 @@ io.on('connection', (socket) => {
           await message.save();
           console.log("Message inserted");
 
-          // Send message to recipient via socket
-          if (socketCache.has(data.to)) {
-            io.to(socketCache.get(data.to)).emit('message', message);
-          }
-
-          // Also send message to sender
-          if (socketCache.has(data.from)) {
-            io.to(socketCache.get(data.from)).emit('message', message);
-          }
+          const chatroomId = [receiver._id, sender._id].sort().join('-');
+          // Send to all users
+          io.to('message-' + chatroomId).emit('message', message);
       } catch (err) {
           console.error("Error inserting message:", err);
       }
@@ -241,6 +263,10 @@ io.on('connection', (socket) => {
       });
 
       try {
+        await Post.updateOne(
+          { _id: post },
+          { $push: { comments: comment._id }}
+        );
         await comment.save();
         console.log("Comment inserted");
 
@@ -253,6 +279,80 @@ io.on('connection', (socket) => {
       console.error("Error handling 'sendComment' event:", error);
     }
   })
+
+  /// EDIT POST ///
+  socket.on('editPost', async(data) => {
+    try {
+      const post = await Post.findById(data.post).populate('owner').populate('likes');
+      if(!post) {
+        console.error("Post not found:", data.post); 
+        return;
+      }
+
+      post.post = data.content;
+      await post.save();
+
+      io.to('postedTo-' + data.to).emit('editPost', post);
+    } catch(error) {
+      console.error("Error handling 'editPost' event:", error);
+    }
+  })
+
+  /// DELETE POST ///
+  socket.on('deletePost', async (data) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const post = await Post.findById(data.post);
+      if(!post) {
+        console.error('Post not found:', data.post);
+        return;
+      }
+      await Comment.deleteMany({ post: data.post}, {session:session});
+      await post.deleteOne({ _id: data.post }, {session:session});
+      await session.commitTransaction();
+      console.log("Deletion complete. Emit to socket.");
+      io.to('postedTo-' + data.to).emit('deletePost', data.post);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  })
+
+  /// DELETE COMMNET ///
+  socket.on('deleteComment', async (data) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const comment = await Comment.findById(data.comment);
+      if(!comment) {
+        console.error('Comment not found:', data.comment);
+        return;
+      }
+
+      // Find the post
+      const post = await Post.findOne({ _id: data.to });
+      if (!post) {
+          console.error('Post not found for comment:', data.to);
+          return;
+      }
+      
+      // Remove comment from comments array in the post
+      post.comments = post.comments.filter(id => id.toString() !== data.comment);
+
+      await post.save({session});
+      await comment.deleteOne({ _id: data.comment }, {session});
+      await session.commitTransaction();
+      console.log("Comment deleted.");
+      io.to('post-' + post._id).emit('deleteComment', comment);
+    } catch (error) {
+      await session.abortTransaction();
+      console.error('Error deleting comment:', error);
+    } finally {
+      session.endSession();
+    }
+  })
+
+  /// USER LEAVES OR DISCONNECTS ///
 
   socket.on('userLeft', (userId) => {
     userCache.delete(userId);
