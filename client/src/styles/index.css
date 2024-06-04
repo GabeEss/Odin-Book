@@ -12,6 +12,10 @@
     cursor: pointer;
 }
 
+.disabled{
+    pointer-events: none;
+}
+
 .messages-page {
 
 }

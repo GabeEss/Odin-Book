@@ -8,6 +8,7 @@ import { usePosts } from "./use-posts-hook";
 import handleSendPost from './create-post';
 import handleDeletePost from './post-delete';
 import handleEditPost from './post-edit';
+import PostLikesComponent from './post-likes-component';
 import CommentListDisplay from '../comments/comment-list-display';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
@@ -161,10 +162,7 @@ function PostListDisplay() {
                         <p className='post-info'>{post.post}</p>
                         <p className='post-owner'>Posted by {post.owner.username}</p>
                         <p className='post-date'>Posted on {post.date_created}</p>
-                        <div className='post-likes-container'>
-                          <button className='post-likes-button'>Likes</button>
-                          <p className='post-likes-number'>{post.likes.length}</p>
-                        </div>
+                        <PostLikesComponent id={post._id} postLikes={post.likes} currentUser={currentUser}/>
                         {post.owner.userId !== currentUser ? null :
                         !deletePostId && !editPostId ? 
                           <div className='post-options'>

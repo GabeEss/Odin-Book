@@ -6,6 +6,7 @@ import { GuestContext } from "../guest/guestid-context";
 import { useComments } from "./use-comments-hook";
 import handleSendComment from './create-comment';
 import handleDeleteComment from './comment-delete';
+import CommentLikesComponent from './comment-likes-component';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -69,7 +70,7 @@ function CommentListDisplay({postId}) {
         socket.on('deleteComment', (commentData) => {
             if(commentData.post === postId) {
                 setComments((prevComments) => prevComments.filter(comment => comment._id !== commentData._id));
-            }            
+            }
         });
 
         return () => {
@@ -118,15 +119,12 @@ function CommentListDisplay({postId}) {
                         <p className='comment-info'>{comment.comment}</p>
                         <p className='comment-owner'>Posted by {comment.owner.username}</p>
                         <p className='comment-date'>Posted on {comment.date_created}</p>
-                        <div className='comment-likes-container'>
-                            <button className='comment-likes-button'>Likes</button>
-                            <p className='comment-likes-number'>{comment.likes.length}</p>
-                        </div>
+                        <CommentLikesComponent id={comment._id} commentLikes={comment.likes} currentUser={currentUser}/>
                         {comment.owner.userId !== currentUser ? null :
                         !deleteCommentId ?
                             <div className='comment-options'>
                                 <button onClick={() => setDeleteCommentId(comment._id)}>Delete Comment</button>
-                            </div>                            
+                            </div>
                         : deleteCommentId === comment._id ?
                         <div>
                             <button onClick={(event) => deleteComment(event, comment._id)}>Confirm Delete</button>
