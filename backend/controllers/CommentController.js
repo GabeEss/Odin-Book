@@ -31,9 +31,15 @@ exports.comment_list = asyncHandler(async (req, res, next) => {
 
     const post = await Post.findById(id).populate({
         path: 'comments',
-        populate: {
-            path: 'owner'
+        populate: [{
+            path: 'owner',
+            model: User
+        },
+        {
+            path: 'likes',
+            model: User
         }
+        ],
     }).exec();
 
     if(!post) {
@@ -50,9 +56,121 @@ exports.comment_list = asyncHandler(async (req, res, next) => {
 })
 
 exports.comment_like = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Comment like");
+    try {
+        const currentUser = await determineUserType(req);
+
+        if(!currentUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            })
+        }
+
+        const id = req.params.id;
+
+        if(!id) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment ID not provided"
+            })
+        }
+
+        const comment = await Comment.findById(id).populate('likes');
+
+        if(!comment.likes) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment not found",
+            })
+        }
+
+        let findUserInArray = false;
+        // Find out if user is in likes array
+        for(let i = 0; i < comment.likes.length; i++ ) {
+            if(comment.likes[i].toString() === currentUser._id.toString())
+                findUserInArray = true;
+        }
+
+        if(findUserInArray) {
+            return res.status(404).json({
+                success: false,
+                message: "User already liked this comment."
+            })
+        }
+
+        comment.likes.push(currentUser);
+        await comment.save();
+
+        return res.status(200).json({
+            success: true,
+            comment: comment
+        })
+    } catch(error) {
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error liking the comment',
+        })
+    }
 });
 
 exports.comment_unlike = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Comment unlike");
+    try {
+        const currentUser = await determineUserType(req);
+
+        if(!currentUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            })
+        }
+
+        const id = req.params.id;
+
+        if(!id) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment ID not provided"
+            })
+        }
+
+        const comment = await Comment.findById(id).populate('likes');
+
+        if(!comment.likes) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment not found",
+            })
+        }
+
+        let findUserInArray = false;
+        // Find out if user is in likes array
+        for(let i = 0; i < comment.likes.length; i++ ) {
+            if(comment.likes[i]._id.toString() === currentUser._id.toString())
+            {
+                findUserInArray = true;
+            }
+        }
+
+        if(!findUserInArray) {
+            return res.status(404).json({
+                success: false,
+                message: "User cannot unlike a comment if they have not liked it."
+            })
+        }
+
+        comment.likes.pull(currentUser);
+        await comment.save();
+
+        return res.status(200).json({
+            success: true,
+            comment: comment
+        })
+    } catch(error) {
+        console.log('Error:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Error unliking the comment',
+        })
+    }
 });

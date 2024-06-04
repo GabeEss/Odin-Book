@@ -25,8 +25,8 @@ router.put("/post/:id/unlike", post_controller.post_unlike);
 /// COMMENTS CREATED AND DELETED VIA SOCKET ///
 
 router.get("/post/:id/comments", comment_controller.comment_list);
-router.put("/post/:id/comment/:id/like", comment_controller.comment_like);
-router.put("/post/:id/comment/:id/unlike", comment_controller.comment_unlike);
+router.put("/comment/:id/like", comment_controller.comment_like);
+router.put("/comment/:id/unlike", comment_controller.comment_unlike);
 
 /// NOTIFICATION ROUTES ///
 
