@@ -18,22 +18,16 @@ router.get("/health", (req, res) => {
 /// POSTS CREATED, UPDATED, AND DELETED VIA SOCKET ///
 
 router.get("/posts", post_controller.post_list);
-router.put("/post/:id/like", post_controller.post_like);
-router.put("/post/:id/unlike", post_controller.post_unlike);
 
 /// COMMENT ROUTES ///
 /// COMMENTS CREATED AND DELETED VIA SOCKET ///
 
 router.get("/post/:id/comments", comment_controller.comment_list);
-router.put("/comment/:id/like", comment_controller.comment_like);
-router.put("/comment/:id/unlike", comment_controller.comment_unlike);
 
 /// NOTIFICATION ROUTES ///
 
 router.get("/notifications", notification_controller.notification_list);
-router.post("/notification", notification_controller.notification_create_post);
-router.delete("/notification/:id", notification_controller.notification_delete);
-router.put("/notification/:id", notification_controller.notification_update);
+router.put("/notification", notification_controller.notification_update);
 
 /// USER ROUTES ///
 
@@ -41,6 +35,7 @@ router.post("/user/register", user_controller.user_register_post);
 router.post("/user/guest/register", user_controller.guest_register_post);
 router.get("/user", user_controller.user_detail);
 router.get("/users", user_controller.user_list);
+router.get("/current-user", user_controller.user_current);
 router.get("/users/:id", user_controller.user_find_by_id);
 router.get("/user/friends", user_controller.user_friends_get);
 router.put("/user/friends/request", user_controller.user_friend_request);

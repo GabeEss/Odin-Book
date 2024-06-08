@@ -14,14 +14,6 @@ exports.notification_list = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: Notification list");
 });
 
-exports.notification_create_post = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Notification create POST");
-});
-
-exports.notification_delete = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: Notification delete");
-});
-
 exports.notification_update = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: Notification update");
 });

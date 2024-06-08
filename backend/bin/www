@@ -62,15 +62,16 @@ io.on('connection', (socket) => {
         return;
       }
       userCache.set(userId, user);
-      console.log("User data cached.");
+      // console.log("User data cached.");
     } else {
       console.log("User data exists in cache.");
     }
     socketCache.set(userId, socket.id);
-    console.log("Socket cached.");
+    // console.log("Socket cached.");
+    // console.log('User joined.');
   });
 
-  /// USE THE MONGO _ID FOR CHATROOMS ///
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER JOINS MESSAGE CHATROOM ///
   socket.on("userJoinsMessageChat", async (recipientId, userId) => {
     console.log("User joins message chat.")
@@ -84,6 +85,7 @@ io.on('connection', (socket) => {
     socket.join(`message-${chatroomId}`);
   })
 
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER LEAVES MESSAGE CHATROOM ///
   socket.on("userLeavesMessageChat", async(recipientId, userId) => {
     console.log("User leaves message chat.");
@@ -96,25 +98,55 @@ io.on('connection', (socket) => {
     socket.join(`message-${chatroomId}`);
   })
 
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER JOINS POSTED-TO CHATROOM ///
   socket.on('userJoinsPostedTo', async (postedToId) => {
+    console.log("User joins posted to: " + postedToId);
     socket.join(`postedTo-${postedToId}`);
   });
 
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER LEAVES POSTED-TO CHATROOM ///
   socket.on('userLeavesPostedTo', async (postedToId) => {
+    console.log("User leaves posted to: " + postedToId);
     socket.leave(`postedTo-${postedToId}`);
   });
 
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER JOINS A SPECIFIC POST CHATROOM ///
   socket.on('userJoinsPost', async (postId) => {
     socket.join(`post-${postId}`);
   });
 
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
   /// USER LEAVES A SPECIFIC POST CHATROOM ///
   socket.on('userLeavesPost', async (postId) => {
     socket.leave(`post-${postId}`);
   });
+
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
+  /// USER JOINS HAS NOTIFICATION CHATROOM ///
+  socket.on('userJoinsHasNotification', async (userId) => {
+    socket.join(`has-notification-${userId}`);
+  })
+
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
+  /// USER LEAVES HAS NOTIFICATION CHATROOM ///
+  socket.on('userLeavesHasNotification', async (userId) => {
+    socket.leave(`has-notification-${userId}`);
+  })
+
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
+  /// USER JOINS HAS MESSAGE CHATROOM ///
+  socket.on('userJoinsHasMessage', async (userId) => {
+    socket.join(`has-message-${userId}`);
+  })
+
+  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
+  /// USER LEAVES HAS MESSAGE CHATROOM ///
+  socket.on('userLeavesHasMessage', async (userId) => {
+    socket.leave(`has-message-${userId}`);
+  })
 
   /// SEND MESSAGE ///
   socket.on('sendMessage', async (data) => {
@@ -160,6 +192,9 @@ io.on('connection', (socket) => {
           const chatroomId = [receiver._id, sender._id].sort().join('-');
           // Send to all users
           io.to('message-' + chatroomId).emit('message', message);
+        
+          // Notification to receiver of message
+          io.to('has-notification-' + receiver._id).emit('notification', message);
       } catch (err) {
           console.error("Error inserting message:", err);
       }
@@ -206,8 +241,8 @@ io.on('connection', (socket) => {
         post: data.post,
         owner: sender,
         posted_to: { id: data.to, model: receivingModel },
-        date_created: new Date(),
         comments: [],
+        date_created: new Date(),
         likes: [],
       });
 
@@ -217,6 +252,10 @@ io.on('connection', (socket) => {
 
           // Send to all users
           io.to('postedTo-' + data.to).emit('post', post);
+          // // Send as a notification to the user
+          if(post.posted_to.model === 'User') {
+            io.to('has-notification-' + post.posted_to.id).emit('notification', post);
+          }
       } catch (err) {
           console.error("Error inserting post:", err);
       }
@@ -277,6 +316,35 @@ io.on('connection', (socket) => {
       }
     } catch (error) {
       console.error("Error handling 'sendComment' event:", error);
+    }
+  })
+
+  /// SEND A NOTIFICATION AFTER A FRIEND REQUEST ///
+  socket.on('sendFriendRequestNotification', async(data) => {
+    try {
+      let sender;
+      if (userCache.has(data.from)) {
+        sender = userCache.get(data.from);
+      } else {
+          // The user is not in the cache, check the userId in the database
+          let user = await User.findOne({ userId: data.from });
+          if (!user) {
+              console.error("Sender user not found in database:", data.from);
+              return;
+          }
+          sender = user;
+          userCache.set(data.from, user);
+      }
+
+      if(!data.to) { 
+        console.error("Receiving user _id not specified."); 
+        return; 
+      }
+
+      if(sender && data.to) 
+        io.to('has-notification-' + data.to).emit('notification', sender);
+    } catch (error) {
+      console.error('Error sending a notification after a friend request.');
     }
   })
 
@@ -352,12 +420,105 @@ io.on('connection', (socket) => {
     }
   })
 
+  /// LIKE POST ///
+
+  socket.on('likePost', async(data) => {
+    try {
+      const user = await User.findOne({ userId: data.from });
+      if(!user) {
+        console.error("User not found:", data.from);
+        return;
+      }
+
+      const post = await Post.findById(data.post).populate('owner').populate('likes');
+      if(!post) {
+        console.error("Post not found:", data.post); 
+        return;
+      }
+      
+      if(data.likeUnlike === 'like')
+        post.likes.push(user);
+      else if(data.likeUnlike === 'unlike') 
+        post.likes.pull(user);
+      else {
+        console.error("Like status not formatted correctly.");
+        return;
+      }
+      await post.save();
+      io.to('postedTo-' + data.to).emit('editPost', post);
+      console.log("Like registered.");
+    } catch(error) {
+      console.error("Error handling 'editPost' event:", error);
+    }
+  })
+
+  /// LIKE COMMENT ///
+
+  socket.on('likeComment', async(data) => {
+    try {
+      const user = await User.findOne({ userId: data.from });
+      if(!user) {
+        console.error("User not found:", data.from);
+        return;
+      }
+
+      const post = await Post.findById(data.to);
+      if(!post) {
+        console.error("Post not found:", data.to);
+        return;
+      }
+
+      const comment = await Comment.findById(data.comment).populate('owner').populate('likes');
+      if(!comment) {
+        console.error("Comment not found:", data.comment); 
+        return;
+      }
+
+      // Check if the comment is in the post
+      if(!post.comments.some(c => c._id.equals(comment._id))) {
+        console.error("Comment not found in post:", data.comment);
+        return;
+      }
+
+      const session = await mongoose.startSession();
+      session.startTransaction();
+
+      try {
+        if(data.likeUnlike === 'like')
+          comment.likes.push(user);
+        else if(data.likeUnlike === 'unlike') 
+          comment.likes.pull(user);
+        else {
+          console.error("Like status not formatted correctly.");
+          return;
+        }
+
+        await Post.updateOne(
+          { _id: post._id, "comments._id": comment._id },
+          { $set: { "comments.$": comment }},
+          { session }
+        );
+        await comment.save({session});
+        await session.commitTransaction();
+
+        io.to('post-' + data.to).emit('editComment', comment);
+        console.log("Comment like registered.");
+      } catch (err) {
+        console.error("Error inserting comment:", err);
+      } finally {
+        session.endSession();
+      }
+    } catch(error) {
+      console.error("Error handling 'editComment' event:", error);
+    }
+  })
+
   /// USER LEAVES OR DISCONNECTS ///
 
   socket.on('userLeft', (userId) => {
     userCache.delete(userId);
     socketCache.delete(userId);
-    console.log('User left.');
+    // console.log('User left.');
   });
 
   socket.on('disconnect', () => {

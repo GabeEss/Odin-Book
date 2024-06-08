@@ -237,6 +237,22 @@ exports.user_list = asyncHandler(async (req, res, next) => {
     })
 });
 
+exports.user_current = asyncHandler(async(req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        currentUser: currentUser
+    })
+})
+
 exports.user_friends_get = asyncHandler(async (req, res, next) => {
     let mongoUser = await determineUserType(req);
 
@@ -323,9 +339,12 @@ exports.user_friend_request = asyncHandler(async (req, res, next) => {
         await session.commitTransaction();
         session.endSession();
 
+        // Note that the userId and _id are not the same.
         return res.status(200).json({
             success: true,
             message: 'Friend request sent successfully',
+            from: currentUser.userId,
+            to: requestedUser._id
         })
     } catch (error) {
         await session.abortTransaction();
