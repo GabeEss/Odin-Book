@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
 
+import HeaderComponent from "../features/header/header-component";
 import EventDisplay from '../features/events/event-display';
 import CreateEventComponent from '../features/events/create-event-component';
 import PostListDisplay from '../features/posts/post-list-display';
@@ -18,8 +19,10 @@ function EventPage() {
     const [isMember, setIsMember] = useState(false);
     const [loading, setLoading] = useState(true);
     const [getEvent, setGetEvent] = useState(false);
+    
     const { id } = useParams();
     const nav = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -43,10 +46,11 @@ function EventPage() {
             }
         }
         fetchEvent();
-    }, [getEvent]);
+    }, [getEvent, location]);
 
     return(
         <div className="event-page page">
+            <HeaderComponent/>
             <h1>Event Page</h1>
             <button className='home-button' onClick={() => nav('/home')}>Home</button>
             <CreateEventComponent/>

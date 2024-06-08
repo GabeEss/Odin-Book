@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
 
+import HeaderComponent from "../features/header/header-component";
 import getUserProfile from "../features/user/get-user-profile";
 import InfoDisplay from '../features/user/info-display';
 import ProfileDisplay from '../features/user/profile-display';
@@ -23,6 +24,7 @@ function UserPage() {
     const [friendChange, setFriendChange] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleHome = () => {
         if(isAuthenticated || guestInit) {
@@ -54,7 +56,7 @@ function UserPage() {
             setError('Failed to fetch user information');
             setLoading(false);
         }
-    }, [friendChange]);
+    }, [friendChange, location]);
 
     if(loading) {
         return(
@@ -66,6 +68,7 @@ function UserPage() {
 
     return(
         <div className='user-page page'>
+            <HeaderComponent/>
             {self ? <p>This is your profile</p> : null}
             {error ? <p>{error}</p> : null}
             <div className='profile-header'>
@@ -92,7 +95,7 @@ function UserPage() {
                 <InfoDisplay user={user}/>
             </div>
             <div className='main-content'>
-                <PostListDisplay/>
+                <PostListDisplay location={location}/>
             </div>
         </div>
     )

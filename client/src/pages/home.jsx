@@ -1,36 +1,13 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
-import SearchbarComponent from "../features/searchbar/searchbar-component";
+import HeaderComponent from "../features/header/header-component";
 
 function HomePage () {
     const {
-        logout,
         isAuthenticated,
     } = useAuth0();
-    const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
-    
-    const nav = useNavigate();
-
-    const handleLogout = () => {
-        if(isAuthenticated) {
-            logout({ returnTo: window.location.origin });
-        }
-
-        if(guestInit) {
-            setGuestInit(false);
-            nav('/');
-        }
-    }
-
-    const handleFriends = () => {
-        nav('/friends');
-    }
-
-    const handleEvents = () => {
-        nav('/events');
-    }
+    const {guestInit} = useContext(GuestInitializeContext);
     
     return(
     <div className="home-page page">
@@ -39,20 +16,7 @@ function HomePage () {
         { isAuthenticated || guestInit ? 
         <div>
             <div className="home-page page">
-            <div className="header">
-                <SearchbarComponent/>
-                <div className="header-dropdown">
-                    <button className="friends-nav" onClick={handleFriends}>Friends</button>
-                    <button className="events-nav" onClick={handleEvents}>Events</button>
-                    <button className="notifications-nav">Notifications</button>
-                    <div className="dropdown-content">
-                        <button className='logout-nav' onClick={handleLogout}>
-                            Log out
-                        </button>
-                        <button className='signup-nav' onClick={() => nav('/signup')}>Update User</button>
-                    </div>
-                </div>
-            </div>
+            <HeaderComponent/>
             <div className="sidebar-left sidebar">
                 <div className="sidebar-content">
                 </div>

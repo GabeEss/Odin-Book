@@ -8,27 +8,28 @@ import { usePosts } from "./use-posts-hook";
 import handleSendPost from './create-post';
 import handleDeletePost from './post-delete';
 import handleEditPost from './post-edit';
-import PostLikesComponent from './post-likes-component';
+import handlePostLike from './post-like';
 import CommentListDisplay from '../comments/comment-list-display';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
-function PostListDisplay() {
+function PostListDisplay({location}) {
     const {getAccessTokenSilently, user} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const {id} = useParams();
-    const { data, error, isLoading } = usePosts(getAccessTokenSilently, id, guest, guestInit);
+    const { data, error, isLoading, refetch } = usePosts(getAccessTokenSilently, id, guest, guestInit);
     const [post, setPost] = useState('');
     const [edit, setEdit] = useState('');
     const [posts, setPosts] = useState([]);
     const [currentUser, setCurrentUser] = useState('');
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(-5);
-    const [loadComments, setLoadComments] = useState(true);
+    const [awaitResponse, setAwaitResponse] = useState(false);
+
     const [deletePostId, setDeletePostId] = useState(null);
     const [editPostId, setEditPostId] = useState(null);
-
+    const [loadCommentsId, setLoadCommentsId] = useState(null);
     // Handle scrolling down to render more posts
     const handleScroll = (e) => {
         const {scrollTop, clientHeight, scrollHeight } = e.target;
@@ -41,11 +42,9 @@ function PostListDisplay() {
       }
     };
 
-    // Set up user for socket, handle user joining and leaving
     // Handle user joining and leaving the posts chat room
     useEffect(() => {
       if(!currentUser || !id) return;
-
       socket.emit('userJoined', currentUser);
       socket.emit('userJoinsPostedTo', id);
 
@@ -54,7 +53,7 @@ function PostListDisplay() {
           socket.emit('userLeavesPostedTo', id);
           socket.off('post');
       }
-    }, [currentUser, id]);
+    }, [currentUser, id, location]);
 
     // Fetches previous posts
     useEffect(() => {
@@ -63,6 +62,11 @@ function PostListDisplay() {
           setPosts(sortedPosts);
         }
     }, [data]);
+
+    // Refetch posts on location change
+    useEffect(() => {
+      refetch();
+    }, [location])
 
     // Listens for new posts
     useEffect(() => {
@@ -76,7 +80,7 @@ function PostListDisplay() {
         return () => {
             socket.off('post');
         }
-    }, []);
+    }, [location]);
 
     // Listens for deleted posts
     useEffect(() => {
@@ -87,7 +91,7 @@ function PostListDisplay() {
         return () => {
             socket.off('deletePost');
         }
-      }, []);
+      }, [location]);
 
     // Listens for updated posts
     useEffect(() => {
@@ -97,6 +101,10 @@ function PostListDisplay() {
           let updatedPosts = prevPosts.filter(post => post._id !== editedPost._id);
           // Add updated post
           updatedPosts = [...updatedPosts, editedPost];
+
+          // Allow user to like or unlike again
+          setAwaitResponse(false);
+          
           // Return sorted posts
           return updatedPosts.sort((a, b) => new Date(b.date_created) - new Date(a.date_created));
         })
@@ -105,7 +113,7 @@ function PostListDisplay() {
       return () => {
         socket.off('editPost');
       }
-    }, []);
+    }, [location]);
 
     // Initializes current user
     useEffect(() => {
@@ -113,8 +121,8 @@ function PostListDisplay() {
         else setCurrentUser(user.sub);
     }, [user.sub]);
 
-    const sendPost = (event) =>
-      handleSendPost(event, socket, setPost, currentUser, id, post);
+    const sendPost = async (event) =>
+      await handleSendPost(event, socket, setPost, currentUser, id, post);
 
     const deletePost = async (event, postId) => {
       await handleDeletePost(event, socket, postId, id);
@@ -127,14 +135,19 @@ function PostListDisplay() {
       setEditPostId(null);
     }
 
+    const handleLike = async (postId, likeUnlike) => {
+      setAwaitResponse(true);
+      await handlePostLike(socket, currentUser, id, postId, likeUnlike);
+    }
+
     const handleCancel = () => {
       setEdit('');
       setDeletePostId(null);
       setEditPostId(null);
     }
       
-    const handleComments = () => {
-      setLoadComments(true);
+    const handleComments = (postId) => {
+      setLoadCommentsId(postId);
     }
 
     if (isLoading) {
@@ -162,7 +175,11 @@ function PostListDisplay() {
                         <p className='post-info'>{post.post}</p>
                         <p className='post-owner'>Posted by {post.owner.username}</p>
                         <p className='post-date'>Posted on {post.date_created}</p>
-                        <PostLikesComponent id={post._id} postLikes={post.likes} currentUser={currentUser}/>
+                        {awaitResponse ? null : post.likes.map(user => user.userId).includes(currentUser) ?
+                          <button onClick={() => handleLike(post._id, 'unlike')}>Unlike Post</button> : 
+                          <button onClick={() => handleLike(post._id, 'like')}>Like Post</button>
+                        }
+                        <p>Likes: {post.likes.length}</p>
                         {post.owner.userId !== currentUser ? null :
                         !deletePostId && !editPostId ? 
                           <div className='post-options'>
@@ -188,8 +205,8 @@ function PostListDisplay() {
                             <button className='cancel-button' onClick={handleCancel}>Cancel</button>
                           </div> :
                           null }
-                        {!loadComments ? 
-                          <button onClick={handleComments}>Comments...</button> :
+                        {loadCommentsId !== post._id ? 
+                          <button onClick={() => handleComments(post._id)}>Comments...</button> :
                           <CommentListDisplay postId={post._id}/>}
                     </div>
                 </div>

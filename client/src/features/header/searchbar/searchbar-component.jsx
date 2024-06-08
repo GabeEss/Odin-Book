@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import getEvents from './get-events';
 import getUsers from './get-users';
-import { GuestInitializeContext } from '../guest/guest-initialize-context';
-import { GuestContext } from '../guest/guestid-context';
+import { GuestInitializeContext } from '../../guest/guest-initialize-context';
+import { GuestContext } from '../../guest/guestid-context';
 
 function SearchbarComponent() {
     const [search, setSearch] = useState('');
@@ -37,10 +37,12 @@ function SearchbarComponent() {
 
     const handleUser = (id) => {
         navigate(`/user/${id}`);
+        setSearchComplete(false);
     }
 
     const handleEvent = (id) => {
-        console.log('Event:', id);
+        navigate(`/event/${id}`);
+        setSearchComplete(false);
     }
 
     return(
@@ -70,12 +72,13 @@ function SearchbarComponent() {
                     events.map((event) => {
                         return (
                             <div key={event._id}>
-                                <button className="event-nav" onClick={() => handleEvent(event._id)}>{event.name}</button>
+                                <button className="event-nav" onClick={() => handleEvent(event._id)}>{event.event}</button>
                             </div>
                         )
                     })
                 }
             </div> : null }
+            <br className='temporary-padding'></br>
             { error ? <p className='error'>{error}</p> : null }
         </div>
     )

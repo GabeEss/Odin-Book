@@ -1,4 +1,4 @@
-import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
+import { makeAuthenticatedRequest } from '../../auth/make-authenticated-request';
 
 async function getUsers(search, getAccessTokenSilently, guest, guestInit) {
     try {

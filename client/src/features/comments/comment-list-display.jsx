@@ -6,7 +6,7 @@ import { GuestContext } from "../guest/guestid-context";
 import { useComments } from "./use-comments-hook";
 import handleSendComment from './create-comment';
 import handleDeleteComment from './comment-delete';
-import CommentLikesComponent from './comment-likes-component';
+import handleCommentLike from './comment-like';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -21,6 +21,7 @@ function CommentListDisplay({postId}) {
     const [currentUser, setCurrentUser] = useState('');
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(-5);
+    const [awaitResponseId, setAwaitResponseId] = useState(null);
 
     // Handle scrolling down to render more comments
     const handleScroll = (e) => {
@@ -48,20 +49,48 @@ function CommentListDisplay({postId}) {
 
     // Fetch past comments
     useEffect(() => {
-        if(data)
-            setComments(data.post.comments);
+        if(data) {
+            const sortedComments = data.post.comments.sort((a, b) => new Date(a.date_created) - new Date(b.date_created))
+            setComments(sortedComments);
+        }
     }, [data]);
 
     // Listens for new comments
+    // No need to set location as a dependency, this event listener will mount when the user opens the comments
     useEffect(() => {
         socket.on('comment', (commentData) => {
             if(commentData.post._id === postId) {
-                setComments((prevComments) => [...prevComments, commentData]);
+                setComments((prevComments) => {
+                    let updatedComments = [...prevComments, commentData];
+                    return updatedComments.sort((a, b) => new Date(a.date_created) - new Date(b.date_created));
+                } );
             }              
         });
 
         return () => {
             socket.off('comment');
+        }
+    }, []);
+
+    // Listens for edited (liked) comments
+    useEffect(() => {
+        socket.on('editComment', commentData => {
+            setComments((prevComments) => {
+                // Filter out old comment
+                let updatedComments = prevComments.filter(prevComment => prevComment._id !== commentData._id);
+                // Add updated comment
+                updatedComments = [...updatedComments, commentData];
+
+                // Allow user to like or unlike post again
+                setAwaitResponseId(null);
+
+                // Return sorted comments
+                return updatedComments.sort((a, b) => new Date(a.date_created) - new Date(b.date_created));
+            })
+        })
+
+        return () => {
+            socket.off('editComment');
         }
     }, []);
 
@@ -84,13 +113,18 @@ function CommentListDisplay({postId}) {
         else setCurrentUser(user.sub);
     }, [user.sub]);
 
-    const sendComment = (event) =>
-        handleSendComment(event, socket, setComment, currentUser, postId, comment);
+    const sendComment = async (event) =>
+        await handleSendComment(event, socket, setComment, currentUser, postId, comment);
 
     const deleteComment = async (event, commentId) => {
         await handleDeleteComment(event, socket, commentId, postId);
         setDeleteCommentId(null);
     }
+
+    const handleLike = async (commentId, likeUnlike) => {
+        setAwaitResponseId(commentId);
+        await handleCommentLike(socket, currentUser, postId, commentId, likeUnlike);
+      }
 
     const handleCancel = () => {
         setDeleteCommentId(null);
@@ -119,7 +153,11 @@ function CommentListDisplay({postId}) {
                         <p className='comment-info'>{comment.comment}</p>
                         <p className='comment-owner'>Posted by {comment.owner.username}</p>
                         <p className='comment-date'>Posted on {comment.date_created}</p>
-                        <CommentLikesComponent id={comment._id} commentLikes={comment.likes} currentUser={currentUser}/>
+                        {awaitResponseId && awaitResponseId === comment._id ? null : comment.likes.map(user => user.userId).includes(currentUser) ?
+                          <button onClick={() => handleLike(comment._id, 'unlike')}>Unlike Comment</button> : 
+                          <button onClick={() => handleLike(comment._id, 'like')}>Like Comment</button>
+                        }
+                        <p>Likes: {comment.likes.length}</p>
                         {comment.owner.userId !== currentUser ? null :
                         !deleteCommentId ?
                             <div className='comment-options'>

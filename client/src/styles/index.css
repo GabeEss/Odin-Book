@@ -16,6 +16,14 @@
     pointer-events: none;
 }
 
+.has-notification {
+    background-color: yellow;
+}
+
+.temporary-padding {
+    padding: 1em;
+}
+
 .messages-page {
 
 }

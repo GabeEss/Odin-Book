@@ -1,12 +1,14 @@
 import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect, useContext } from "react";
+import { useLocation } from 'react-router-dom';
 import {useNavigate,useParams} from 'react-router-dom';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
 import { useMessages } from "../features/messages/use-messages-hook";
 import MessageList from "../features/messages/message-list-display";
 import handleSendMessage from "../features/messages/create-message";
+import HeaderComponent from "../features/header/header-component";
 // import MessageModal from "../features/messages/message-modal";
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
@@ -23,17 +25,15 @@ function MessagingPage() {
     const [currentUser, setCurrentUser] = useState('');
 
     const nav = useNavigate();
+    const location = useLocation();
 
-    // Set up user for socket, handle user joining and leaving message chatroom
+    // Handle user joining and leaving message chatroom
     useEffect(() => {
         if(!currentUser) return;
-
-        socket.emit('userJoined', currentUser);
-        // Send recipient id and sender id
+        // Send recipient id (mongo) and sender id (auth or guest)
         socket.emit('userJoinsMessageChat', id, currentUser);
 
         return () => {
-            socket.emit('userLeft', currentUser);
             socket.emit('userLeavesMessageChat', id, currentUser)
             socket.off('message');
         }
@@ -55,7 +55,7 @@ function MessagingPage() {
         return () => {
             socket.off('message');
         }
-    }, []);
+    }, [location]);
 
     // Initializes current user
     useEffect(() => {
@@ -88,6 +88,7 @@ function MessagingPage() {
 
     return(
         <div className='messages-page page'>
+            <HeaderComponent/>
             <button onClick={handleHome}>Home</button>
             <MessageList messages={messages} user={user} guest={guest}/>
             {/* <MessageModal

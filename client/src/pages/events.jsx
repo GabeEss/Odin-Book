@@ -5,6 +5,7 @@ import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-re
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
 
+import HeaderComponent from "../features/header/header-component";
 import CreateEventComponent from '../features/events/create-event-component';
 import EventListDisplay from '../features/events/event-list-display';
 
@@ -45,6 +46,7 @@ function EventsPage() {
 
     return(
         <div className='events-page page'>
+            <HeaderComponent/>
             <h1>Events Page</h1>
             <button className='home-button' onClick={handleHome}>Home</button>
             <CreateEventComponent/>

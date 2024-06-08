@@ -6,6 +6,7 @@ import { GuestContext } from "../features/guest/guestid-context";
 import { makeAuthenticatedRequest } from "../features/auth/make-authenticated-request";
 import FriendRequestList from "../features/friends/friend-request-list";
 import FriendListDisplay from "../features/friends/friend-list-display";
+import HeaderComponent from "../features/header/header-component";
 
 function FriendsPage() {
     const [friends, setFriends] = useState([]);
@@ -46,6 +47,7 @@ function FriendsPage() {
 
   return (
     <div className="friends-page page">
+        <HeaderComponent/>
         <FriendRequestList 
             friendRequests={friendRequests} 
             setGetRequests={setGetRequests} 
