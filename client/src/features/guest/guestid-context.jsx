@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-// Create a context to hold the guest id and store in local storage
+// Context to hold the guest id and store in local storage
 
 export const GuestContext = createContext();
 

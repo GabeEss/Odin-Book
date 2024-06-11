@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-// Create a context to initialize the guest
+// Context to initialize the guest
 
 export const GuestInitializeContext = createContext();
 

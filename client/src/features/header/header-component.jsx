@@ -1,15 +1,13 @@
-// Needs a socket chatroom to listen for notifications
-// Send a notification for when the user has a post on their page
-// A notification for when the user has a post on an event they are apart of
-// A notification for a received friend request
 import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import { NotificationsContext } from './notifications/notifications-context';
 import { handleGetUser } from './get-current-user';
 import SearchbarComponent from "./searchbar/searchbar-component";
+import NotificationsList from './notifications/notifications-list-display';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -21,12 +19,13 @@ function HeaderComponent() {
         user
     } = useAuth0();
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
+    const {notifications, setNotifications} = useContext(NotificationsContext); // shows if user has a notification
     const {guest} = useContext(GuestContext);
     const location = useLocation();
     const nav = useNavigate();
     const [currentUser, setCurrentUser] = useState(null); // mongo user
     const [authUser, setAuthUser] = useState(null); // guest or auth user
-    const [hasNotification, setHasNotification] = useState(false);
+    const [openNotifications, setOpenNotifications] = useState(false); // opens notification display component
 
     useEffect(() => {
         handleGetUser(getAccessTokenSilently, guest, guestInit, setCurrentUser);
@@ -41,7 +40,7 @@ function HeaderComponent() {
         socket.emit('userJoinsHasNotification', currentUser._id);
 
         socket.on('notification', () => {
-            setHasNotification(true);
+            setNotifications(true);
         });
     
         return() => {
@@ -69,7 +68,12 @@ function HeaderComponent() {
     }, [user.sub]);
 
     const handleNotificationClick = () => {
-        setHasNotification(false);
+        setNotifications(false);
+        if(!openNotifications) {
+            setOpenNotifications(true);
+        }
+        else
+            setOpenNotifications(false);
     }
 
     const handleFriends = () => {
@@ -88,7 +92,6 @@ function HeaderComponent() {
         nav(`/user/${currentUser._id}`);
     }
 
-
     return(
         <div className="header">
             <SearchbarComponent/>
@@ -97,10 +100,15 @@ function HeaderComponent() {
                 <button className="friends-nav" onClick={handleFriends}>Friends</button>
                 <button className="events-nav" onClick={handleEvents}>Events</button>
                 <button className="home-nav" onClick={handleHome}>Home</button>
-                {hasNotification ? 
-                <button className="notifications-nav has-notification" onClick={handleNotificationClick}>Notifications</button> : 
-                <button className="notifications-nav" onClick={handleNotificationClick}>Notifications</button>
-                }
+                <div className='notifications-container'>
+                    {notifications ? 
+                    <button className="notifications-nav has-notification" onClick={handleNotificationClick}>Notifications</button> : 
+                    <button className="notifications-nav" onClick={handleNotificationClick}>Notifications</button>
+                    }
+                    {openNotifications ?
+                      <NotificationsList setOpenNotifications={setOpenNotifications}/> : null
+                    }
+                </div>
                 <div className="dropdown-content">
                     <button className='logout-nav' onClick={handleLogout}>
                         Log out

@@ -30,6 +30,7 @@ function PostListDisplay({location}) {
     const [deletePostId, setDeletePostId] = useState(null);
     const [editPostId, setEditPostId] = useState(null);
     const [loadCommentsId, setLoadCommentsId] = useState(null);
+    
     // Handle scrolling down to render more posts
     const handleScroll = (e) => {
         const {scrollTop, clientHeight, scrollHeight } = e.target;
@@ -104,7 +105,7 @@ function PostListDisplay({location}) {
 
           // Allow user to like or unlike again
           setAwaitResponse(false);
-          
+
           // Return sorted posts
           return updatedPosts.sort((a, b) => new Date(b.date_created) - new Date(a.date_created));
         })
