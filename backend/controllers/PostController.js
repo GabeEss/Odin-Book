@@ -4,13 +4,9 @@ const User = require("../models/user");
 const Event = require("../models/event");
 const Notification = require("../models/notification");
 
-const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
-const mongoose = require('mongoose');
 const findPageModel = require("../utils/findPageModel");
 const determineUserType = require("../utils/determineUserType");
-const getUserInfo = require("../utils/getUserInfo");
-const decodeTokenApi = require("../utils/decodeTokenApiCall");
 
 exports.post_list = asyncHandler(async (req, res, next) => {
     const currentUser = await determineUserType(req);

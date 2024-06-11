@@ -15,6 +15,7 @@ const User = require('../models/user');
 const Event = require('../models/event');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const Notification = require('../models/notification');
 
 const cors = require('cors');
 app.use(cors());
@@ -136,18 +137,6 @@ io.on('connection', (socket) => {
     socket.leave(`has-notification-${userId}`);
   })
 
-  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
-  /// USER JOINS HAS MESSAGE CHATROOM ///
-  socket.on('userJoinsHasMessage', async (userId) => {
-    socket.join(`has-message-${userId}`);
-  })
-
-  /// USE THE MONGO _ID FOR ALL CHATROOMS ///
-  /// USER LEAVES HAS MESSAGE CHATROOM ///
-  socket.on('userLeavesHasMessage', async (userId) => {
-    socket.leave(`has-message-${userId}`);
-  })
-
   /// SEND MESSAGE ///
   socket.on('sendMessage', async (data) => {
     try {
@@ -185,9 +174,21 @@ io.on('connection', (socket) => {
         timestamp: new Date(),
       });
 
+      const notification = new Notification({
+        notification: `${sender.username} sent you a message.`,
+        timestamp: new Date(),
+        user: receiver,
+        read: false,
+        type: 'newMessage',
+        triggeredBy: sender
+      });
+
       try {
+          // Don't want the message to depend on the notification, so no transaction.
           await message.save();
           console.log("Message inserted");
+          await notification.save();
+          console.log("Notification sent.");
 
           const chatroomId = [receiver._id, sender._id].sort().join('-');
           // Send to all users
@@ -195,6 +196,8 @@ io.on('connection', (socket) => {
         
           // Notification to receiver of message
           io.to('has-notification-' + receiver._id).emit('notification', message);
+
+          await session.commitTransaction();
       } catch (err) {
           console.error("Error inserting message:", err);
       }
@@ -246,6 +249,15 @@ io.on('connection', (socket) => {
         likes: [],
       });
 
+      const notification = new Notification({
+        notification: `${sender.username} posted on your page.`,
+        timestamp: new Date(),
+        user: receiver,
+        read: false,
+        type: 'newPost',
+        triggeredBy: sender
+      });
+
       try {
           await post.save();
           console.log("Post inserted");
@@ -253,8 +265,10 @@ io.on('connection', (socket) => {
           // Send to all users
           io.to('postedTo-' + data.to).emit('post', post);
           // // Send as a notification to the user
-          if(post.posted_to.model === 'User') {
+          if(post.posted_to.model === 'User' ) {
+            await notification.save();
             io.to('has-notification-' + post.posted_to.id).emit('notification', post);
+            console.log("Notification sent.");
           }
       } catch (err) {
           console.error("Error inserting post:", err);
@@ -341,8 +355,20 @@ io.on('connection', (socket) => {
         return; 
       }
 
-      if(sender && data.to) 
+      const notification = new Notification({
+        notification: `${sender.username} sent you a friend request.`,
+        timestamp: new Date(),
+        user: receiver,
+        read: false,
+        type: 'friendRequest',
+        triggeredBy: sender
+      });
+
+      if(sender && data.to) {
+        await notification.save();
         io.to('has-notification-' + data.to).emit('notification', sender);
+        console.log("Friend request notification sent.");
+      }
     } catch (error) {
       console.error('Error sending a notification after a friend request.');
     }
@@ -383,6 +409,9 @@ io.on('connection', (socket) => {
       io.to('postedTo-' + data.to).emit('deletePost', data.post);
     } catch (error) {
       console.error('Error deleting post:', error);
+      await session.abortTransaction();
+    } finally {
+      session.endSession();
     }
   })
 
@@ -505,6 +534,7 @@ io.on('connection', (socket) => {
         console.log("Comment like registered.");
       } catch (err) {
         console.error("Error inserting comment:", err);
+        await session.abortTransaction();
       } finally {
         session.endSession();
       }

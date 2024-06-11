@@ -23,6 +23,15 @@ const NotificationSchema = new Schema({
         type: Boolean,
         default: false,
         required: true,
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+    triggeredBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     }
 })
 

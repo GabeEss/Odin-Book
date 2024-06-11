@@ -25,9 +25,10 @@ router.get("/posts", post_controller.post_list);
 router.get("/post/:id/comments", comment_controller.comment_list);
 
 /// NOTIFICATION ROUTES ///
+/// NOTIFICATIONS CREATED VIA SOCKET ///
 
 router.get("/notifications", notification_controller.notification_list);
-router.put("/notification", notification_controller.notification_update);
+router.put("/notifications", notification_controller.notification_update);
 
 /// USER ROUTES ///
 
