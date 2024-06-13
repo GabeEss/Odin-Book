@@ -43,11 +43,11 @@ router.put("/user/friends/request", user_controller.user_friend_request);
 router.put("/user/friends/accept", user_controller.user_friend_accept);
 router.put("/user/friends/reject", user_controller.user_friend_reject);
 router.put("/user/remove", user_controller.user_remove);
-router.put("/user/block", user_controller.user_block);
 router.get("/user/notifications", user_controller.user_notifications_get);
 router.put("/user/notifications/read", user_controller.user_notifications_read);
 router.put("/user/update", user_controller.user_update);
 router.get("/user/update", user_controller.user_update_get);
+router.get("/user/newsfeed", user_controller.user_newsfeed);
 router.delete("/user", user_controller.user_delete);
 
 /// EVENT ROUTES ///

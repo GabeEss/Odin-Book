@@ -547,11 +547,47 @@ exports.user_remove = asyncHandler(async (req, res, next) => {
     }
 });
 
-// Block a user for the current user
-// Might be too much scope creep for this project
-exports.user_block = asyncHandler(async(req, res, next) => {
-    res.send("NOT IMPLEMENTED: User block");
-})
+
+exports.user_newsfeed = asyncHandler(async (req, res, next) => {
+    const currentUser = await determineUserType(req);
+
+    if(!currentUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found",
+        })
+    }
+
+    const userPosts = (await Post.find({
+        owner: currentUser._id
+    }).populate('owner').
+    populate('likes').exec()) || [];
+
+    const postsOnUserPage = (await Post.find({
+        id: currentUser._id,
+        model: "User"
+    }).populate('owner').
+    populate('likes').exec()) || [];
+
+    // Get users friends if not undefined, if undefined, will return an empty array
+    const friends = currentUser?.friends || [];
+
+    const friendPosts = friends.length > 0 ? (await Post.find({
+        owner: { $in: friends }
+    }).populate('owner').populate('likes').exec()) : [];
+
+    const combinedPosts = [...userPosts, ...postsOnUserPage, ...friendPosts];
+
+    // Remove duplicates
+    const postsMap = new Map(combinedPosts.map(post => [post._id, post]));
+
+    const uniquePosts = Array.from(postsMap.values());
+
+    return res.status(200).json({
+        success: true,
+        posts: uniquePosts
+    })
+});
 
 exports.user_notifications_get = asyncHandler(async (req, res, next) => {
     res.send("NOT IMPLEMENTED: User notifications get");

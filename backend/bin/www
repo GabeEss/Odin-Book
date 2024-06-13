@@ -449,6 +449,51 @@ io.on('connection', (socket) => {
     }
   })
 
+  /// DELETE MESSAGE ///
+
+  socket.on('deleteMessage', async(data) => {
+    try {
+      let sender;
+      if (userCache.has(data.from)) {
+        sender = userCache.get(data.from);
+      } else {
+          // The user is not in the cache, check the userId in the database
+          let user = await User.findOne({ userId: data.from });
+          if (!user) {
+              console.error("Sender user not found in database:", data.from);
+              return;
+          }
+          sender = user;
+          userCache.set(data.from, user);
+      }
+
+      // Get the recipient user
+      let receiver = await User.findOne({ _id: data.to });
+      if (!receiver) {
+        console.error("Receiver user not found in database:", data.to);
+        return;
+      }
+
+      const message = await Message.findById(data.messageId);
+
+      if(!message) {
+        console.error("No message found.");
+        return;
+      }
+
+      // Delete the message
+      await Message.findByIdAndDelete(data.messageId);
+      
+      const chatroomId = [receiver._id, sender._id].sort().join('-');
+
+      // Send to all users
+      io.to('message-' + chatroomId).emit('deleteMessage', message);
+    } catch (error) {
+      console.error("Unable to delete message:", error);
+      return;
+    }
+  })
+
   /// LIKE POST ///
 
   socket.on('likePost', async(data) => {
