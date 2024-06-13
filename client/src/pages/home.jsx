@@ -2,6 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useContext } from "react";
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import HeaderComponent from "../features/header/header-component";
+import FeedDisplayList from "../features/feed/feed-display-list";
 
 function HomePage () {
     const {
@@ -21,7 +22,9 @@ function HomePage () {
                 <div className="sidebar-content">
                 </div>
             </div>
-            <div className="main-component"></div>
+            <div className="main-component">
+                <FeedDisplayList/>
+            </div>
             <div className="sidebar-right sidebar"></div>
         </div>
         </div>

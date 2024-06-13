@@ -29,8 +29,8 @@ function FeedDisplayList() {
 
 
     useEffect(() => {
-        const fetchFeed = () => {
-            const response = makeAuthenticatedRequest(
+        const fetchFeed = async () => {
+            const response = await makeAuthenticatedRequest(
                 getAccessTokenSilently,
                 'get',
                 `${import.meta.env.VITE_API_URL}/user/newsfeed`,
