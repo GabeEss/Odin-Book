@@ -34,7 +34,7 @@
     flex-grow: 1;
 }
 
-.posts-container {
+.posts-container, .newsfeed-container {
     overflow-y: auto;
 }
 

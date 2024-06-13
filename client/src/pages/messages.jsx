@@ -9,7 +9,6 @@ import { useMessages } from "../features/messages/use-messages-hook";
 import MessageList from "../features/messages/message-list-display";
 import handleSendMessage from "../features/messages/create-message";
 import HeaderComponent from "../features/header/header-component";
-// import MessageModal from "../features/messages/message-modal";
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -18,7 +17,6 @@ function MessagingPage() {
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const {id} = useParams();
-    // const [modalIsOpen, setModalIsOpen] = useState(false);
     const { data, error, isLoading } = useMessages(getAccessTokenSilently, id, guest, guestInit);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -39,7 +37,7 @@ function MessagingPage() {
         }
     }, [currentUser]);
 
-    // // Fetches previous messages
+    // Fetches previous messages
     useEffect(() => {
         if(data) {
             setMessages(data.userMessages);
@@ -57,15 +55,21 @@ function MessagingPage() {
         }
     }, [location]);
 
+    useEffect(() => {
+        socket.on('deleteMessage', (messageData) => {
+            setMessages((prevMessages) => prevMessages.filter(message => message._id !== messageData._id));
+        })
+
+        return() => {
+            socket.off('deleteMessage');
+        }
+    }, [location])
+
     // Initializes current user
     useEffect(() => {
         if(guestInit) setCurrentUser(guest);
         else setCurrentUser(user.sub);
     }, [user.sub]);
-
-    // function closeModal() {
-    //     setModalIsOpen(false);
-    // }
 
     const handleHome = () => {
         nav('/home');
@@ -90,12 +94,7 @@ function MessagingPage() {
         <div className='messages-page page'>
             <HeaderComponent/>
             <button onClick={handleHome}>Home</button>
-            <MessageList messages={messages} user={user} guest={guest}/>
-            {/* <MessageModal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                messages={data.userMessages || []}
-            /> */}
+            <MessageList socket={socket} messages={messages} user={user} guest={guest} currentUser={currentUser} id={id}/>
             <form onSubmit={sendMessage}>
                 <input type="text" value={message} onChange={handleMessageChange} />
                 <button type="submit">Send Message</button>
