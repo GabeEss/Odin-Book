@@ -1,16 +1,27 @@
 import Modal from 'react-modal';
+import MessageList from './message-list-display';
+import {useNavigate} from 'react-router-dom';
 
-function MessageModal({ isOpen, onRequestClose, messages }) {
+function MessageModal({ isOpen, onRequestClose, modalUser }) {
+  const nav = useNavigate();
+
+  const handleModalUserClick = () => {
+    nav(`/messages/${modalUser._id}`);
+    onRequestClose();
+  }
+
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Message Modal"
     >
-      <h2>Received Messages</h2>
-      {messages.length !== 0 ? messages.slice(-5).map((message, index) => (
-        <p key={index}>{message}</p>
-      )) : "No messages"}
+      <h2
+        role='button'
+        tabIndex="0"
+        onClick={() => handleModalUserClick()}>
+          {modalUser.username}</h2>
+      <MessageList modalUserId={modalUser._id}/>
       <button onClick={onRequestClose}>Close</button>
     </Modal>
   );

@@ -48,11 +48,23 @@ function FeedDisplayList() {
         fetchFeed();
     }, []);
 
+    const handleItemClick = (item) => {
+        if(item.posted_to.model === "User") {
+            nav(`/user/${item.posted_to.id}`);
+        } else if (item.posted_to.model === "Event") {
+            nav(`/event/${item.posted_to.id}`);
+        }
+    }
+
     return(
         <div className="newsfeed-container" onScroll={handleScroll}>
             {newsItems.length > 0 ? 
                 newsItems.slice(numItems).map((item, index) => (
-                    <div key={index}>
+                    <div key={index}
+                        role='button'
+                        tabIndex="0"
+                        onClick={() => handleItemClick(item)}
+                    >   
                         <div className="post-container">
                             <p className='post-info'>{item.post}</p>
                             <p className='post-owner'>Posted by {item.owner.username}</p>

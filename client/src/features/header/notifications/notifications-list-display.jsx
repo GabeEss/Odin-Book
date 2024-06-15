@@ -5,12 +5,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { GuestInitializeContext } from "../../guest/guest-initialize-context";
 import { GuestContext } from "../../guest/guestid-context";
 
-function NotificationsList({setOpenNotifications}) {
+
+function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     const {
         getAccessTokenSilently,
     } = useAuth0();
     const {guest} = useContext(GuestContext);
-    const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
+    const {guestInit} = useContext(GuestInitializeContext);
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(-5);
     const nav = useNavigate();
@@ -45,7 +46,10 @@ function NotificationsList({setOpenNotifications}) {
     const handleNotificationClick = (notification) => {
         setOpenNotifications(false);
         if(notification.type === "newMessage") {
-            nav(`/messages/${notification.triggeredBy._id}`);
+            if(location.pathname !== `/messages/${notification.triggeredBy._id}`) {
+                setModalUser(notification.triggeredBy);
+                setIsOpen(true);
+            }
         } else if (notification.type === "newPost") {
             nav(`/user/${notification.user}`);
         } else if (notification.type === 'friendRequest') {
@@ -54,26 +58,29 @@ function NotificationsList({setOpenNotifications}) {
     }
 
     return(
-        <div className="notifications-list" onScroll={handleScroll}>
-            {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notificatins</div> :
-            notifications.slice(numItems).map((notification, index) =>
-                <div 
-                    key={index}
-                    role='button'
-                    tabIndex="0"
-                    onClick={() => handleNotificationClick(notification)}
-                >
-                        {notification.read ? 
-                            <div className='notification-container read'>
-                                <p>{notification.notification}</p>
-                                <p>Sent at {notification.timestamp}</p>
-                            </div> : 
-                            <div className='notification-container notread'>
-                                <p>{notification.notification}</p>
-                                <p>Sent at {notification.timestamp}</p>
-                            </div>}
-                </div>
-            )}
+        <div>
+            <div className="notifications-list" onScroll={handleScroll}>
+                {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notificatins</div> :
+                notifications.slice(numItems).map((notification, index) =>
+                    <div 
+                        key={index}
+                        role='button'
+                        tabIndex="0"
+                        onClick={() => handleNotificationClick(notification)}
+                    >
+                            {notification.read ? 
+                                <div className='notification-container read'>
+                                    <p>{notification.notification}</p>
+                                    <p>Sent at {notification.timestamp}</p>
+                                </div> : 
+                                <div className='notification-container notread'>
+                                    <p>{notification.notification}</p>
+                                    <p>Sent at {notification.timestamp}</p>
+                                </div>}
+                    </div>
+                )}
+            </div>
+            
         </div>
     )
 }

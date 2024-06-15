@@ -8,6 +8,7 @@ import { NotificationsContext } from './notifications/notifications-context';
 import { handleGetUser } from './get-current-user';
 import SearchbarComponent from "./searchbar/searchbar-component";
 import NotificationsList from './notifications/notifications-list-display';
+import MessageModal from '../messages/message-modal';
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -26,6 +27,8 @@ function HeaderComponent() {
     const [currentUser, setCurrentUser] = useState(null); // mongo user
     const [authUser, setAuthUser] = useState(null); // guest or auth user
     const [openNotifications, setOpenNotifications] = useState(false); // opens notification display component
+    const [isOpen, setIsOpen] = useState(false); // Determines if the message modal is open
+    const [modalUser, setModalUser] = useState(null);
 
     useEffect(() => {
         handleGetUser(getAccessTokenSilently, guest, guestInit, setCurrentUser);
@@ -92,6 +95,11 @@ function HeaderComponent() {
         nav(`/user/${currentUser._id}`);
     }
 
+    // Handle modal closing
+    const onRequestClose = () => { 
+        setIsOpen(false);
+    }
+
     return(
         <div className="header">
             <SearchbarComponent/>
@@ -106,7 +114,8 @@ function HeaderComponent() {
                     <button className="notifications-nav" onClick={handleNotificationClick}>Notifications</button>
                     }
                     {openNotifications ?
-                      <NotificationsList setOpenNotifications={setOpenNotifications}/> : null
+                      <NotificationsList setOpenNotifications={setOpenNotifications} setIsOpen={setIsOpen} setModalUser={setModalUser}/>
+                       : null
                     }
                 </div>
                 <div className="dropdown-content">
@@ -116,6 +125,8 @@ function HeaderComponent() {
                     <button className='signup-nav' onClick={() => nav('/signup')}>Update User</button>
                 </div>
             </div>
+            {isOpen ? <MessageModal isOpen={isOpen} modalUser={modalUser} onRequestClose={onRequestClose}/> 
+            : null }
         </div>
     )
 }
