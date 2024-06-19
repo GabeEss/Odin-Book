@@ -94,7 +94,7 @@ function MessageList({modalUserId}) {
     useEffect(() => {
         if(guestInit) setCurrentUser(guest);
         else setCurrentUser(user.sub);
-    }, [user.sub, location]);
+    }, [user, location]);
 
     const handleMessageChange = (event) => {
         setMessage(event.target.value);
@@ -124,8 +124,7 @@ function MessageList({modalUserId}) {
                 {isRendering && <div>Loading...</div>}
                 {messages.slice(numItems).map((message, index) => (
                     <div key={index}>
-                        {message.sender && (message.sender.userId === user.sub ||
-                        message.sender.userId === guest ? 
+                        {message.sender && (message.sender.userId === guest || message.sender.userId === user.sub ? 
                         <div className='rightside-message'>
                             <p>{message.message}</p> 
                             <p>Sent by you.</p>

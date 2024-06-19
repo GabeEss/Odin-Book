@@ -120,7 +120,7 @@ function PostListDisplay({location}) {
     useEffect(() => {
         if(guestInit) setCurrentUser(guest);
         else setCurrentUser(user.sub);
-    }, [user.sub]);
+    }, [user]);
 
     const sendPost = async (event) =>
       await handleSendPost(event, socket, setPost, currentUser, id, post);

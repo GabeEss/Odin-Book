@@ -26,7 +26,7 @@ function CreateGuestComponent() {
                 // Initialize guest user and store guest id for future logins from same computer
                 if(response.data.success === true) {
                     setGuestInit(true);
-                    // setGuest(response.data.guestId);
+                    setGuest(response.data.guestId);
                     if(response.data.firstTimeLogin === true) {
                         nav('/signup');
                     } else nav('/home');

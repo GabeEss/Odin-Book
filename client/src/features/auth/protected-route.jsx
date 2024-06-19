@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
 import { useLocation, Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useState, useEffect, useContext } from 'react';
@@ -39,6 +40,8 @@ const ProtectedRoute = ({ children }) => {
     useEffect(() => {
         if (isAuthenticated && guestInit === true) {
             setGuestInit(false);
+            // Clear the guestId cookie, which is set in the backend
+            Cookies.remove('guestId');
         }
     }, [isAuthenticated]);
 

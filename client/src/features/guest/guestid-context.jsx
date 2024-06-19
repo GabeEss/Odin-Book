@@ -8,7 +8,7 @@ export const GuestContext = createContext();
 export const GuestProvider = ({ children }) => {
     const [guest, setGuest] = useState(() => {
         const storedGuest = localStorage.getItem('guest');
-        return storedGuest ? JSON.parse(storedGuest) : "";
+        return storedGuest && storedGuest !== "undefined" ? JSON.parse(storedGuest) : "";
     });
 
     useEffect(() => {

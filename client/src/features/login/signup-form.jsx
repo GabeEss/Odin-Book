@@ -70,6 +70,7 @@ function SignUpForm () {
     const handleSignUp = async (e) => {
         e.preventDefault();
             try {
+                console.log("Sign up sent");
                 const response = await makeAuthenticatedRequest(
                     getAccessTokenSilently,
                     'put',
@@ -81,7 +82,9 @@ function SignUpForm () {
                         from,
                         displayColor,
                         coverColor
-                    }
+                    },
+                    guest,
+                    guestInit
                 );
                 if(response.data.success === true) {
                     navigate('/home');
@@ -89,7 +92,8 @@ function SignUpForm () {
                     setError('Failed to update user information. Please try again.');
                 }
             } catch (error) {
-                setError(error.response.data.message);
+                console.log(error);
+                setError(error.message);
             }
         }
 

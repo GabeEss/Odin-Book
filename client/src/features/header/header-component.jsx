@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import Cookies from 'js-cookie';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
@@ -61,6 +62,8 @@ function HeaderComponent() {
         if(guestInit) {
             setGuestInit(false);
             nav('/');
+            // Clear the guestId cookie, which is set in the backend
+            Cookies.remove('guestId');
         }
     }
 
@@ -68,7 +71,7 @@ function HeaderComponent() {
     useEffect(() => {
         if(guestInit) setAuthUser(guest);
         else setAuthUser(user.sub);
-    }, [user.sub]);
+    }, [user]);
 
     const handleNotificationClick = () => {
         setNotifications(false);

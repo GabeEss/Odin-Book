@@ -111,7 +111,7 @@ function CommentListDisplay({postId}) {
     useEffect(() => {
         if(guestInit) setCurrentUser(guest);
         else setCurrentUser(user.sub);
-    }, [user.sub]);
+    }, [user]);
 
     const sendComment = async (event) =>
         await handleSendComment(event, socket, setComment, currentUser, postId, comment);
