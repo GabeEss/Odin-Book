@@ -332,7 +332,7 @@ io.on('connection', (socket) => {
   })
 
   /// SEND A NOTIFICATION AFTER A FRIEND REQUEST ///
-  socket.on('sendFriendRequestNotification', async(data) => {
+  socket.on('sendFriendRequestNotification', async (data) => {
     try {
       let sender;
       if (userCache.has(data.from)) {
@@ -356,7 +356,7 @@ io.on('connection', (socket) => {
       const notification = new Notification({
         notification: `${sender.username} sent you a friend request.`,
         timestamp: new Date(),
-        user: receiver,
+        user: data.to,
         read: false,
         type: 'friendRequest',
         triggeredBy: sender

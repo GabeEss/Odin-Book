@@ -29,6 +29,7 @@ async function main() {
 }
 
 app.use(cors());
+app.use(cookieParser());
 
 const verifyJwt = jwt({
   secret: jwks.expressJwtSecret({
@@ -40,7 +41,9 @@ const verifyJwt = jwt({
   audience: process.env.AUTH_AUDIENCE,
   issuer: process.env.AUTH_ISSUER,
   algorithms: ['RS256'],
-}).unless({ path: ['/'] });
+}).unless((req) => {
+  return req.path === '/' || req.cookies.guestId;
+});
 
 app.use((req, res, next) => {
   verifyJwt(req, res, (err) => {

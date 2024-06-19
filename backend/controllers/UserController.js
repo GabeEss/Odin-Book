@@ -11,6 +11,7 @@ const decodeTokenApiCall = require("../utils/decodeTokenApiCall");
 const getUserInfo = require("../utils/getUserInfo");
 const determineUserType = require("../utils/determineUserType");
 const searchUserCollection = require("../utils/searchUserCollection");
+const generateGuestID = require("../utils/generateGuestID");
 
 exports.user_register_post = asyncHandler(async (req, res, next) => {
     try {
@@ -67,64 +68,59 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
 
 exports.guest_register_post = asyncHandler(async (req, res, next) => {
     try {
-        // const guest = req.headers['x-guest'];
-        // if(!guest) {
-            // return res.status(400).json({
-                // success: false,
-                // message: 'No guest header',
-            // })
-        // }
-        // console.log(guest);
-        return res.status(200).json({
-            success: true,
-            message: 'Guest exists in database. Regular login.',
-            firstTimeLogin: true,
-        })
+        const guest = req.headers['x-guest'];
+        const mongoUser = await getUserInfo(guest);
+
+        if(mongoUser) {
+            console.log("Guest user exists.");
+
+            // Set the guestId cookie
+            res.cookie('guestId', guest, { httpOnly: true });
+
+            return res.status(200).json({
+                success: true,
+                message: 'Guest exists in database. Regular login.',
+                firstTimeLogin: false,
+                guestId: guest
+            })
+        } else {
+            console.log("Creating guest");
+
+            const guestNum = await generateGuestID();
+            const guestId = "guest" + guestNum;
+
+            const newGuest = new User({
+                userId: guestId,
+                username: guestId,
+                email: `FakeMail${guestId}@guestaddress.com`,
+                worksAt: "Guest Factory",
+                livesIn: "Guestro City, Guestland",
+                from: "Guestville, Guestland",
+                displayColor: "green",
+                coverColor: "purple",
+                friends: [],
+                friendRequests: [],
+                sentRequests: [],
+                notifications: [],
+            })
+
+            await newGuest.save();
+
+            // Set the guestId cookie
+            res.cookie('guestId', guestId, { httpOnly: true });
+
+            return res.status(201).json({
+                success: true,
+                message: 'Guest created successfully',
+                firstTimeLogin: true,
+                guestId: guestId,
+            })
+        }
+        
     } catch (error) {
         console.log('Error:', error.message);
         return res.status(500).json({success: false, message: 'Error registering guest'});
     }
-    //     const mongoGuest = await getUserInfo(guest, null);
-
-    //     if(mongoGuest) {
-    //         return res.status(200).json({
-    //             success: true,
-    //             message: 'Guest exists in database. Regular login.',
-    //         })
-    //     }
-
-    //     console.log("Creating guest");
-
-    //     const guestNum = await generateGuestID();
-    //     const guestId = "guest" + guestNum;
-    //     const guestName = "guest" + guestNum;
-
-    //     const newGuest = new User({
-    //         userId: guestId,
-    //         username: guestName,
-    //         worksAt: "Guest Factory",
-    //         livesIn: "Guestro City, Guestland",
-    //         from: "Guestville, Guestland",
-    //         displayColor: "green",
-    //         coverColor: "purple",
-    //         friends: [],
-    //         friendRequests: [],
-    //         sentRequests: [],
-    //         notifications: [],
-    //     })
-
-    //     await newGuest.save();
-
-    //     return res.status(201).json({
-    //         success: true,
-    //         message: 'Guest created successfully',
-    //         guestId: guestId,
-    //     })
-
-    // } catch (error) {
-    //     console.log('Error:', error.message);
-    //     return res.status(500).json({success: false, message: 'Error registering guest'});
-    // }
 });
 
 exports.user_detail = asyncHandler(async (req, res, next) => {
