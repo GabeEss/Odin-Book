@@ -30,6 +30,8 @@ function HeaderComponent() {
     const [openNotifications, setOpenNotifications] = useState(false); // opens notification display component
     const [isOpen, setIsOpen] = useState(false); // Determines if the message modal is open
     const [modalUser, setModalUser] = useState(null);
+    const [dropdown, setDropdown] = useState(false);
+    const [searchComplete, setSearchComplete] = useState(false); // Opens the search results
 
     useEffect(() => {
         handleGetUser(getAccessTokenSilently, guest, guestInit, setCurrentUser);
@@ -75,6 +77,8 @@ function HeaderComponent() {
 
     const handleNotificationClick = () => {
         setNotifications(false);
+        setDropdown(false);
+        setSearchComplete(false);
         if(!openNotifications) {
             setOpenNotifications(true);
         }
@@ -103,29 +107,47 @@ function HeaderComponent() {
         setIsOpen(false);
     }
 
+    const handleDropdownClick = () => {
+        setDropdown(!dropdown);
+        setOpenNotifications(false);
+        setSearchComplete(false);
+    }
+
     return(
         <div className="header">
-            <SearchbarComponent/>
+            <div className='user-and-search'>
+                <SearchbarComponent 
+                    searchComplete={searchComplete}
+                    setSearchComplete={setSearchComplete}
+                    setDropdown={setDropdown}
+                    setOpenNotifications={setOpenNotifications}/>
+            </div>
             <div className="header-dropdown">
-                {currentUser ? <button className="user-nav" onClick={handleUser}>User Page</button> : null}
-                <button className="friends-nav" onClick={handleFriends}>Friends</button>
-                <button className="events-nav" onClick={handleEvents}>Events</button>
-                <button className="home-nav" onClick={handleHome}>Home</button>
-                <div className='notifications-container'>
+                <div className='header-navigation-group'>
+                    <button className="friends-nav header-button" onClick={handleFriends}>Friends</button>
+                    <button className="events-nav header-button" onClick={handleEvents}>Events</button>
+                    <button className="home-nav header-button" onClick={handleHome}>Home</button>
+                </div>
+                <div className='dropdown-container'>
                     {notifications ? 
-                    <button className="notifications-nav has-notification" onClick={handleNotificationClick}>Notifications</button> : 
-                    <button className="notifications-nav" onClick={handleNotificationClick}>Notifications</button>
+                    <button className="notifications-nav has-notification header-button" onClick={handleNotificationClick}>Notifications</button> : 
+                    <button className="notifications-nav header-button" onClick={handleNotificationClick}>Notifications</button>
                     }
                     {openNotifications ?
                       <NotificationsList setOpenNotifications={setOpenNotifications} setIsOpen={setIsOpen} setModalUser={setModalUser}/>
                        : null
                     }
                 </div>
-                <div className="dropdown-content">
-                    <button className='logout-nav' onClick={handleLogout}>
-                        Log out
-                    </button>
-                    <button className='signup-nav' onClick={() => nav('/signup')}>Update User</button>
+                <div className="dropdown-container">
+                    <button className='header-button' onClick={handleDropdownClick}>...</button>
+                    {dropdown ? 
+                    <div className='dropdown-button-container dropdown'>
+                        {currentUser ? <button className="header-button dropdown-content" onClick={handleUser}>User Page</button> : null}
+                        <button className='logout-header header-button dropdown-content' onClick={handleLogout}>
+                            Log out
+                        </button>
+                        <button className='signup-header header-button dropdown-content' onClick={() => nav('/signup')}>Update User</button>                    
+                    </div> : null }
                 </div>
             </div>
             {isOpen ? <MessageModal isOpen={isOpen} modalUser={modalUser} onRequestClose={onRequestClose}/> 

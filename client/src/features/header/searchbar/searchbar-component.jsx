@@ -6,11 +6,10 @@ import getUsers from './get-users';
 import { GuestInitializeContext } from '../../guest/guest-initialize-context';
 import { GuestContext } from '../../guest/guestid-context';
 
-function SearchbarComponent() {
+function SearchbarComponent({searchComplete, setSearchComplete, setDropdown, setOpenNotifications}) {
     const [search, setSearch] = useState('');
     const [users, setUsers] = useState([]);
     const [events, setEvents] = useState([]);
-    const [searchComplete, setSearchComplete] = useState(false);
     const [error, setError] = useState('');
     const { guestInit } = useContext(GuestInitializeContext);
     const { guest } = useContext(GuestContext);
@@ -19,6 +18,13 @@ function SearchbarComponent() {
 
     const handleSearch = async (e) => {
         e.preventDefault();
+        setOpenNotifications(false);
+        setDropdown(false);
+
+        if(search === "") {
+            setSearchComplete(false);
+            return;
+        }
         setSearchComplete(false);
         try {
             const users = await getUsers(search, getAccessTokenSilently, guest, guestInit);
@@ -54,25 +60,25 @@ function SearchbarComponent() {
                 className='searchbar' 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)}/>
-                <button className='search-button' type='submit'>Search</button>
+                <button className='search-button header-button' type='submit'>Search</button>
             </form>
-            { searchComplete ? <div className='search-results'>
-                <h2>Users</h2>
+            { searchComplete ? <div className='search-results dropdown'>
+                <h3 className='search-header'>Users</h3>
                 {users && users.length === 0 ? <p>No users found</p> :
                         users.map((user) => {
                             return (
                                 <div key={user._id}>
-                                    <button className="user-nav" onClick={() => handleUser(user._id)}>{user.username}</button>
+                                    <button className="user-nav header-button search-nav" onClick={() => handleUser(user._id)}>{user.username}</button>
                                 </div>
                             )
                         })
                 }
-                <h2>Events</h2>
+                <h3 className='search-header'>Events</h3>
                 {events && events.length === 0 ? <p>No events found</p> :
                     events.map((event) => {
                         return (
                             <div key={event._id}>
-                                <button className="event-nav" onClick={() => handleEvent(event._id)}>{event.event}</button>
+                                <button className="event-nav header-button" onClick={() => handleEvent(event._id)}>{event.event}</button>
                             </div>
                         )
                     })

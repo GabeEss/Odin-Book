@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState, useContext, useRef } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {useParams} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
@@ -111,7 +111,7 @@ function MessageList({modalUserId}) {
     }
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <div className='spinner'></div>;
     }
 
     if (error) {
@@ -121,25 +121,33 @@ function MessageList({modalUserId}) {
     return(
         <div className='messages-and-send-message'>
             <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
-                {isRendering && <div>Loading...</div>}
+                {isRendering && <div className='spinner'></div>}
                 {messages.slice(numItems).map((message, index) => (
                     <div key={index}>
-                        {message.sender && (message.sender.userId === guest || message.sender.userId === user.sub ? 
-                        <div className='rightside-message'>
-                            <p>{message.message}</p> 
-                            <p>Sent by you.</p>
-                            <button onClick={() => handleDeleteClick(message._id)}>Delete</button>
+                        {message.sender && (message.sender.userId === (user?.sub || guest) ? 
+                        <div className='rightside-message-container'>
+                            <div className='message-fit-content right-message'>
+                                <p className='message-info'>{message.message}</p> 
+                                <div className='message-other-details'>
+                                    <p>Sent by you.</p>
+                                    <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+                                </div>
+                            </div>
                         </div> :
-                        <div className='leftside-message'>
-                            <p>{message.message}</p>
-                            <p>Sent by {message.sender.username}</p>
+                        <div className='leftside-message-container'>
+                            <div className='message-fit-content left-message'>
+                                <p className='message-info'>{message.message}</p>
+                                <div className='message-other-details'>
+                                    <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                                </div>
+                            </div>
                         </div>)}
                     </div>
                 ))}
             </div>
             <form className="send-message-container" onSubmit={sendMessage}>
-                <input type="text" value={message} onChange={handleMessageChange} />
-                <button type="submit">Send Message</button>
+                <textarea className='send-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
+                <button className='submit-message-button' type="submit">Send Message</button>
             </form>
         </div>
     )

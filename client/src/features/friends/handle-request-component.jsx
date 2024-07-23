@@ -48,8 +48,8 @@ function HandleRequestComponent({ id, setFriendChange, friendChange }) {
     }
 
   return (
-    <div>
-      <button onClick={() => acceptRequest()}>Accept</button>
+    <div className='friend-request-component'>
+      <button className='accept-friend-button' onClick={() => acceptRequest()}>Accept</button>
       <button onClick={() => rejectRequest()}>Reject</button>
     </div>
   );

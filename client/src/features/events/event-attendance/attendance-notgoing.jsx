@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 function AttendanceNotGoing({event}) {
     return(
         <div className="attendance-not-going-container">
@@ -6,8 +8,8 @@ function AttendanceNotGoing({event}) {
                     return(
                         <div className='attendance-not-going' key={member.user._id}>
                             {member.status === 'notGoing' && event.owner === member.user._id ? 
-                            <p>{member.user.username + ` (admin)`}</p> : member.status === 'notGoing' ?
-                            <p>{member.user.username}</p> : null}
+                            <p><Link to={`/user/${member.user._id}`}>{member.user.username + ` (admin)`}</Link></p> : member.status === 'notGoing' ?
+                            <p><Link to={`/user/${member.user._id}`}>{member.user.username}</Link></p> : null}
                         </div>
                     );
                 }  

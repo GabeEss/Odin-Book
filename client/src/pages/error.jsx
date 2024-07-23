@@ -6,8 +6,8 @@ function ErrorPage() {
     const nav = useNavigate();
 
     return (
-        <div>
-            <h1>Error</h1>
+        <div className='error-page'>
+            <h1 className='error-heading'>Error</h1>
             {isAuthenticated ? 
                     <button onClick={() => {logout()}}>
                         Logout

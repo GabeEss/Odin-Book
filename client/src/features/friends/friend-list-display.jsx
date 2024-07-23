@@ -10,14 +10,14 @@ function FriendListDisplay({friends}) {
             :
                 friends.map((friend) => {
                     return (
-                        <button 
-                            key={friend._id} 
-                            className='user-nav friend-list-item'
-                            onClick={() => navigate(`/user/${friend._id}`)}
-                            >
-                            {/* {friend.displayColor} */}
-                            {friend.username}
-                        </button>
+                        <div
+                        onClick={() => navigate(`/user/${friend._id}`)}
+                        className='friend-list-item' key={friend._id}>
+                            <div className="friend-display-item" style={{backgroundColor: friend.displayColor}}></div>
+                            <p className='friend-list-name'>
+                                {friend.username}
+                            </p>
+                        </div>
                     )
                 })
             }

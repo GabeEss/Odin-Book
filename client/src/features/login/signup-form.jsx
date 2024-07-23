@@ -101,49 +101,57 @@ function SignUpForm () {
             navigate('/home');
         };
 
-    if(isLoading) return (<h2 className='loading-heading'>Loading...</h2>);
+    if(isLoading) return (<h2 className='loading-heading spinner'></h2>);
 
     return(
         <form className='signup-form form' onSubmit={handleSignUp}>
-            <label>
-                Username:
+            <label className='signup-field'>
+            <p className='signup-label'>Username:</p>
                 <input
+                maxLength={20}
+                className='signup-input'
                 type="text"
                 placeholder={placeholderUsername}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 />
             </label>
-            <label>
-                Works At:
+            <label className='signup-field'>
+                <p className='signup-label'>Works At:</p>
                 <input
+                maxLength={40}
+                className='signup-input'
                 type="text"
                 placeholder={placeholderWorksAt}
                 value={worksAt}
                 onChange={(e) => setWorksAt(e.target.value)}
                 />
             </label>
-            <label>
-                Lives In:
+            <label className='signup-field'>
+                <p className='signup-label'>Lives In:</p>
                 <input
+                maxLength={40}
+                className='signup-input'
                 type='text'
                 placeholder={placeholderLivesIn}
                 value={livesIn}
                 onChange={(e) => setLivesIn(e.target.value)}
                 />
             </label>
-            <label>
-                From:
+            <label className='signup-field'>
+                <p className='signup-label'>From:</p>
                 <input
+                maxLength={40}
+                className='signup-input'
                 type='text'
                 placeholder={placeholderFrom}
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
                 />
             </label>
-            <label>
-                Profile Color:
-                <select value={displayColor} onChange={(e) => setDisplayColor(e.target.value)}>
+            <label className='signup-field'>
+                <p className='signup-label'>Profile Color:</p>
+                <select className='signup-input' value={displayColor} onChange={(e) => setDisplayColor(e.target.value)}>
                     <option value="blue">Blue</option>
                     <option value="green">Green</option>
                     <option value="red">Red</option>
@@ -151,9 +159,9 @@ function SignUpForm () {
                     <option value="purple">Purple</option>
                 </select>
             </label>
-            <label>
-                Cover Color:
-                <select value={coverColor} onChange={(e) => setCoverColor(e.target.value)}>
+            <label className='signup-field'>
+                <p className='signup-label'>Cover Color:</p>
+                <select className='signup-input' value={coverColor} onChange={(e) => setCoverColor(e.target.value)}>
                     <option value="blue">Blue</option>
                     <option value="green">Green</option>
                     <option value="red">Red</option>
@@ -161,8 +169,10 @@ function SignUpForm () {
                     <option value="purple">Purple</option>
                 </select>
             </label>
-                <button className='signup-button' type='submit'>Sign Up</button>
-                <button className='skip-button' onClick={handleSkip}>Skip</button>
+                <div className='signup-submit-buttons'>
+                    <button className='signup-button' type='submit'>Update Information</button>
+                    <button className='skip-button' onClick={handleSkip}>Skip</button>
+                </div>
                 <p className="error-message">{error}</p>
         </form>
     )

@@ -11,6 +11,11 @@ const handleSendPost = async (event, socket, setPost, currentUser, id, post) => 
         return;
     }
 
+    if (post.length > 100) {
+        console.log("Post is too long.");
+        return;
+    }
+
     if(!id) {
         console.log("No page reference provided.")
         return;

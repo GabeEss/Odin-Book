@@ -13,7 +13,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     const {guest} = useContext(GuestContext);
     const {guestInit} = useContext(GuestInitializeContext);
     const [rendering, setIsRendering] = useState(false);
-    const [numItems, setNumItems] = useState(-5);
+    const [numItems, setNumItems] = useState(5);
     const nav = useNavigate();
     const { data, error, isLoading, refetch } = useNotifications(getAccessTokenSilently, guest, guestInit);
     const [notifications, setNotifications] = useState([]);
@@ -21,7 +21,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     // Handle scrolling down to render more posts
     const handleScroll = (e) => {
         const {scrollTop, clientHeight, scrollHeight } = e.target;
-        if (scrollTop + clientHeight >= scrollHeight && !rendering && numItems < posts.length) {
+        if (scrollTop + clientHeight >= scrollHeight && !rendering && numItems < notifications.length) {
           setIsRendering(true);
           setTimeout(() => {
               setNumItems(prevNumItems => prevNumItems + 5);
@@ -58,29 +58,27 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     }
 
     return(
-        <div>
-            <div className="notifications-list" onScroll={handleScroll}>
-                {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notificatins</div> :
-                notifications.slice(numItems).map((notification, index) =>
-                    <div 
-                        key={index}
-                        role='button'
-                        tabIndex="0"
-                        onClick={() => handleNotificationClick(notification)}
-                    >
-                            {notification.read ? 
-                                <div className='notification-container read'>
-                                    <p>{notification.notification}</p>
-                                    <p>Sent at {notification.timestamp}</p>
-                                </div> : 
-                                <div className='notification-container notread'>
-                                    <p>{notification.notification}</p>
-                                    <p>Sent at {notification.timestamp}</p>
-                                </div>}
-                    </div>
-                )}
-            </div>
-            
+        <div className="notifications-list dropdown" onScroll={handleScroll}>
+            {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notificatins</div> :
+            notifications.slice(0, numItems).map((notification, index) =>
+                <div 
+                    key={index}
+                    className='notification'
+                    role='button'
+                    tabIndex="0"
+                    onClick={() => handleNotificationClick(notification)}
+                >
+                        {notification.read ? 
+                            <div className='notification-container read'>
+                                <p>{notification.notification}</p>
+                                <p>{new Date(notification.timestamp).toLocaleString()}</p>
+                            </div> : 
+                            <div className='notification-container notread'>
+                                <p>{notification.notification}</p>
+                                <p>{new Date(notification.timestamp).toLocaleString()}</p>
+                            </div>}
+                </div>
+            )}
         </div>
     )
 }

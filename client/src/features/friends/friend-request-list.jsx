@@ -1,17 +1,20 @@
 import HandleRequestComponent from './handle-request-component';
+import {Link} from 'react-router-dom';
 
 function FriendRequestList({friendRequests, setGetRequests, getRequests}) {
 
     return(
-        <div className="friend-request-list">
+        <div className='friend-request-container'>
             {friendRequests && friendRequests.length === 0 ? null
-            : <div>
+            : <div className="friend-request-list">
                 <h2>Friend Requests</h2>
                 {friendRequests.map((request) => {
                     return (
-                        <div key={request._id}>
-                            {/* {request.displayColor} */}
-                            {request.username}
+                        <div className='friend-request-item' key={request._id}>
+                            <div className='friend-request-user-display'>
+                                {/* <div className="friend-display-item" style={{backgroundColor: request.displayColor}}></div> */}
+                                <p>Friend request from <Link to={`/user/${request._id}`}>{request.username}</Link>.</p>
+                            </div>
                             <HandleRequestComponent 
                                 id={request}
                                 setFriendChange={setGetRequests}

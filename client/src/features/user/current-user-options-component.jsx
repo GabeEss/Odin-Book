@@ -12,9 +12,9 @@ function CurrentUserOptions() {
     }
 
     return (
-        <div>
+        <div className="user-options">
             <button className='signup-nav' onClick={handleUpdateClick}>Update Information</button>
-            <button className="friends-nav" onClick={handleFriendClick}>Friend Requests</button>
+            <button className="friends-nav" onClick={handleFriendClick}>Friends</button>
         </div>
     );
 }

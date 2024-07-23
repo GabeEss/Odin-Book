@@ -12,6 +12,7 @@ function FriendsPage() {
     const [friends, setFriends] = useState([]);
     const [friendRequests, setFriendRequests] = useState([]);
     const [getRequests, setGetRequests] = useState(false);
+    const [loadingWheel, setLoadingWheel] = useState(true);
     const { getAccessTokenSilently } = useAuth0();
     const { guestInit } = useContext(GuestInitializeContext);
     const { guest } = useContext(GuestContext);
@@ -21,6 +22,7 @@ function FriendsPage() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
+                setLoadingWheel(true);
                 const response = await makeAuthenticatedRequest(
                     getAccessTokenSilently,
                     'get',
@@ -32,6 +34,7 @@ function FriendsPage() {
                 if(response.data.success) {
                     setFriends(response.data.friends);
                     setFriendRequests(response.data.friendRequests);
+                    setLoadingWheel(false);
                 } else console.log(response.data.message);
             } catch (error) {
                 console.error('error', error);
@@ -44,20 +47,19 @@ function FriendsPage() {
         nav('/home');
     }
 
+    if(loadingWheel) return <div className="spinner"></div>
 
   return (
     <div className="friends-page page">
         <HeaderComponent/>
-        <FriendRequestList 
-            friendRequests={friendRequests} 
-            setGetRequests={setGetRequests} 
-            getRequests={getRequests} 
-        />
-        <br />
-        <FriendListDisplay friends={friends} />
-        <br />
-        <br />
-        <button onClick={handleHome}>Home</button>
+        <div className="friends-list-main">
+            <FriendRequestList 
+                friendRequests={friendRequests} 
+                setGetRequests={setGetRequests} 
+                getRequests={getRequests} 
+            />
+            <FriendListDisplay friends={friends} />
+        </div>
     </div>
   );
 }

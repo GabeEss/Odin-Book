@@ -47,13 +47,16 @@ function EventsPage() {
     return(
         <div className='events-page page'>
             <HeaderComponent/>
-            <h1>Events Page</h1>
-            <button className='home-button' onClick={handleHome}>Home</button>
-            <CreateEventComponent/>
-            {loading ? <p className="loading">Loading...</p> : events.length > 0 ? 
-                <EventListDisplay events={events}/> :
-                <p>No events to display</p>
-            }
+            <div className='events-main'>
+                <h1 className='events-header'>Events</h1>
+                <div className='event-create-and-list'>
+                    <CreateEventComponent/>
+                    {loading ? <p className="loading">Loading...</p> : events.length > 0 ? 
+                        <EventListDisplay events={events}/> :
+                        <p className='no events'>No events to display</p>
+                    }
+                </div>
+            </div>
         </div>
     )
 }

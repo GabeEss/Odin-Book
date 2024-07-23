@@ -12,13 +12,13 @@ function UserOptions({id, sentRequest, receivedRequest, isFriend, setFriendChang
     }
 
     return (
-        <div>
-            <button onClick={handleMessage}>Send message</button>
+        <div className='user-options'>
+            <button className='send-message-userpage' onClick={handleMessage}>Send message</button>
             {isFriend ? <RemoveFriendComponent
                 id={id}
                 setFriendChange={setFriendChange}
                 friendChange={friendChange}/> : 
-            sentRequest ? <p>Friend request sent</p> : 
+            sentRequest ? null : 
             receivedRequest ? 
             <HandleRequestComponent
                 id={id}

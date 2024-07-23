@@ -36,7 +36,7 @@ function DeleteEventComponent() {
 
     return(
         <div className="delete-event">
-            <button onClick={handleDelete}>Delete Event</button>
+            <button className='owner-button' onClick={handleDelete}>Delete Event</button>
         </div>
     )
 }

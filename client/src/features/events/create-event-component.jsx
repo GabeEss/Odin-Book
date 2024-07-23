@@ -46,21 +46,27 @@ function CreateEventComponent() {
         }
     };
 
+    const handleCancel = () => {
+        setModalIsOpen(false);
+    }
+
     return(
         <div className='create-event-component'>
             <button className='create-event-button' onClick={() => setModalIsOpen(true)}>Create Event</button>
             <Modal
+                className='create-event-modal'
                 isOpen={modalIsOpen}
                 onRequestClose={() => setModalIsOpen(false)}
                 contentLabel="Create Event Modal"
             >
-                <button onClick={() => setModalIsOpen(false)}>Close</button>
-                <h2>Create Event</h2>
                 <form className='create-event-form' onSubmit={handleSubmit}>
+                    <h2>Create New Event</h2>
                     <label>
                         Event Name:
                     </label>
-                    <input type="text" />
+                    <input
+                    maxLength={25}
+                    type="text" />
                     <label>
                         Date:
                     </label>
@@ -72,14 +78,18 @@ function CreateEventComponent() {
                     <label>
                         Location:
                     </label>
-                    <input type="text" />
+                    <input 
+                    maxLength={25}
+                    type="text" />
                     <label>
                         Description:
                     </label>
-                    <input type="text" />
+                    <textarea
+                    maxLength={50}/>
                     <button type="submit">
                         Submit
                     </button>
+                    <button onClick={handleCancel}>Cancel</button>
                 </form>
                 {error && <p>{error}</p>}
             </Modal>

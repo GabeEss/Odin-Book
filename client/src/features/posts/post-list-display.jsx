@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect, useContext } from "react";
-import {useParams} from 'react-router-dom';
+import {useParams, Link} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
 import { usePosts } from "./use-posts-hook";
@@ -152,7 +152,7 @@ function PostListDisplay({location}) {
     }
 
     if (isLoading) {
-      return <div>Loading...</div>;
+      return <div className='spinner'></div>;
     }
 
     if (error) {
@@ -161,54 +161,64 @@ function PostListDisplay({location}) {
 
   return (
     <div className={'posts-container'} onScroll={handleScroll}>
-      <form onSubmit={sendPost}>
-        <input
-          type="text"
+      <form className='post-submit-container' onSubmit={sendPost}>
+        <textarea
+          className='post-submit'
+          rows="4"
+          cols="50"
+          maxLength={100}
           value={post}
           onChange={(e) => setPost(e.target.value)}
           placeholder="What's on your mind?"
         />
-        <button type="submit">Post</button>
+        <button className='post-submit-button' type="submit">Post</button>
       </form>
       {posts.slice(numItems).map((post, index) => (
                 <div key={index}>
                     <div className='post-container'>
+                      <div className='post-top-row'>
+                      {post.owner.userId !== currentUser ? null :
+                          !deletePostId && !editPostId ? 
+                            <div className='post-options'>
+                                <button className='edit-post' onClick={() => setEditPostId(post._id)}>✏️</button>
+                                <button className='delete-post' onClick={() => setDeletePostId(post._id)}>🗑️</button>
+                            </div> : null }
                         <p className='post-info'>{post.post}</p>
-                        <p className='post-owner'>Posted by {post.owner.username}</p>
-                        <p className='post-date'>Posted on {post.date_created}</p>
-                        {awaitResponse ? null : post.likes.map(user => user.userId).includes(currentUser) ?
-                          <button onClick={() => handleLike(post._id, 'unlike')}>Unlike Post</button> : 
-                          <button onClick={() => handleLike(post._id, 'like')}>Like Post</button>
-                        }
-                        <p>Likes: {post.likes.length}</p>
-                        {post.owner.userId !== currentUser ? null :
-                        !deletePostId && !editPostId ? 
-                          <div className='post-options'>
-                              <button onClick={() => setEditPostId(post._id)}>Edit Post</button>
-                              <button onClick={() => setDeletePostId(post._id)}>Delete Post</button>
-                          </div> : editPostId === post._id ? 
-                          <form onSubmit={(event) => editPost(event, post._id)}>
-                            <label>
-                              Update Post:
-                              <input 
-                              type='text'
-                              placeholder={post.post}
-                              value={edit}
-                              onChange={(e) => setEdit(e.target.value)}
-                              />
-                            </label>
-                            <button className='edit-post-button' type='submit'>Submit Update</button>
-                            <button className='cancel-button' onClick={handleCancel}>Cancel</button>
-                          </form> :
-                          deletePostId === post._id ? 
-                          <div>
-                            <button onClick={(event) => deletePost(event, post._id)}>Confirm Delete</button>
-                            <button className='cancel-button' onClick={handleCancel}>Cancel</button>
-                          </div> :
-                          null }
-                        {loadCommentsId !== post._id ? 
-                          <button onClick={() => handleComments(post._id)}>Comments...</button> :
-                          <CommentListDisplay postId={post._id}/>}
+                        </div>
+                        <div className='post-middle-row'>
+                          <p className='post-owner'><Link to={`/user/${post.owner._id}`}>{post.owner.username}</Link></p>
+                          <p className='post-date'>{new Date(post.date_created).toLocaleString()}</p>
+                          <div className='post-likes-container'>                         
+                            {awaitResponse ? null : post.likes.map(user => user.userId).includes(currentUser) ?
+                              <button className='unlike-button' onClick={() => handleLike(post._id, 'unlike')}>👎</button> : 
+                              <button className='like-button' onClick={() => handleLike(post._id, 'like')}>👍</button>
+                            }
+                            <p className='post-likes'>Likes: {post.likes.length}</p>
+                          </div> 
+                        </div>
+                            <form 
+                            className={`edit-post-form ${editPostId === post._id ? 'active' : ''}`}
+                            onSubmit={(event) => editPost(event, post._id)}>
+                                <textarea 
+                                row='4'
+                                cols='50'
+                                maxLength={100}
+                                placeholder={post.post}
+                                value={edit}
+                                onChange={(e) => setEdit(e.target.value)}
+                                />
+                              <button className='edit-post-button' type='submit'>Update</button>
+                              <button className='cancel-button' onClick={handleCancel}>Cancel</button>
+                            </form> 
+                            <div className={`delete-post-form ${deletePostId === post._id ? 'active' : ''}`}>
+                              <button className='delete-post-button' onClick={(event) => deletePost(event, post._id)}>Confirm Delete</button>
+                              <button className='cancel-button' onClick={handleCancel}>Cancel</button>
+                            </div>
+                          <div className='post-comments-section'>
+                          {loadCommentsId !== post._id ? 
+                              <button onClick={() => handleComments(post._id)}>Comments...</button> :
+                              <CommentListDisplay postId={post._id}/>}
+                          </div>
                     </div>
                 </div>
         ))}

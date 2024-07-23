@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 function AttendancePending({event}) {
     return(
         <div className="attendance-pending-container">
@@ -6,8 +8,8 @@ function AttendancePending({event}) {
                     return(
                         <div className='pending' key={member.user._id}>
                             {member.status === 'pending' && event.owner === member.user._id ? 
-                            <p>{member.user.username + ` (admin)`}</p> : member.status === 'pending' ?
-                            <p>{member.user.username}</p> : null}
+                            <p><Link to={`/user/${member.user._id}`}>{member.user.username + ` (admin)`}</Link></p> : member.status === 'pending' ?
+                            <p><Link to={`/user/${member.user._id}`}>{member.user.username}</Link></p> : null}
                         </div>
                     );
                 }

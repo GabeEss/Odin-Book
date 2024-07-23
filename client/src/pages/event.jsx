@@ -4,11 +4,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import { GuestContext } from "../features/guest/guestid-context";
-
 import HeaderComponent from "../features/header/header-component";
 import EventDisplay from '../features/events/event-display';
-import CreateEventComponent from '../features/events/create-event-component';
-import PostListDisplay from '../features/posts/post-list-display';
 
 function EventPage() {
     const { getAccessTokenSilently } = useAuth0();
@@ -51,21 +48,17 @@ function EventPage() {
     return(
         <div className="event-page page">
             <HeaderComponent/>
-            <h1>Event Page</h1>
-            <button className='home-button' onClick={() => nav('/home')}>Home</button>
-            <CreateEventComponent/>
             {loading ? <p className='loading'>Loading...</p> :
-                <EventDisplay
-                    event={event} 
-                    isOwner={isOwner} 
-                    isMember={isMember} 
-                    setGetEvent={setGetEvent}
-                    getEvent={getEvent}
-                />
+                <div className='event-main-content'>
+                    <EventDisplay
+                        event={event} 
+                        isOwner={isOwner} 
+                        isMember={isMember} 
+                        setGetEvent={setGetEvent}
+                        getEvent={getEvent}
+                    />
+                </div>
             }
-            <div className='main-content'>
-                <PostListDisplay/>
-            </div>
         </div>
     )
 }

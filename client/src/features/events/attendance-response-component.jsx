@@ -31,9 +31,9 @@ function AttendanceResponeComponent({event, setGetEvent, getEvent}) {
 
     return(
         <div className='attendance-response-container'>
-            <h1>Attendance Response</h1>
-            <p>Are you attending this event?</p>
-            <div className='response-buttons'>
+            <h3 className='attendance-response-header'>Attendance Response</h3>
+            <p className='event-attending-question'>Are you attending this event?</p>
+            <div className='event-response-buttons'>
                 <button onClick={() => handleResponse('going')}>Yes</button>
                 <button onClick={() => handleResponse('notGoing')}>No</button>
                 <button onClick={() => handleResponse('maybe')}>Maybe</button>

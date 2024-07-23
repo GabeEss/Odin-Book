@@ -15,14 +15,23 @@ const ProtectedRoute = ({ children }) => {
     const [isCheckingConnection, setIsCheckingConnection] = useState(true);
     const { guestInit, setGuestInit } = useContext(GuestInitializeContext);
 
-    // Check backend connection when loading a new page.
-    // Note: this will not check mongo.
+    // Check backend connection when loading a new page, then check mongo connection.
     useEffect(() => {
       const checkConnection = async () => {
           try {
-            //   console.log('Checking connection to backend.');
               const response = await axios.get(`${import.meta.env.VITE_API_URL}/health`);
-              setIsConnected(response.status === 200);
+              if(response) {
+                // Check connection to MongoDB
+                const dbResponse = await axios.get(`${import.meta.env.VITE_API_URL}/health/db`);
+                if (dbResponse.status === 200) {
+                    setIsConnected(true);
+                } else if (dbResponse.data === "MongoDB connecting") {
+                    // If MongoDB is connecting, retry after a delay
+                    setTimeout(checkConnection, 5000);
+                } else {
+                    setIsConnected(false);
+                }
+              }
           } catch (error) {
               console.error('Failed to connect to backend:', error);
               setGuestInit(false);

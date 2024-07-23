@@ -34,7 +34,7 @@ function LeaveEventComponent({setGetEvent, getEvent}) {
     }
     return(
         <div className="update-event-membership">
-            <button onClick={handleLeave}>Leave Event</button>
+            <button className='event-user-button' onClick={handleLeave}>Leave Event</button>
         </div>
     )
 }

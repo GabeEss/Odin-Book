@@ -1,7 +1,8 @@
-function ProfileDisplay({user}) {
+function ProfileDisplay({user, self}) {
     return(
         <div>
-            <h1>{user.username}</h1>
+            {self ? <div className="user-you"><h1 className="user-header">{user.username} </h1> <p> (you)</p></div> 
+            : <h1 className="user-header">{user.username}</h1>}
             <div className="user-display" style={{backgroundColor: user.displayColor}}></div>
         </div>
     )

@@ -64,20 +64,21 @@ function UpdateEventComponent({event, setGetEvent, getEvent}) {
     return(
         <div className="update-event">
             <div className='update-event-component'>
-            <button className='update-event-button' onClick={() => setModalIsOpen(true)}>Update Event</button>
+            <button className='update-event-button owner-button' onClick={() => setModalIsOpen(true)}>Update Event</button>
             <Modal
+                className='create-event-modal'
                 isOpen={modalIsOpen}
                 onRequestClose={() => setModalIsOpen(false)}
                 contentLabel="Create Event Modal"
             >
-                <button onClick={() => setModalIsOpen(false)}>Close</button>
-                <h2>Update Event</h2>
-                <form className='update-event-form' onSubmit={handleSubmit}>
+                <form className='create-event-form update-event-form' onSubmit={handleSubmit}>
+                    <h2>Update Event</h2>
                     <label>
                         Event Name:
                     </label>
                     <input 
                     type="text"
+                    maxLength={25}
                     placeholder={eventName}
                     value={eventName}
                     onChange={(e) => setEventName(e.target.value)}
@@ -103,6 +104,7 @@ function UpdateEventComponent({event, setGetEvent, getEvent}) {
                     </label>
                     <input
                     type="text" 
+                    maxLength={25}
                     placeholder={location}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
@@ -110,13 +112,13 @@ function UpdateEventComponent({event, setGetEvent, getEvent}) {
                     <label>
                         Description:
                     </label>
-                    <input 
-                    type="text" 
+                    <textarea 
+                    maxLength={50}
                     placeholder={description}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     />
-                    <div>
+                    <div className='remove-event-members'>
                         <label>
                             Remove Selected Members:
                         </label>
@@ -129,6 +131,7 @@ function UpdateEventComponent({event, setGetEvent, getEvent}) {
                     <button type="submit">
                         Submit
                     </button>
+                    <button onClick={() => setModalIsOpen(false)}>Close</button>
                 </form>
                 {error && <p>{error}</p>}
             </Modal>

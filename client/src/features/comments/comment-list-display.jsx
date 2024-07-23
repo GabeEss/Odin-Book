@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
+import { Link } from 'react-router-dom';
 import { useState, useEffect, useContext } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
@@ -139,36 +140,43 @@ function CommentListDisplay({postId}) {
     return(
         <div className='comments-container' onScroll={handleScroll}>
             <form onSubmit={sendComment}>
-                <input
-                 type='text'
-                 value={comment}
-                 onChange={(e) => setComment(e.target.value)}
-                 placeholder='Write a comment...'
+                <textarea 
+                className='comment-textarea'
+                row='4'
+                cols='50'
+                maxLength={100}
+                placeholder="Write a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
                 />
-                <button type='submit'>Send</button>
+                <button className='comment-submit-button' type='submit'>Send</button>
             </form>
             {comments && comments.slice(numItems).map((comment, index) => (
                 <div key={index}>
                     <div className='comment-container'>
-                        <p className='comment-info'>{comment.comment}</p>
-                        <p className='comment-owner'>Posted by {comment.owner.username}</p>
-                        <p className='comment-date'>Posted on {comment.date_created}</p>
-                        {awaitResponseId && awaitResponseId === comment._id ? null : comment.likes.map(user => user.userId).includes(currentUser) ?
-                          <button onClick={() => handleLike(comment._id, 'unlike')}>Unlike Comment</button> : 
-                          <button onClick={() => handleLike(comment._id, 'like')}>Like Comment</button>
-                        }
-                        <p>Likes: {comment.likes.length}</p>
+                        <div className='comment-options-info'>
                         {comment.owner.userId !== currentUser ? null :
                         !deleteCommentId ?
                             <div className='comment-options'>
-                                <button onClick={() => setDeleteCommentId(comment._id)}>Delete Comment</button>
+                                <button className='delete-comment-button' onClick={() => setDeleteCommentId(comment._id)}>🗑️</button>
+                            </div> : null }
+                        <p className='comment-info'>{comment.comment}</p>
+                        </div>
+                        <div className='comment-middle-row'>
+                            <p className='comment-owner'><Link to={`/user/${comment.owner._id}`}>{comment.owner.username}</Link></p>
+                            <p className='comment-date'>{new Date(comment.date_created).toLocaleString()}</p>
+                            <div className='comment-likes-container'>
+                                {awaitResponseId && awaitResponseId === comment._id ? null : comment.likes.map(user => user.userId).includes(currentUser) ?
+                                <button className='unlike-button' onClick={() => handleLike(comment._id, 'unlike')}>👎</button> : 
+                                <button className='like-button' onClick={() => handleLike(comment._id, 'like')}>👍</button>
+                                }
+                                <p>Likes: {comment.likes.length}</p>
                             </div>
-                        : deleteCommentId === comment._id ?
-                        <div>
+                        </div>
+                        <div className={`delete-comment-form ${deleteCommentId === comment._id ? 'active' : ''}`}>
                             <button onClick={(event) => deleteComment(event, comment._id)}>Confirm Delete</button>
                             <button className='cancel-button' onClick={handleCancel}>Cancel</button>
-                        </div> : null
-                        }
+                        </div>
                     </div>
                 </div>
             ))}

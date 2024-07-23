@@ -11,22 +11,15 @@ function HomePage () {
     const {guestInit} = useContext(GuestInitializeContext);
     
     return(
-    <div className="home-page page">
-        <h1>Home Page</h1>
-        { guestInit ? <p>Guest user initialized</p> : null}
+    <div>
         { isAuthenticated || guestInit ? 
-        <div>
-            <div className="home-page page">
+        <div className="home-page page">
             <HeaderComponent/>
-            <div className="sidebar-left sidebar">
-                <div className="sidebar-content">
-                </div>
-            </div>
-            <div className="main-component">
+            <div className="home-main">
+                <h1 className="home-header">Your Feed</h1>
+                { guestInit ? <p className="guest-init">Welcome Guest!</p> : null}
                 <FeedDisplayList/>
             </div>
-            <div className="sidebar-right sidebar"></div>
-        </div>
         </div>
          : null
         }
