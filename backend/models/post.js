@@ -1,6 +1,5 @@
 const {DateTime} = require('luxon');
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
 const PostSchema = new Schema({
@@ -17,6 +16,7 @@ const PostSchema = new Schema({
     posted_to: {
         id: {
             type: Schema.Types.ObjectId,
+            refPath: 'posted_to.model',
             required: true,
         },
         model: {

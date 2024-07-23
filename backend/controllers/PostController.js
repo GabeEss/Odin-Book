@@ -20,13 +20,12 @@ exports.post_list = asyncHandler(async (req, res, next) => {
 
     const { id } = req.query;
 
-    if(!id ) {
+    if(!id) {
         return res.status(400).json({
             success: false,
             message: 'Missing query parameters',
         })
     }
-
 
     // Determine the type of page where the posts are being fetched
     const page = await findPageModel(id);
@@ -36,12 +35,13 @@ exports.post_list = asyncHandler(async (req, res, next) => {
         'posted_to.model': page.model,
     }).
     populate('owner').
-    populate('likes').exec();
+    populate('likes').
+    exec();
 
     if(!posts) {
         return res.status(404).json({
             success: false,
-            message: 'No posts found',
+            message: 'Posts undefined',
         })
     }
 

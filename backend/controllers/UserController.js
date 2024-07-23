@@ -557,20 +557,25 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
     const userPosts = (await Post.find({
         owner: currentUser._id
     }).populate('owner').
-    populate('likes').exec()) || [];
+    populate('likes').
+    populate('posted_to.id').exec()) || [];
 
     const postsOnUserPage = (await Post.find({
         id: currentUser._id,
         model: "User"
     }).populate('owner').
-    populate('likes').exec()) || [];
+    populate('likes').
+    populate('posted_to.id').exec()) || [];
 
     // Get users friends if not undefined, if undefined, will return an empty array
     const friends = currentUser?.friends || [];
 
     const friendPosts = friends.length > 0 ? (await Post.find({
         owner: { $in: friends }
-    }).populate('owner').populate('likes').exec()) : [];
+    }).populate('owner').
+    populate('likes').
+    populate('posted_to.id').
+    exec()) : [];
 
     const combinedPosts = [...userPosts, ...postsOnUserPage, ...friendPosts];
 

@@ -263,7 +263,7 @@ io.on('connection', (socket) => {
           // Send to all users
           io.to('postedTo-' + data.to).emit('post', post);
           // // Send as a notification to the user
-          if(post.posted_to.model === 'User' ) {
+          if(post.posted_to.model === 'User' && receiver._id.toString() !== sender._id.toString()) {
             await notification.save();
             io.to('has-notification-' + post.posted_to.id).emit('notification', post);
             console.log("Notification sent.");

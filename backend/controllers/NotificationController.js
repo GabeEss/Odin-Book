@@ -54,9 +54,10 @@ exports.notification_update = asyncHandler(async (req, res, next) => {
         { read: true } // update read to true
     );
 
-    if(result.nModified == 0) {
-        return res.status(404).json({
+    if(result.modifiedCount == 0) {
+        return res.status(200).json({
             success: false,
+            notifications: notifications,
             message: 'No unread notifications found'
         })
     }
@@ -64,6 +65,6 @@ exports.notification_update = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
         success: true,
         notifications: notifications,
-        message: `${result.nModified} notifications marked as read`
+        message: `${result.modifiedCount} notifications marked as read`
     })
 });

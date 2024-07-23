@@ -7,11 +7,26 @@ const notification_controller = require("../controllers/NotificationController")
 const user_controller = require("../controllers/UserController");
 const event_controller = require("../controllers/EventController");
 const message_controller = require("../controllers/MessageController");
+const mongoose = require('mongoose');
 
 /// HEALTH ROUTE ///
 
 router.get("/health", (req, res) => {
   res.status(200).send("OK");
+});
+
+router.get("/health/db", (req, res) => {
+  const state = mongoose.connection.readyState;
+
+  if(state === 0) {
+    res.status(500).send("MongoDB disconnected.");
+  } else if (state === 1) {
+    res.status(200).send("MongoDB connected");
+  } else if (state === 2) {
+    res.status(500).send("MongoDB connecting");
+  } else if (state === 3) {
+    res.status(500).send("MongoDB disconnecting");
+  }
 });
 
 /// POST ROUTES ///
