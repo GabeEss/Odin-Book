@@ -133,7 +133,6 @@ textarea:focus {
     align-self: center;
     align-items: center;
     z-index: 1000;
-    border: black solid 1px;
 }
 
 .header-button {
