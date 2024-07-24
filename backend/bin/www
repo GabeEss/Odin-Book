@@ -44,7 +44,7 @@ var server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: process.env.API_CLIENT || "http://localhost:5173",
+    origin: process.env.API_CLIENT || "https://my-name-book.netlify.app",
     methods: ["GET", "POST"],
     credentials: true
   }
