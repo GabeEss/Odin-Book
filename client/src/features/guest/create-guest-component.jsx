@@ -5,7 +5,7 @@ import { GuestContext } from './guestid-context';
 import { GuestInitializeContext } from './guest-initialize-context';
 import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
 
-function CreateGuestComponent() {
+function CreateGuestComponent({setLoadingWheel}) {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
     const nav = useNavigate();
     const {guest, setGuest} = useContext(GuestContext);
@@ -13,6 +13,7 @@ function CreateGuestComponent() {
 
     const handleGuest = async () => {
         if(!isAuthenticated) {
+            setLoadingWheel(true);
             try {
                 const response = await makeAuthenticatedRequest(
                     getAccessTokenSilently,
@@ -33,7 +34,7 @@ function CreateGuestComponent() {
                 } else console.log(response.data.message);
             } catch(error) {
                 console.error('error', error);
-            }
+            } finally { setLoadingWheel(false); }
         }
     }
 

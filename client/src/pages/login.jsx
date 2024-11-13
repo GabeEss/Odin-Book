@@ -21,6 +21,7 @@ function LoginPage() {
     const {guest} = useContext(GuestContext);
     const [sendToSignup, setSendToSignup] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
+    const [loadingWheel, setLoadingWheel] = useState(false);
 
     const navigate = useNavigate();
 
@@ -69,15 +70,17 @@ function LoginPage() {
         }
     }, [isAuthenticated, isRegistered, sendToSignup]);
 
-    // if(loading) return <div>Loading...</div>;
+    if(loadingWheel) return <div className="spinner"></div>
 
     return(
         <div className='login-page page'>
             <h1 className='login-heading'>Welcome to Name Book</h1>
             {!isAuthenticated ? 
                 <div className='login-section section'>
-                    <LoginComponent isRegistered={isRegistered} setIsRegistered={setIsRegistered}/>
-                    <CreateGuestComponent/>
+                    <LoginComponent 
+                        isRegistered={isRegistered} 
+                        setIsRegistered={setIsRegistered}/>
+                    <CreateGuestComponent setLoadingWheel={setLoadingWheel}/>
                 </div>
             : 
                 <div className='welcome-section section'>

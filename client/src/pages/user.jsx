@@ -80,7 +80,7 @@ function UserPage() {
                 <div className='sidebar'>
                     <InfoDisplay user={user}/>
                 </div>
-                <div className='main-content'>
+                <div className='user-main'>
                     <PostListDisplay location={location}/>
                 </div>
             </div>

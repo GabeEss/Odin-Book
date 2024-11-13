@@ -11,8 +11,8 @@ function EventDisplay({ event, isOwner, isMember, setGetEvent, getEvent }) {
             <div className='event-details-attendance-posts'>
                 <div className='event-details'>
                     <h3>Event Information</h3>
-                    <p>Description: {event.description}</p>
-                    <div className='event-item-date-location event-details-date-location'>
+                    <p className='event-item-description'>Description: {event.description}</p>
+                    <div className='event-details-date-location'>
                         <p>Date: {new Date(event.date).toISOString().split('T')[0]} at {event.time}</p>
                         <p>Location: {event.location}</p>
                     </div>
