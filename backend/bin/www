@@ -37,6 +37,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+require('../sockets/socket')(server);
 
 /**
  * Create Socket.IO server.
