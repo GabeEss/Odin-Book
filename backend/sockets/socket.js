@@ -20,8 +20,8 @@ const socketCache = new Map();
  */
 function initializeSocket(server) {
   const corsDeploy = "https://my-name-book.netlify.app";
-  // There was an issue with localhost instead of 127 for whatever reason while testing
-  const corsTest = "http://127.0.0.1:5173";
+  // Different addresses work for different browsers while testing
+  const corsTest = [ "http://127.0.0.1:5173", "http://localhost:5173" ];
   const io = socketIo(server, {
     cors: {
       origin: corsTest,
