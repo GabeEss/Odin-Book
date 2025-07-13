@@ -5,6 +5,7 @@ async function getUserFromCache(userId, userCache) {
         return userCache.get(userId);
     }
 
+    // lean query returns a plain JS object instead of the full Mongoose doc
     const user = await User.findOne({ userId: userId }).lean();
     
     if(!user) return null;
