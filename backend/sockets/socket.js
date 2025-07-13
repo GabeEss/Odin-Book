@@ -1,6 +1,7 @@
 const socketIo = require('socket.io');
 const mongoose = require("mongoose");
 
+// Models
 const Message = require('../models/message');
 const User = require('../models/user');
 const Event = require('../models/event');
@@ -8,7 +9,10 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Notification = require('../models/notification');
 
-// Cache for users
+// Helpers
+const getUserFromCache = require('../utils/socket-helpers/getUserFromCache');
+
+// Cache for users, don't need to check db for every request
 const userCache = new Map();
 // Socket cache for users
 const socketCache = new Map();
@@ -35,16 +39,10 @@ io.on('connection', (socket) => {
   console.log('New client connected: ', socket.id);
 
   socket.on('userJoined', async (userId) => {
-    if(!userCache.has(userId)) {
-      let user = await User.findOne({ userId: userId });
-      if(!user) {
-        console.error("User not found in database.");
-        return;
-      }
-      userCache.set(userId, user);
-      // console.log("User data cached.");
-    } else {
-      console.log("User data exists in cache.");
+    const user = await getUserFromCache(userId, userCache);
+    if(!user) { 
+      console.error("Connecting user not found in database:", userId); 
+      return;
     }
     socketCache.set(userId, socket.id);
     // console.log("Socket cached.");
@@ -55,13 +53,14 @@ io.on('connection', (socket) => {
   /// USER JOINS MESSAGE CHATROOM ///
   socket.on("userJoinsMessageChat", async (recipientId, userId) => {
     console.log("User joins message chat.")
-    let user = userCache.get(userId);
+    const user = await getUserFromCache(userId, userCache);
     if (!user) {
-      user = await User.findOne({ userId: userId });
+      console.error("User not found in database:", userId);
+      return;
     }
     // Sort the ids so the chatroom ID will be the same regardless of who is logged in
     const chatroomId = [recipientId, user._id].sort().join('-');
-    console.log(chatroomId);
+    // console.log(chatroomId);
     socket.join(`message-${chatroomId}`);
   })
 
@@ -69,9 +68,10 @@ io.on('connection', (socket) => {
   /// USER LEAVES MESSAGE CHATROOM ///
   socket.on("userLeavesMessageChat", async(recipientId, userId) => {
     console.log("User leaves message chat.");
-    let user = userCache.get(userId);
+    const user = await getUserFromCache(userId, userCache);
     if (!user) {
-      user = await User.findOne({ userId: userId });   
+      console.error("User not found in database:", userId);
+      return;
     }
     // Sort the ids so the chatroom ID will be the same regardless of who is logged in
     const chatroomId = [recipientId, user._id].sort().join('-');
@@ -119,19 +119,12 @@ io.on('connection', (socket) => {
   /// SEND MESSAGE ///
   socket.on('sendMessage', async (data) => {
     try {
-      let sender;
-      if (userCache.has(data.from)) {
-        sender = userCache.get(data.from);
-      } else {
-          // The user is not in the cache, check the userId in the database
-          let user = await User.findOne({ userId: data.from });
-          if (!user) {
-              console.error("Sender user not found in database:", data.from);
-              return;
-          }
-          sender = user;
-          userCache.set(data.from, user);
+      const sender = await getUserFromCache(data.from, userCache);
+      if(!sender) { 
+        console.error("Sender user not found in database:", data.from);
+        return;
       }
+      
 
       // Get the recipient user
       let receiver = await User.findOne({ _id: data.to });
@@ -186,18 +179,10 @@ io.on('connection', (socket) => {
   // SEND POST ///
   socket.on('sendPost', async (data) => {
     try {
-      let sender;
-      if (userCache.has(data.from)) {
-        sender = userCache.get(data.from);
-      } else {
-          // The user is not in the cache, check the userId in the database
-          let user = await User.findOne({ userId: data.from });
-          if (!user) {
-              console.error("Sender user not found in database:", data.from);
-              return;
-          }
-          sender = user;
-          userCache.set(data.from, user);
+      const sender = await getUserFromCache(data.from, userCache);
+      if(!sender) { 
+        console.error("Sender user not found in database:", data.from);
+        return;
       }
 
       // Get the recipient user/event
@@ -258,18 +243,10 @@ io.on('connection', (socket) => {
   // SEND COMMENT ///
   socket.on('sendComment', async (data) => {
     try {
-      let sender;
-      if (userCache.has(data.from)) {
-        sender = userCache.get(data.from);
-      } else {
-          // The user is not in the cache, check the userId in the database
-          let user = await User.findOne({ userId: data.from });
-          if (!user) {
-              console.error("Sender user not found in database:", data.from);
-              return;
-          }
-          sender = user;
-          userCache.set(data.from, user);
+      const sender = await getUserFromCache(data.from, userCache);
+      if(!sender) { 
+        console.error("Sender user not found in database:", data.from);
+        return;
       }
 
       let post = await Post.findOne({ _id: data.to });
@@ -313,18 +290,10 @@ io.on('connection', (socket) => {
   /// SEND A NOTIFICATION AFTER A FRIEND REQUEST ///
   socket.on('sendFriendRequestNotification', async (data) => {
     try {
-      let sender;
-      if (userCache.has(data.from)) {
-        sender = userCache.get(data.from);
-      } else {
-          // The user is not in the cache, check the userId in the database
-          let user = await User.findOne({ userId: data.from });
-          if (!user) {
-              console.error("Sender user not found in database:", data.from);
-              return;
-          }
-          sender = user;
-          userCache.set(data.from, user);
+      const sender = await getUserFromCache(data.from, userCache);
+      if(!sender) { 
+        console.error("Sender user not found in database:", data.from);
+        return;
       }
 
       if(!data.to) { 
@@ -430,18 +399,10 @@ io.on('connection', (socket) => {
 
   socket.on('deleteMessage', async(data) => {
     try {
-      let sender;
-      if (userCache.has(data.from)) {
-        sender = userCache.get(data.from);
-      } else {
-          // The user is not in the cache, check the userId in the database
-          let user = await User.findOne({ userId: data.from });
-          if (!user) {
-              console.error("Sender user not found in database:", data.from);
-              return;
-          }
-          sender = user;
-          userCache.set(data.from, user);
+      const sender = await getUserFromCache(data.from, userCache);
+      if(!sender) { 
+        console.error("Sender user not found in database:", data.from);
+        return;
       }
 
       // Get the recipient user
