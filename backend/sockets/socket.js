@@ -34,6 +34,22 @@ function initializeSocket(server) {
     }
   });
 
+  // Find the user associated with the disconnected socket and remove them from the caches
+  // Return the number of users disconnected
+  function cleanupDisconnectedSocket(disconnectedSocketId) {
+    let cleanedUpUsers = 0;
+
+    for(let [userId, socketId] of socketCache.entries()) {
+      if(socketId === disconnectedSocketId) {
+        userCache.delete(userId);
+        socketCache.delete(userId);
+        cleanedUpUsers++;
+      }
+    }
+
+    return cleanedUpUsers;
+  }
+
 /// NEW CONNECTION ///
 io.on('connection', (socket) => {
   console.log('New client connected: ', socket.id);
@@ -58,7 +74,7 @@ io.on('connection', (socket) => {
       console.error("User not found in database:", userId);
       return;
     }
-    // Sort the ids so the chatroom ID will be the same regardless of who is logged in
+    // recipientId is MongoDB _id from URL params, user._id is MongoDB _id from database
     const chatroomId = [recipientId, user._id].sort().join('-');
     // console.log(chatroomId);
     socket.join(`message-${chatroomId}`);
@@ -73,7 +89,7 @@ io.on('connection', (socket) => {
       console.error("User not found in database:", userId);
       return;
     }
-    // Sort the ids so the chatroom ID will be the same regardless of who is logged in
+    // recipientId is MongoDB _id from URL params, user._id is MongoDB _id from database
     const chatroomId = [recipientId, user._id].sort().join('-');
     socket.leave(`message-${chatroomId}`);
   })
@@ -124,9 +140,6 @@ io.on('connection', (socket) => {
         console.error("Sender user not found in database:", data.from);
         return;
       }
-      
-
-      // Get the recipient user
       let receiver = await User.findOne({ _id: data.to });
       if (!receiver) {
         console.error("Receiver user not found in database:", data.to);
@@ -339,6 +352,7 @@ io.on('connection', (socket) => {
   })
 
   /// DELETE POST ///
+  /// NOTE TRANSACTIONS DON'T WORK WITH LOCAL MONGO ///
   socket.on('deletePost', async (data) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -362,6 +376,7 @@ io.on('connection', (socket) => {
   })
 
   /// DELETE COMMNET ///
+  /// NOTE TRANSACTIONS DON'T WORK WITH LOCAL MONGO ///
   socket.on('deleteComment', async (data) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -465,7 +480,7 @@ io.on('connection', (socket) => {
   })
 
   /// LIKE COMMENT ///
-
+  /// NOTE TRANSACTIONS DON'T WORK WITH LOCAL MONGO ///
   socket.on('likeComment', async(data) => {
     try {
       const user = await User.findOne({ userId: data.from });
@@ -535,17 +550,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-
-    // Find the user associated with the disconnected socket and remove them from the caches
-    for (let [userId, socketId] of socketCache.entries()) {
-      if (socketId === socket.id) {
-        userCache.delete(userId);
-        socketCache.delete(userId);
-        console.log('User disconnected:', userId);
-        break;
-      }
-    }
+    console.log('Client disconnecting:', socket.id);
+    const disconnectedUsers = cleanupDisconnectedSocket(socket.id);
+    
+    if(disconnectedUsers === 1) console.log(`Cleaned up ${disconnectedUsers} user.`)
+    else if(disconnectedUsers > 1) console.log(`Cleaned up ${disconnectedUsers} users. Warning: multiples users in socket with the same id.`)
+    else console.log(`Warning: No users found in socket cache.`)
   });
 
   socket.on('error', (error) => {
