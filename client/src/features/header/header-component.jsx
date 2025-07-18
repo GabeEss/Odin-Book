@@ -1,17 +1,15 @@
-import io from 'socket.io-client';
 import Cookies from 'js-cookie';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import { SocketContext } from '../sockets/socket-context';
 import { NotificationsContext } from './notifications/notifications-context';
 import { handleGetUser } from './get-current-user';
 import SearchbarComponent from "./searchbar/searchbar-component";
 import NotificationsList from './notifications/notifications-list-display';
 import MessageModal from '../messages/message-modal';
-
-const socket = io(`${import.meta.env.VITE_API_URL}`);
 
 function HeaderComponent() {
     const {
@@ -23,6 +21,7 @@ function HeaderComponent() {
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {notifications, setNotifications} = useContext(NotificationsContext); // shows if user has a notification
     const {guest} = useContext(GuestContext);
+    const { socket } = useContext(SocketContext);
     const location = useLocation();
     const nav = useNavigate();
     const [currentUser, setCurrentUser] = useState(null); // mongo user

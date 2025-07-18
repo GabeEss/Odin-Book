@@ -1,21 +1,20 @@
-import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useLocation, Link } from 'react-router-dom';
 import {useParams} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import { SocketContext } from "../sockets/socket-context";
 import { useMessages } from "./use-messages-hook";
 import handleDeleteMessage from "./delete-message";
 import handleSendMessage from "./create-message";
-
-const socket = io(`${import.meta.env.VITE_API_URL}`);
 
 // modalUserId is the mongo _id of the non-current user in the message exchange when using the modal
 function MessageList({modalUserId}) {
     const {getAccessTokenSilently, user} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
+    const {socket} = useContext(SocketContext);
     const {id} = useParams();
     const { data, error, isLoading } = useMessages(getAccessTokenSilently, modalUserId || id, guest, guestInit);
     const [message, setMessage] = useState('');

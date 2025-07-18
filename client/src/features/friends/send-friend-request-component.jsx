@@ -1,17 +1,16 @@
-import io from 'socket.io-client';
 import { useContext } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { makeAuthenticatedRequest } from "../auth/make-authenticated-request";
 import { GuestContext } from "../guest/guestid-context";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
-
-const socket = io(`${import.meta.env.VITE_API_URL}`);
+import { SocketContext } from "../sockets/socket-context";
 
 // Send friend request to user (._id)
 function SendFriendRequest({id, setFriendChange, friendChange}) {
     const { getAccessTokenSilently } = useAuth0();
     const { guest } = useContext(GuestContext);
     const { guestInit } = useContext(GuestInitializeContext);
+    const { socket } = useContext(SocketContext);
 
     const handleFriendRequest = async () => {
         try {

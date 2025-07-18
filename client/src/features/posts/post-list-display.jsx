@@ -1,9 +1,9 @@
-import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect, useContext } from "react";
 import {useParams, Link} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import { SocketContext } from "../sockets/socket-context";
 import { usePosts } from "./use-posts-hook";
 import handleSendPost from './create-post';
 import handleDeletePost from './post-delete';
@@ -11,12 +11,11 @@ import handleEditPost from './post-edit';
 import handlePostLike from './post-like';
 import CommentListDisplay from '../comments/comment-list-display';
 
-const socket = io(`${import.meta.env.VITE_API_URL}`);
-
 function PostListDisplay({location}) {
     const {getAccessTokenSilently, user} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
+    const {socket} = useContext(SocketContext);
     const {id} = useParams();
     const { data, error, isLoading, refetch } = usePosts(getAccessTokenSilently, id, guest, guestInit);
     const [post, setPost] = useState('');

@@ -1,20 +1,19 @@
-import io from 'socket.io-client';
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useContext } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import { SocketContext } from "../sockets/socket-context";
 import { useComments } from "./use-comments-hook";
 import handleSendComment from './create-comment';
 import handleDeleteComment from './comment-delete';
 import handleCommentLike from './comment-like';
 
-const socket = io(`${import.meta.env.VITE_API_URL}`);
-
 function CommentListDisplay({postId}) {
     const {getAccessTokenSilently, user} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
+    const {socket} = useContext(SocketContext);
     const { data, error, isLoading } = useComments(getAccessTokenSilently, postId, guest, guestInit);
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
