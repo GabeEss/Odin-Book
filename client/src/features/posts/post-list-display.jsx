@@ -45,11 +45,9 @@ function PostListDisplay({location}) {
     // Handle user joining and leaving the posts chat room
     useEffect(() => {
       if(!currentUser || !id) return;
-      // socket.emit('userJoined', currentUser);
       socket.emit('userJoinsPostedTo', id);
 
       return () => {
-          // socket.emit('userLeft', currentUser);
           socket.emit('userLeavesPostedTo', id);
           socket.off('post');
       }

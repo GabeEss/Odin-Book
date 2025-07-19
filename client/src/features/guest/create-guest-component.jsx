@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { GuestContext } from './guestid-context';
 import { GuestInitializeContext } from './guest-initialize-context';
+import { SocketContext } from '../sockets/socket-context';
 import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
 
 function CreateGuestComponent({setLoadingWheel}) {
@@ -10,6 +11,7 @@ function CreateGuestComponent({setLoadingWheel}) {
     const nav = useNavigate();
     const {guest, setGuest} = useContext(GuestContext);
     const {setGuestInit} = useContext(GuestInitializeContext);
+    const {socket} = useContext(SocketContext);
 
     const handleGuest = async () => {
         if(!isAuthenticated) {
@@ -24,13 +26,15 @@ function CreateGuestComponent({setLoadingWheel}) {
                     true
                 );
 
-                // Initialize guest user and store guest id for future logins from same computer
+                // Initialize guest user and store guest id for future logins from same browser
                 if(response.data.success === true) {
                     setGuestInit(true);
                     setGuest(response.data.guestId);
                     if(response.data.firstTimeLogin === true) {
                         nav('/signup');
-                    } else nav('/home');
+                    } else { 
+                        nav('/home');
+                    }
                 } else console.log(response.data.message);
             } catch(error) {
                 console.error('error', error);

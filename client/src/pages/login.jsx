@@ -8,6 +8,7 @@ import CreateGuestComponent from '../features/guest/create-guest-component';
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
 import { GuestContext } from '../features/guest/guestid-context';
 import { SocketContext } from '../features/sockets/socket-context';
+import { UserContext } from '../features/user/context/current-user-context';
 
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 
@@ -21,6 +22,7 @@ function LoginPage() {
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const { socket } = useContext(SocketContext);
+    const {currentUser} = useContext(UserContext);
     const [sendToSignup, setSendToSignup] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [loadingWheel, setLoadingWheel] = useState(false);
@@ -28,8 +30,12 @@ function LoginPage() {
     const navigate = useNavigate();
 
     const handleHome = () => {
-        if(isAuthenticated || guestInit)
+        if(isAuthenticated || guestInit) {
+            if(socket) {
+                socket.emit('userJoined', currentUser.userId);
+            }
             navigate('/home');
+        }
     }
 
     // Check if user is registered once they log in with auth0
@@ -46,9 +52,6 @@ function LoginPage() {
                     guestInit
                 )
                 if(response.data.success) {
-                    if(socket) {
-                        // emit userJoined socket event
-                    }
                     if(response.data.worksAt === '' || response.data.livesIn === '' || response.data.from === '') {
                         setSendToSignup(true);
                     } else setIsRegistered(true);
@@ -63,14 +66,20 @@ function LoginPage() {
     }
 }, [isAuthenticated, guestInit]);
 
-    // If user is authenticated and registered, navigate to home page
+    // AUTH0 user is authenticated and registered, navigate to home page
     // If the user needs information updated, navigate to signup page
     useEffect(() => {
         if(isAuthenticated && isRegistered) {
+            if(socket) {
+                socket.emit('userJoined', currentUser.userId);
+            }
             setGuestInit(false);
             navigate('/home');
         } else if(isAuthenticated && sendToSignup) {
             setGuestInit(false);
+            if(socket) {
+                socket.emit('userJoined', currentUser.userId);
+            }
             navigate('/signup');
         }
     }, [isAuthenticated, isRegistered, sendToSignup]);

@@ -32,7 +32,6 @@ function HeaderComponent() {
             return; 
         }
 
-        socket.emit('userJoined', currentUser.userId);
         socket.emit('userJoinsHasNotification', currentUser._id);
 
         socket.on('notification', () => {
@@ -40,7 +39,6 @@ function HeaderComponent() {
         });
     
         return() => {
-            socket.emit('userLeft', currentUser.userId);
             socket.emit('userLeavesHasNotification', currentUser._id);
             socket.off('notification');
         }
@@ -48,10 +46,12 @@ function HeaderComponent() {
 
     const handleLogout = () => {
         if(isAuthenticated) {
+            socket.emit('userLeft', currentUser.userId);
             logout({ returnTo: window.location.origin });
         }
 
         if(guestInit) {
+            socket.emit('userLeft', currentUser.userId);
             setGuestInit(false);
             nav('/');
             // Clear the guestId cookie, which is set in the backend
