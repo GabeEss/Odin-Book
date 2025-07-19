@@ -1,4 +1,4 @@
-import { makeAuthenticatedRequest } from '../auth/make-authenticated-request';
+import { makeAuthenticatedRequest } from "../../auth/make-authenticated-request";
 
 export const handleGetUser = async (getAccessTokenSilently, guest, guestInit, setCurrentUser) => {
     try {
@@ -13,6 +13,7 @@ export const handleGetUser = async (getAccessTokenSilently, guest, guestInit, se
         if(response.data.success) {
             setCurrentUser(response.data.currentUser);
         } else {
+            setCurrentUser(null);
             console.log(response.data.message);
         }
     } catch (error) {

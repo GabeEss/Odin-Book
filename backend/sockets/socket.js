@@ -14,7 +14,7 @@ const getUserFromCache = require('../utils/socket-helpers/getUserFromCache');
 
 // Cache for users, don't need to check db for every request
 const userCache = new Map();
-// Socket cache for users
+// Cache for users and sockets, keep for debugging
 const socketCache = new Map();
 
 /**
@@ -61,8 +61,8 @@ io.on('connection', (socket) => {
       return;
     }
     socketCache.set(userId, socket.id);
-    // console.log("Socket cached.");
-    // console.log('User joined.');
+    console.log("Socket cached.");
+    console.log(`User joined: ${userId}`);
   });
 
   /// USE THE MONGO _ID FOR ALL CHATROOMS ///
@@ -551,8 +551,17 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnecting:', socket.id);
+
+    // BEFORE
+    console.log('Before disconnect socketCache:', Array.from(socketCache.entries()));
+    console.log('Before disconnect userCache:', Array.from(userCache.entries()));
+
     const disconnectedUsers = cleanupDisconnectedSocket(socket.id);
-    
+
+    // AFTER
+    console.log('After disconnect socketCache:', Array.from(socketCache.entries()));
+    console.log('After disconnect userCache:', Array.from(userCache.entries()));
+
     if(disconnectedUsers === 1) console.log(`Cleaned up ${disconnectedUsers} user.`)
     else if(disconnectedUsers > 1) console.log(`Cleaned up ${disconnectedUsers} users. Warning: multiples users in socket with the same id.`)
     else console.log(`Warning: No users found in socket cache.`)

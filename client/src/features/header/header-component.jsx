@@ -3,10 +3,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
-import { GuestContext } from "../guest/guestid-context";
 import { SocketContext } from '../sockets/socket-context';
+import { UserContext } from '../user/context/current-user-context';
 import { NotificationsContext } from './notifications/notifications-context';
-import { handleGetUser } from './get-current-user';
 import SearchbarComponent from "./searchbar/searchbar-component";
 import NotificationsList from './notifications/notifications-list-display';
 import MessageModal from '../messages/message-modal';
@@ -15,17 +14,13 @@ function HeaderComponent() {
     const {
         logout,
         isAuthenticated,
-        getAccessTokenSilently,
-        user
     } = useAuth0();
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {notifications, setNotifications} = useContext(NotificationsContext); // shows if user has a notification
-    const {guest} = useContext(GuestContext);
     const { socket } = useContext(SocketContext);
+    const { currentUser } = useContext(UserContext);
     const location = useLocation();
     const nav = useNavigate();
-    const [currentUser, setCurrentUser] = useState(null); // mongo user
-    const [authUser, setAuthUser] = useState(null); // guest or auth user
     const [openNotifications, setOpenNotifications] = useState(false); // opens notification display component
     const [isOpen, setIsOpen] = useState(false); // Determines if the message modal is open
     const [modalUser, setModalUser] = useState(null);
@@ -33,15 +28,11 @@ function HeaderComponent() {
     const [searchComplete, setSearchComplete] = useState(false); // Opens the search results
 
     useEffect(() => {
-        handleGetUser(getAccessTokenSilently, guest, guestInit, setCurrentUser);
-    }, []);
-
-    useEffect(() => {
-        if(!authUser || !currentUser) {
+        if(!currentUser) {
             return; 
         }
 
-        socket.emit('userJoined', authUser);
+        socket.emit('userJoined', currentUser.userId);
         socket.emit('userJoinsHasNotification', currentUser._id);
 
         socket.on('notification', () => {
@@ -49,11 +40,11 @@ function HeaderComponent() {
         });
     
         return() => {
-            socket.emit('userLeft', authUser);
+            socket.emit('userLeft', currentUser.userId);
             socket.emit('userLeavesHasNotification', currentUser._id);
             socket.off('notification');
         }
-    }, [authUser, currentUser, location]);
+    }, [currentUser, location]);
 
     const handleLogout = () => {
         if(isAuthenticated) {
@@ -67,12 +58,6 @@ function HeaderComponent() {
             Cookies.remove('guestId');
         }
     }
-
-    // Initializes current user
-    useEffect(() => {
-        if(guestInit) setAuthUser(guest);
-        else setAuthUser(user.sub);
-    }, [user]);
 
     const handleNotificationClick = () => {
         setNotifications(false);
