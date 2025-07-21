@@ -8,7 +8,7 @@ import CreateGuestComponent from '../features/guest/create-guest-component';
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
 import { GuestContext } from '../features/guest/guestid-context';
 import { SocketContext } from '../features/sockets/socket-context';
-import { UserContext } from '../features/user/context/current-user-context';
+import { UserContext } from '../features/user/context/user-context';
 
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 
@@ -31,9 +31,6 @@ function LoginPage() {
 
     const handleHome = () => {
         if(isAuthenticated || guestInit) {
-            if(socket) {
-                socket.emit('userJoined', currentUser.userId);
-            }
             navigate('/home');
         }
     }
@@ -70,16 +67,10 @@ function LoginPage() {
     // If the user needs information updated, navigate to signup page
     useEffect(() => {
         if(isAuthenticated && isRegistered) {
-            if(socket) {
-                socket.emit('userJoined', currentUser.userId);
-            }
             setGuestInit(false);
             navigate('/home');
         } else if(isAuthenticated && sendToSignup) {
             setGuestInit(false);
-            if(socket) {
-                socket.emit('userJoined', currentUser.userId);
-            }
             navigate('/signup');
         }
     }, [isAuthenticated, isRegistered, sendToSignup]);

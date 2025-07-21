@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { SocketContext } from '../sockets/socket-context';
-import { UserContext } from '../user/context/current-user-context';
+import { UserContext } from '../user/context/user-context';
 import { NotificationsContext } from './notifications/notifications-context';
 import SearchbarComponent from "./searchbar/searchbar-component";
 import NotificationsList from './notifications/notifications-list-display';

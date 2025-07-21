@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import {useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
-import { UserContext } from '../features/user/context/current-user-context';
+import { UserContext } from '../features/user/context/user-context';
 import { SocketContext } from '../features/sockets/socket-context';
 
 function ErrorPage() {

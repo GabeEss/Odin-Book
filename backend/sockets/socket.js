@@ -547,6 +547,7 @@ io.on('connection', (socket) => {
     userCache.delete(userId);
     socketCache.delete(userId);
     console.log('User left:', userId);
+    // console.log('User left.');
   });
 
   socket.on('disconnect', () => {

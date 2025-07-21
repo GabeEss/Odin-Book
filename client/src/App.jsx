@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { GuestProvider } from './features/guest/guestid-context';
 import { GuestInitializeProvider } from './features/guest/guest-initialize-context';
 import { SocketProvider } from './features/sockets/socket-context';
-import { UserProvider } from './features/user/context/current-user-context';
+import { UserProvider } from './features/user/context/user-context';
 import { NotificationsProvider } from './features/header/notifications/notifications-context';
 import { useAuth0 } from '@auth0/auth0-react';
 import { default as PR } from './features/auth/protected-route';
