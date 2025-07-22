@@ -5,6 +5,7 @@ import {useParams} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
 import { SocketContext } from "../sockets/socket-context";
+import { UserContext } from "../user/context/user-context";
 import { useMessages } from "./use-messages-hook";
 import handleDeleteMessage from "./delete-message";
 import handleSendMessage from "./create-message";
@@ -15,11 +16,11 @@ function MessageList({modalUserId}) {
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const {socket} = useContext(SocketContext);
+    const {currentUser} = useContext(UserContext);
     const {id} = useParams();
     const { data, error, isLoading } = useMessages(getAccessTokenSilently, modalUserId || id, guest, guestInit);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-    const [currentUser, setCurrentUser] = useState('');
 
     const location = useLocation();
 
@@ -50,12 +51,12 @@ function MessageList({modalUserId}) {
         if(!currentUser) return;
 
         // Send recipient id (mongo) and sender id (auth or guest)
-        if(modalUserId) socket.emit('userJoinsMessageChat', modalUserId, currentUser);
-        else socket.emit('userJoinsMessageChat', id, currentUser);
+        if(modalUserId) socket.emit('userJoinsMessageChat', modalUserId, currentUser.userId);
+        else socket.emit('userJoinsMessageChat', id, currentUser.userId);
 
         return () => {
-            if(modalUserId) socket.emit('userLeavesMessageChat', id, currentUser);
-            else socket.emit('userLeavesMessageChat', id, currentUser)
+            if(modalUserId) socket.emit('userLeavesMessageChat', id, currentUser.userId);
+            else socket.emit('userLeavesMessageChat', id, currentUser.userId)
             socket.off('message');
         }
     }, [currentUser]);
@@ -89,24 +90,18 @@ function MessageList({modalUserId}) {
         }
     }, [location])
 
-    // Initializes current user
-    useEffect(() => {
-        if(guestInit) setCurrentUser(guest);
-        else setCurrentUser(user.sub);
-    }, [user, location]);
-
     const handleMessageChange = (event) => {
         setMessage(event.target.value);
     }
 
     const sendMessage = async (event) => {
-        if(modalUserId) await handleSendMessage(event, socket, setMessage, currentUser, modalUserId, message);
-        else await handleSendMessage(event, socket, setMessage, currentUser, id, message);
+        if(modalUserId) await handleSendMessage(event, socket, setMessage, currentUser.userId, modalUserId, message);
+        else await handleSendMessage(event, socket, setMessage, currentUser.userId, id, message);
     }
         
     const handleDeleteClick = async (messageId) => {
-        if(modalUserId) await handleDeleteMessage(socket, currentUser, modalUserId, messageId);
-        else await handleDeleteMessage(socket, currentUser, id, messageId);
+        if(modalUserId) await handleDeleteMessage(socket, currentUser.userId, modalUserId, messageId);
+        else await handleDeleteMessage(socket, currentUser.userId, id, messageId);
     }
 
     if (isLoading) {

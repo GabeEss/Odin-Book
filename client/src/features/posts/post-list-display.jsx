@@ -4,6 +4,7 @@ import {useParams, Link} from 'react-router-dom';
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
 import { SocketContext } from "../sockets/socket-context";
+import { UserContext } from "../user/context/user-context";
 import { usePosts } from "./use-posts-hook";
 import handleSendPost from './create-post';
 import handleDeletePost from './post-delete';
@@ -12,16 +13,16 @@ import handlePostLike from './post-like';
 import CommentListDisplay from '../comments/comment-list-display';
 
 function PostListDisplay({location}) {
-    const {getAccessTokenSilently, user} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const {socket} = useContext(SocketContext);
+    const {currentUser} = useContext(UserContext);
     const {id} = useParams();
     const { data, error, isLoading, refetch } = usePosts(getAccessTokenSilently, id, guest, guestInit);
     const [post, setPost] = useState('');
     const [edit, setEdit] = useState('');
     const [posts, setPosts] = useState([]);
-    const [currentUser, setCurrentUser] = useState('');
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(-5);
     const [awaitResponse, setAwaitResponse] = useState(false);
@@ -113,14 +114,8 @@ function PostListDisplay({location}) {
       }
     }, [location]);
 
-    // Initializes current user
-    useEffect(() => {
-        if(guestInit) setCurrentUser(guest);
-        else setCurrentUser(user.sub);
-    }, [user]);
-
     const sendPost = async (event) =>
-      await handleSendPost(event, socket, setPost, currentUser, id, post);
+      await handleSendPost(event, socket, setPost, currentUser.userId, id, post);
 
     const deletePost = async (event, postId) => {
       await handleDeletePost(event, socket, postId, id);
@@ -135,7 +130,7 @@ function PostListDisplay({location}) {
 
     const handleLike = async (postId, likeUnlike) => {
       setAwaitResponse(true);
-      await handlePostLike(socket, currentUser, id, postId, likeUnlike);
+      await handlePostLike(socket, currentUser.userId, id, postId, likeUnlike);
     }
 
     const handleCancel = () => {
@@ -174,7 +169,7 @@ function PostListDisplay({location}) {
                 <div key={index}>
                     <div className='post-container'>
                       <div className='post-top-row'>
-                      {post.owner.userId !== currentUser ? null :
+                      {post.owner.userId !== currentUser.userId ? null :
                           !deletePostId && !editPostId ? 
                             <div className='post-options'>
                                 <button className='edit-post' onClick={() => setEditPostId(post._id)}>✏️</button>
@@ -186,7 +181,7 @@ function PostListDisplay({location}) {
                           <p className='post-owner'><Link to={`/user/${post.owner._id}`}>{post.owner.username}</Link></p>
                           <p className='post-date'>{new Date(post.date_created).toLocaleString()}</p>
                           <div className='post-likes-container'>                         
-                            {awaitResponse ? null : post.likes.map(user => user.userId).includes(currentUser) ?
+                            {awaitResponse ? null : post.likes.map(user => user.userId).includes(currentUser.userId) ?
                               <button className='unlike-button' onClick={() => handleLike(post._id, 'unlike')}>👎</button> : 
                               <button className='like-button' onClick={() => handleLike(post._id, 'like')}>👍</button>
                             }

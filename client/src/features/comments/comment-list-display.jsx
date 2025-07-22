@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from "react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
 import { SocketContext } from "../sockets/socket-context";
+import { UserContext } from '../user/context/user-context';
 import { useComments } from "./use-comments-hook";
 import handleSendComment from './create-comment';
 import handleDeleteComment from './comment-delete';
@@ -14,11 +15,11 @@ function CommentListDisplay({postId}) {
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
     const {socket} = useContext(SocketContext);
+    const {currentUser} = useContext(UserContext);
     const { data, error, isLoading } = useComments(getAccessTokenSilently, postId, guest, guestInit);
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
     const [deleteCommentId, setDeleteCommentId] = useState(null);
-    const [currentUser, setCurrentUser] = useState('');
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(-5);
     const [awaitResponseId, setAwaitResponseId] = useState(null);
@@ -107,14 +108,8 @@ function CommentListDisplay({postId}) {
         }
     }, []);
 
-    // Initializes current user
-    useEffect(() => {
-        if(guestInit) setCurrentUser(guest);
-        else setCurrentUser(user.sub);
-    }, [user]);
-
     const sendComment = async (event) =>
-        await handleSendComment(event, socket, setComment, currentUser, postId, comment);
+        await handleSendComment(event, socket, setComment, currentUser.userId, postId, comment);
 
     const deleteComment = async (event, commentId) => {
         await handleDeleteComment(event, socket, commentId, postId);
@@ -123,7 +118,7 @@ function CommentListDisplay({postId}) {
 
     const handleLike = async (commentId, likeUnlike) => {
         setAwaitResponseId(commentId);
-        await handleCommentLike(socket, currentUser, postId, commentId, likeUnlike);
+        await handleCommentLike(socket, currentUser.userId, postId, commentId, likeUnlike);
       }
 
     const handleCancel = () => {
@@ -154,7 +149,7 @@ function CommentListDisplay({postId}) {
                 <div key={index}>
                     <div className='comment-container'>
                         <div className='comment-options-info'>
-                        {comment.owner.userId !== currentUser ? null :
+                        {comment.owner.userId !== currentUser.userId ? null :
                         !deleteCommentId ?
                             <div className='comment-options'>
                                 <button className='delete-comment-button' onClick={() => setDeleteCommentId(comment._id)}>🗑️</button>
@@ -165,7 +160,7 @@ function CommentListDisplay({postId}) {
                             <p className='comment-owner'><Link to={`/user/${comment.owner._id}`}>{comment.owner.username}</Link></p>
                             <p className='comment-date'>{new Date(comment.date_created).toLocaleString()}</p>
                             <div className='comment-likes-container'>
-                                {awaitResponseId && awaitResponseId === comment._id ? null : comment.likes.map(user => user.userId).includes(currentUser) ?
+                                {awaitResponseId && awaitResponseId === comment._id ? null : comment.likes.map(user => user.userId).includes(currentUser.userId) ?
                                 <button className='unlike-button' onClick={() => handleLike(comment._id, 'unlike')}>👎</button> : 
                                 <button className='like-button' onClick={() => handleLike(comment._id, 'like')}>👍</button>
                                 }
