@@ -133,18 +133,6 @@ function CommentListDisplay({postId}) {
 
     return(
         <div className='comments-container' onScroll={handleScroll}>
-            <form onSubmit={sendComment}>
-                <textarea 
-                className='comment-textarea'
-                row='4'
-                cols='50'
-                maxLength={100}
-                placeholder="Write a comment..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                />
-                <button className='comment-submit-button' type='submit'>Send</button>
-            </form>
             {comments && comments.slice(numItems).map((comment, index) => (
                 <div key={index}>
                     <div className='comment-container'>
@@ -174,6 +162,18 @@ function CommentListDisplay({postId}) {
                     </div>
                 </div>
             ))}
+            <form onSubmit={sendComment}>
+                <textarea 
+                className='comment-textarea'
+                row='4'
+                cols='50'
+                maxLength={100}
+                placeholder="Write a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                />
+                <button className='comment-submit-button' type='submit'>Send</button>
+            </form>
         </div>
     )
 }

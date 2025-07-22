@@ -825,7 +825,9 @@ textarea:focus {
 }
 
 .comments-container form {
-    padding-top: 1em;
+    margin-top: 1em;
+    padding-top: .5em;
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
     /* opacity: 0;
     max-height: 0;
     visibility: hidden;
