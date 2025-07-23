@@ -40,10 +40,6 @@ function EventsPage() {
         fetchEvents();
     }, []);
 
-    const handleHome = () => {
-        nav('/home');
-    }
-
     return(
         <div className='events-page page'>
             <HeaderComponent/>

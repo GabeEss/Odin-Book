@@ -590,14 +590,6 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
     })
 });
 
-exports.user_notifications_get = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User notifications get");
-});
-
-exports.user_notifications_read = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User notifications read");
-});
-
 exports.user_update_get = asyncHandler(async (req, res, next) => {
     const mongoUser = await determineUserType(req);
     if(!mongoUser) {

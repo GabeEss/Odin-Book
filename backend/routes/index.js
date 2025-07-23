@@ -58,8 +58,6 @@ router.put("/user/friends/request", user_controller.user_friend_request);
 router.put("/user/friends/accept", user_controller.user_friend_accept);
 router.put("/user/friends/reject", user_controller.user_friend_reject);
 router.put("/user/remove", user_controller.user_remove);
-router.get("/user/notifications", user_controller.user_notifications_get);
-router.put("/user/notifications/read", user_controller.user_notifications_read);
 router.put("/user/update", user_controller.user_update);
 router.get("/user/update", user_controller.user_update_get);
 router.get("/user/newsfeed", user_controller.user_newsfeed);
@@ -81,5 +79,6 @@ router.put("/event/:id/respond", event_controller.event_respond);
 /// MESSAGES CREATED VIA SOCKET ///
 
 router.get("/messages", message_controller.message_get);
+router.get("/conversations", message_controller.message_conversations_get);
 
 module.exports = router;
