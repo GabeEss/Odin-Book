@@ -59,7 +59,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
 
     return(
         <div className="notifications-list dropdown" onScroll={handleScroll}>
-            {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notificatins</div> :
+            {isLoading ? <div>Loading...</div> : error ? <div>Error fetching notifications</div> :
             notifications.slice(0, numItems).map((notification, index) =>
                 <div 
                     key={index}

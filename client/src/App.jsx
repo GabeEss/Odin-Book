@@ -18,7 +18,6 @@ const SignUpPage = lazy(() => import('./pages/sign-up'));
 const UserPage = lazy(() => import('./pages/user'));
 const FriendsPage = lazy(() => import('./pages/friends'));
 const MessagingPage = lazy(() => import('./pages/messages'));
-const ConversationPage = lazy(() => import('./pages/conversations'));
 const EventPage = lazy(() => import('./pages/event'));
 const EventsPage = lazy(() => import('./pages/events'));
 
@@ -50,7 +49,6 @@ function App() {
                       <Route path='/event/:id' element={<PR><EventPage/></PR>}/>
                       <Route path='/events' element={<PR><EventsPage/></PR>}/>
                       <Route path='/friends' element={<PR><FriendsPage/></PR>}/>
-                      <Route path='/conversations' element={<PR><ConversationPage/></PR>}/>
                       <Route path='/messages/:id' element={<PR><MessagingPage/></PR>}/>
                     </Routes>
                   </Suspense>

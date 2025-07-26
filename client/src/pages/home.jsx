@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { GuestInitializeContext } from "../features/guest/guest-initialize-context";
 import HeaderComponent from "../features/header/header-component";
 import FeedDisplayList from "../features/feed/feed-display-list";
+import ConversationsComponent from "../features/conversations/conversations-component";
 
 function HomePage () {
     const {
@@ -19,6 +20,7 @@ function HomePage () {
                 <h1 className="home-header">Your Feed</h1>
                 { guestInit ? <p className="guest-init">Welcome Guest!</p> : null}
                 <FeedDisplayList/>
+                <ConversationsComponent/>
             </div>
         </div>
          : null
