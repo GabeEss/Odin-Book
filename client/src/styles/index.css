@@ -380,10 +380,6 @@ textarea:focus {
 .home-page {
 }
 
-.home-main {
-
-}
-
 .home-header {
 
 }
@@ -395,25 +391,56 @@ textarea:focus {
     justify-content: center;
 }
 
+.home-content { 
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+    grid-template-rows: 1fr;
+}
+
 .guest-init {
     margin-bottom: 1em;
 }
 
 .home-sidebar {
-    position: absolute;
-    top: -50;
-    right: 0;
-    width: 300px;
-    height: 500px;
-    color: black;
-    background-color: white;
-    z-index: 1001;
-    font-weight: bold;
+    margin: 1.5em;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
 }
 
-.home-sidebar:hover {
-    color: #ffa726;
+.convo-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1em;
+    border-radius: 1em;
+    border: black solid 1px;
+    margin-bottom: 3em;
+    color: var(--primary);
+    background-color: var(--header);
+    overflow: hidden;
+    height: fit-content;
+    box-shadow: 0 0 .2em var(--primary);
+    transition: all 0.3s ease;
+}
+
+.convo-list:hover {
+    color: var(--tertiary);
+    background-color: var(--secondary);
+}
+
+.convo {
     cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+    .home-content {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 
@@ -422,7 +449,7 @@ textarea:focus {
 .newsfeed-container {
     margin: 1.5em;
     display: flex;
-    width: 65%;
+    width: auto;
 }
 
 .userfeed-container {

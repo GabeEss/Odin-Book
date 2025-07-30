@@ -30,6 +30,7 @@ function ConversationsComponent() {
 
     return(
         <div className='home-sidebar'>
+            <h1>Conversations</h1>
             <div className='convo-list'>
                 {isLoading ? <div>Loading...</div> : error ? <div>Error fetching convos...</div> : 
                 convos.map((convo, index) => 

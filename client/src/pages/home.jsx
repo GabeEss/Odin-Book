@@ -19,8 +19,10 @@ function HomePage () {
             <div className="home-main">
                 <h1 className="home-header">Your Feed</h1>
                 { guestInit ? <p className="guest-init">Welcome Guest!</p> : null}
-                <FeedDisplayList/>
-                <ConversationsComponent/>
+                <div className="home-content">
+                    <FeedDisplayList/>
+                    <ConversationsComponent/>
+                </div>
             </div>
         </div>
          : null
