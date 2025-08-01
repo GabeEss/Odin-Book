@@ -22,10 +22,11 @@ class Bot {
                     notifications: [],
                 })
                 await newBot.save();
+                return newBot;
             } catch {
                 console.error("Failed to create bot.")
-            }
-            
+                return;
+            }            
         }
         console.log("Bot exists.");
         return bot;
