@@ -20,6 +20,7 @@ class BotService {
             notifications: [],
         },
     }
+
     static async initializeBots() {
         // Get all bot configs
         for(const botConfig of Object.values(this.BOTS)) {
@@ -34,6 +35,28 @@ class BotService {
                 }
             } else console.log(`Bot exists: ${botConfig.username}`);
         }
+    }
+
+    static async isBotUserId(userId) {
+        return userId.startsWith('bot_');
+    }
+
+    static async handleSignUp(newUser, socket) {
+        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
+        if(!welcomeBot) {
+            console.log("Failed to get Welcome Bot for user sign up.");
+            return;
+        }
+
+        const welcomeMessage = 'Welcome to Name Book! Feel free to shoot me a message.';
+
+        const message = new Message({
+            sender: welcomeBot._id,
+            receiver: newUser._id,
+            message: welcomeMessage,
+            timestamp: new Date()
+        });
+        await message.save();
     }
 }
 
