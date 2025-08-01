@@ -13,7 +13,7 @@ export const handleGetUser = async (getAccessTokenSilently, guest, guestInit, se
         if(response.data.success) {
             setCurrentUser(response.data.currentUser);
         } else {
-            setCurrentUser(null);
+            setCurrentUser("");
             console.log(response.data.message);
         }
     } catch (error) {
