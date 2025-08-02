@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Message = require('../models/user');
 const Event = require('../models/event');
+const Notification = require('../models/notification');
 
 class BotService {
     static BOTS = {
@@ -41,7 +42,7 @@ class BotService {
         return userId.startsWith('bot_');
     }
 
-    static async handleSignUp(newUser, socket) {
+    static async handleSignUp(newUser, io) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
         if(!welcomeBot) {
             console.log("Failed to get Welcome Bot for user sign up.");
@@ -56,7 +57,31 @@ class BotService {
             message: welcomeMessage,
             timestamp: new Date()
         });
-        await message.save();
+
+        const notification = new Notification({
+            notification: ``,
+            timestamp: new Date(),
+            user: newUser._id,
+            read: false,
+            type: 'newMessage',
+            triggeredBy: welcomeBot._id
+        });
+
+        try {
+            await message.save();
+            console.log("Message inserted");
+            await notification.save();
+            console.log("Notification sent.");
+
+            const chatroomId = [newUser._id, welcomeBot._id].sort().join('-');
+
+            if(io) {
+                io.to('message-' + chatroomId).emit('message', message);
+                io.to('has-notification-' + newUser._id).emit('notification', message);
+            }
+        } catch(error) {
+            console.error("Error inserting message:", error);
+        }
     }
 }
 
