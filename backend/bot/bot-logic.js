@@ -59,7 +59,7 @@ class BotService {
         });
 
         const notification = new Notification({
-            notification: ``,
+            notification: `${welcomeBot.username} sent you a message.`,
             timestamp: new Date(),
             user: newUser._id,
             read: false,
