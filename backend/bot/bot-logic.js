@@ -1,8 +1,8 @@
 const User = require('../models/user');
 const Message = require('../models/user');
-const Event = require('../models/event');
 const Notification = require('../models/notification');
 
+// NOTE: THIS CLASS DOES NOT CHECK FOR USER TYPE SAFETY
 class BotService {
     static BOTS = {
         // WELCOME BOT SENDS A MESSAGE ON SIGN UP AND RESPONDS TO MESSAGES
@@ -38,14 +38,20 @@ class BotService {
         }
     }
 
-    static async isBotUserId(userId) {
-        return userId.startsWith('bot_');
+    static async initializeBotEvent() {
+
     }
 
     static async handleSignUp(newUser, io) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
         if(!welcomeBot) {
             console.log("Failed to get Welcome Bot for user sign up.");
+            return;
+        }
+
+        // Does not catch bad types
+        if(!newUser) {
+            console.log("New user is not properly defined for bot logic.");
             return;
         }
 
@@ -69,9 +75,9 @@ class BotService {
 
         try {
             await message.save();
-            console.log("Message inserted");
+            console.log("Bot message inserted.");
             await notification.save();
-            console.log("Notification sent.");
+            console.log("Bot notification sent.");
 
             const chatroomId = [newUser._id, welcomeBot._id].sort().join('-');
 
@@ -82,6 +88,69 @@ class BotService {
         } catch(error) {
             console.error("Error inserting message:", error);
         }
+    }
+
+    static async handleMessage(user, io) {
+        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId});
+
+        if(!welcomeBot) {
+            console.log("Failed to get Welcome Bot for user message.");
+            return;
+        }
+        
+        // Does not catch bad types
+        if(!user) {
+            console.log("User is not defined properly for bot messaging.");
+            return;
+        }
+
+        const responses = [
+            "Thanks for checking out Name Book.",
+            "Thanks for the message! I'm a rudimentary bot! Don't expect much from me!",
+            "I'm sending this message to you via socket!",
+            "Neato!",
+            "Isn't this cool. Wow!",
+            "Maybe one day I'll be a real chat bot."
+        ]
+
+        const response = responses[Math.floor(Math.random() * responses.length)];
+
+        const message = new Message({
+            sender: welcomeBot._id,
+            receiver: user._id,
+            message: response,
+            timestamp: new Date(),
+        });
+
+        const notification = new Notification({
+            notification: `${welcomeBot.username} sent you a message.`,
+            timestamp: new Date(),
+            user: user._id,
+            read: false,
+            type: 'newMessage',
+            triggeredBy: welcomeBot._id
+        });
+
+        try {
+            await message.save();
+            console.log("Bot message inserted.");
+            await notification.save();
+            console.log("Bot notification sent.");
+
+            const chatroomId = [user._id, welcomeBot._id].sort().join('-');
+
+            if(io) {
+                io.to('message-' + chatroomId).emit('message', message);
+                io.to('has-notification-' + user._id).emit('notification', message);
+            }
+        } catch (error) {
+            console.error("Error inserting message:", error);
+        }
+    }
+
+    // Doesn't check mongo for existence of bot, only checks userId
+    static async isBot(userId) {
+        return userId.startsWith('bot_');
     }
 }
 
