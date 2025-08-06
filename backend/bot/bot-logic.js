@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Message = require('../models/user');
+const Message = require('../models/message');
 const Notification = require('../models/notification');
 
 // NOTE: THIS CLASS DOES NOT CHECK FOR USER TYPE SAFETY
@@ -38,11 +38,7 @@ class BotService {
         }
     }
 
-    static async initializeBotEvent() {
-
-    }
-
-    static async handleSignUp(newUser, io) {
+    static async handleSignUp(newUser) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
         if(!welcomeBot) {
             console.log("Failed to get Welcome Bot for user sign up.");
@@ -56,6 +52,18 @@ class BotService {
         }
 
         const welcomeMessage = 'Welcome to Name Book! Feel free to shoot me a message.';
+
+        // Check for welcome message
+        const existing = await Message.findOne({
+            sender: welcomeBot._id,
+            receiver: newUser._id,
+            message: welcomeMessage
+        });
+
+        if(existing) {
+            console.log("Welcome message already sent.")
+            return;
+        }
 
         const message = new Message({
             sender: welcomeBot._id,
@@ -78,19 +86,12 @@ class BotService {
             console.log("Bot message inserted.");
             await notification.save();
             console.log("Bot notification sent.");
-
-            const chatroomId = [newUser._id, welcomeBot._id].sort().join('-');
-
-            if(io) {
-                io.to('message-' + chatroomId).emit('message', message);
-                io.to('has-notification-' + newUser._id).emit('notification', message);
-            }
         } catch(error) {
             console.error("Error inserting message:", error);
         }
     }
 
-    static async handleMessage(user, io) {
+    static async handleMessage(user, io, chatroomId) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId});
 
         if(!welcomeBot) {
@@ -137,8 +138,6 @@ class BotService {
             await notification.save();
             console.log("Bot notification sent.");
 
-            const chatroomId = [user._id, welcomeBot._id].sort().join('-');
-
             if(io) {
                 io.to('message-' + chatroomId).emit('message', message);
                 io.to('has-notification-' + user._id).emit('notification', message);
@@ -149,7 +148,7 @@ class BotService {
     }
 
     // Doesn't check mongo for existence of bot, only checks userId
-    static async isBot(userId) {
+    static isBot(userId) {
         return userId.startsWith('bot_');
     }
 }

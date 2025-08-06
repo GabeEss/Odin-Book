@@ -3,6 +3,7 @@ const Comment = require("../models/comment");
 const User = require("../models/user");
 const Notification = require("../models/notification");
 const Event = require("../models/event");
+const BotService = require('../bot/bot-logic');
 
 const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
@@ -53,6 +54,9 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
             })
 
             await newUser.save();
+
+            // Bot sends a message
+            await BotService.handleSignUp(newUser);
 
             return res.status(201).json({
                 success: true,
@@ -105,6 +109,9 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
             })
 
             await newGuest.save();
+
+            // Bot sends a message
+            await BotService.handleSignUp(newGuest);
 
             // Set the guestId cookie
             res.cookie('guestId', guestId, { httpOnly: true });

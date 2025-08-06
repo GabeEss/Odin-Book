@@ -7,8 +7,6 @@ import CreateGuestComponent from '../features/guest/create-guest-component';
 
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
 import { GuestContext } from '../features/guest/guestid-context';
-import { SocketContext } from '../features/sockets/socket-context';
-import { UserContext } from '../features/user/context/user-context';
 
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 
@@ -21,8 +19,6 @@ function LoginPage() {
     // const [loading, setLoading] = useState(false);
     const {guestInit, setGuestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
-    const { socket } = useContext(SocketContext);
-    const {currentUser} = useContext(UserContext);
     const [sendToSignup, setSendToSignup] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [loadingWheel, setLoadingWheel] = useState(false);

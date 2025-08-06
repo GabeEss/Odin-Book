@@ -1,3 +1,5 @@
+// Socket connection handler
+
 const socketIo = require('socket.io');
 const mongoose = require("mongoose");
 
@@ -9,6 +11,8 @@ const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Notification = require('../models/notification');
 
+const BotService = require('../bot/bot-logic');
+
 // Helpers
 const getUserFromCache = require('../utils/socket-helpers/getUserFromCache');
 
@@ -18,7 +22,7 @@ const userCache = new Map();
 const socketCache = new Map();
 
 /**
- * Initialize Socket.IO server
+ * Initialize Socket.IO server instance
  * @param {Object} server - HTTP server instance
  * @returns {Object} Socket.IO instance
  */
@@ -140,6 +144,7 @@ io.on('connection', (socket) => {
         console.error("Sender user not found in database:", data.from);
         return;
       }
+
       let receiver = await User.findOne({ _id: data.to });
       if (!receiver) {
         console.error("Receiver user not found in database:", data.to);
@@ -181,6 +186,10 @@ io.on('connection', (socket) => {
         
           // Notification to receiver of message
           io.to('has-notification-' + receiver._id).emit('notification', message);
+
+          if(BotService.isBot(receiver.userId)) {
+              await BotService.handleMessage(sender, io, chatroomId);
+          }
       } catch (err) {
           console.error("Error inserting message:", err);
       }
