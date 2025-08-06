@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Message = require('../models/message');
+const Post = require('../models/post');
 const Notification = require('../models/notification');
 
 // NOTE: THIS CLASS DOES NOT CHECK FOR USER TYPE SAFETY
@@ -38,32 +39,17 @@ class BotService {
         }
     }
 
+    // Send a message and a post when the user registers. This method should only be invoked once for any given user.
+    // Not set up to catch duplicates.
     static async handleSignUp(newUser) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
-        if(!welcomeBot) {
-            console.log("Failed to get Welcome Bot for user sign up.");
-            return;
-        }
-
-        // Does not catch bad types
-        if(!newUser) {
-            console.log("New user is not properly defined for bot logic.");
+        if(!welcomeBot || !newUser) {
+            console.log("Failed to get Welcome Bot or invalid user.");
             return;
         }
 
         const welcomeMessage = 'Welcome to Name Book! Feel free to shoot me a message.';
-
-        // Check for welcome message
-        const existing = await Message.findOne({
-            sender: welcomeBot._id,
-            receiver: newUser._id,
-            message: welcomeMessage
-        });
-
-        if(existing) {
-            console.log("Welcome message already sent.")
-            return;
-        }
+        const welcomePost = 'Thanks for using Name Book!';
 
         const message = new Message({
             sender: welcomeBot._id,
@@ -71,8 +57,17 @@ class BotService {
             message: welcomeMessage,
             timestamp: new Date()
         });
+S
+        const post = new Post({
+            post: welcomePost,
+            owner: welcomeBot._id,
+            posted_to: { id: newUser._id, model: 'User' },
+            comments: [],
+            date_created: new Date(),
+            likes: [],
+        })
 
-        const notification = new Notification({
+        const messageNotification = new Notification({
             notification: `${welcomeBot.username} sent you a message.`,
             timestamp: new Date(),
             user: newUser._id,
@@ -81,16 +76,31 @@ class BotService {
             triggeredBy: welcomeBot._id
         });
 
+        const postNotification = new Notification({
+            notification: `${welcomeBot.username} posted on your page.`,
+            timestamp: new Date(),
+            user: newUser._id,
+            read: false,
+            type: 'newPost',
+            triggeredBy: welcomeBot._id
+        })
+
         try {
             await message.save();
             console.log("Bot message inserted.");
-            await notification.save();
-            console.log("Bot notification sent.");
+            await messageNotification.save();
+            console.log("Bot message notification sent.");
+            await post.save();
+            console.log("Bot post inserted.");
+            await postNotification.save();
+            console.log("Bot post notification sent.");
         } catch(error) {
             console.error("Error inserting message:", error);
         }
     }
 
+
+    // If you want to add a delay, do it on the user end.
     static async handleMessage(user, io, chatroomId) {
         const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId});
 
