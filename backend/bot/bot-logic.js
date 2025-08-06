@@ -86,14 +86,14 @@ S
         })
 
         try {
-            await message.save();
-            console.log("Bot message inserted.");
-            await messageNotification.save();
-            console.log("Bot message notification sent.");
-            await post.save();
-            console.log("Bot post inserted.");
-            await postNotification.save();
-            console.log("Bot post notification sent.");
+            await Promise.all([
+                message.save(),
+                messageNotification.save(),
+                post.save(),
+                postNotification.save(),
+            ])
+            
+            console.log("Welcome message and post created successfully.");
         } catch(error) {
             console.error("Error inserting message:", error);
         }

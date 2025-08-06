@@ -114,7 +114,11 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
             await BotService.handleSignUp(newGuest);
 
             // Set the guestId cookie
-            res.cookie('guestId', guestId, { httpOnly: true });
+            res.cookie('guestId', guestId, { 
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000,
+                sameSite: 'lax'
+             });
 
             return res.status(201).json({
                 success: true,
