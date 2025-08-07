@@ -70,28 +70,6 @@ exports.message_conversations_get = asyncHandler(async (req, res, next) => {
     }
 
     try{
-        // const messages = await Message.find({
-        //     $or: [
-        //         { sender: currentUser._id },
-        //         { receiver: currentUser._id },
-        //     ]
-        // }).populate('sender', 'username')
-        // .populate('receiver', 'username')
-        // .select('sender receiver');
-
-        // const usersMap = new Map();
-
-        // messages.forEach((msg) => {
-        //     if(msg.sender._id.toString() !== currentUser._id.toString()) {
-        //         usersMap.set(msg.sender._id.toString(), msg.sender.username);
-        //     }
-        //     if(msg.receiver._id.toString() !== currentUser._id.toString()) {
-        //         usersMap.set(msg.receiver._id.toString(), msg.receiver.username);
-        //     }
-        // })
-
-        // const users = Array.from(usersMap, ([id, username]) => ({id, username}));
-
         // Using mongo aggregation pipeline: 
         // Step one, get messages with currentUser
         // Step two, create a new field for the conversation partners of the current user

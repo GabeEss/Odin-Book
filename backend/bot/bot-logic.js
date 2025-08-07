@@ -1,10 +1,12 @@
 const User = require('../models/user');
 const Message = require('../models/message');
 const Post = require('../models/post');
+const Event = require('../models/event');
 const Notification = require('../models/notification');
 
 // NOTE: THIS CLASS DOES NOT CHECK FOR USER TYPE SAFETY
 class BotService {
+    // Stores bots, can be initialized collectively
     static BOTS = {
         // WELCOME BOT SENDS A MESSAGE ON SIGN UP AND RESPONDS TO MESSAGES
         WELCOME: {
@@ -23,6 +25,18 @@ class BotService {
         },
     }
 
+    // Stores events, must be initialized individually
+    // NOTE: can't fill in owner or members fields without an initialized bot
+    static EVENTS = {
+        WELCOME: {
+            event: "Welcome to Name Book!",
+            date: new Date(3000, 0, 1, 12, 1),
+            time: "00:01",
+            location: "Digital Space",
+            description: "Join our welcoming community and connect with other members!",
+        },
+    }
+
     static async initializeBots() {
         // Get all bot configs
         for(const botConfig of Object.values(this.BOTS)) {
@@ -36,6 +50,46 @@ class BotService {
                     console.error("Failed to create bot.");
                 }
             } else console.log(`Bot exists: ${botConfig.username}`);
+        }
+    }
+
+    static async initializeWelcomeEvent() {
+        // Check mongo for owner
+        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId });
+
+        if(!welcomeBot) {
+            console.error("Welcome Bot not found. Cannot create welcome event.");
+            return;
+        }
+
+        // Check if welcome event exists
+        const existingEvent = await Event.findOne({
+            event: this.EVENTS.WELCOME.event,
+            owner: welcomeBot._id,
+        });
+
+        if(existingEvent) {
+            console.log(`Event exists: ${existingEvent.event}`);
+            return;
+        }
+
+        try {
+            const welcomeEvent = new Event({
+                event: this.EVENTS.WELCOME.event,
+                owner: welcomeBot._id,
+                date: this.EVENTS.WELCOME.date,
+                time: this.EVENTS.WELCOME.time,
+                location: this.EVENTS.WELCOME.location,
+                description: this.EVENTS.WELCOME.description,
+                members: [{
+                    user: welcomeBot._id,
+                    status: 'going',
+                }]
+            });
+
+            await welcomeEvent.save();
+        } catch (error) {
+            console.error("Error creating welcome event: ", error);
         }
     }
 

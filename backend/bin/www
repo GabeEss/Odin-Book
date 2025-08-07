@@ -37,6 +37,9 @@ app.set('io', io);
     await BotService.initializeBots();
     console.log('Bots initialized successfully.');
 
+    await BotService.initializeWelcomeEvent();
+    console.log('Welcome event initialized successfully.');
+
     server.listen(port);
     server.on('error', onError);
     server.on('listening', onListening);
