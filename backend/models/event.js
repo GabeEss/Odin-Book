@@ -48,7 +48,17 @@ const EventSchema = new Schema({
             },
         }],
         required: true,
+        validate: {
+            validator: function(members) {
+                const userIds = members.map(m => m.user.toString());
+                return userIds.length === new Set(userIds).size();
+            },
+            message: 'Duplicate users not allowed in event members'
+        }
     },
-})
+});
+
+// Events are unique if they have a specific name and owner
+EventSchema.index({ event: 1, owner: 1}, { unique: true });
 
 module.exports = mongoose.model('Event', EventSchema);

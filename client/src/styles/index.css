@@ -434,6 +434,12 @@ textarea:focus {
 
 .convo {
     cursor: pointer;
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+
+.convo:hover {
+    text-decoration: underline;
 }
 
 @media screen and (max-width: 768px) {

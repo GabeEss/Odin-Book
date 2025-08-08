@@ -25,7 +25,7 @@ function ConversationsComponent() {
     }, [location])
 
     const handleMessageClick = (convo) => {
-        nav(`/user/${convo.id}`);
+        nav(`/messages/${convo.id}`);
     }
 
     return(

@@ -30,7 +30,7 @@ class BotService {
     static EVENTS = {
         WELCOME: {
             event: "Welcome to Name Book!",
-            date: new Date(3000, 0, 1, 12, 1),
+            date: new Date(3000, 0, 1, 0, 1),
             time: "00:01",
             location: "Digital Space",
             description: "Join our welcoming community and connect with other members!",
@@ -93,12 +93,62 @@ class BotService {
         }
     }
 
+    static async firstPostWelcomeEvent() {
+        // Check mongo for owner
+        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId });
+
+        if(!welcomeBot) {
+            console.error("Welcome Bot not found. Cannot create welcome event.");
+            return;
+        }
+
+        // Check if welcome event exists
+        const existingEvent = await Event.findOne({
+            event: this.EVENTS.WELCOME.event,
+            owner: welcomeBot._id,
+        });
+
+        if(!existingEvent) {
+            console.log(`Event does not exist.`);
+            return;
+        }
+
+        const firstPost = "Enjoy your stay at Name Book!";
+
+        const post = new Post({
+            post: firstPost,
+            owner: welcomeBot._id,
+            posted_to: { id: existingEvent._id, model: 'Event' },
+            comments: [],
+            date_created: new Date(),
+            likes: [],
+        })
+
+        try {
+            await post.save();
+            console.log("Welcome event post inserted.");
+        } catch (error) {
+            console.error("Error posting on the Welcome Event.", error);
+        }
+    }
+
     // Send a message and a post when the user registers. This method should only be invoked once for any given user.
     // Not set up to catch duplicates.
     static async handleSignUp(newUser) {
-        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId })
+        const welcomeBot = await User.findOne({ userId: this.BOTS.WELCOME.userId });
+
         if(!welcomeBot || !newUser) {
             console.log("Failed to get Welcome Bot or invalid user.");
+            return;
+        }
+
+        const welcomeEvent = await Event.findOne({ 
+            event: this.EVENTS.WELCOME.event,
+            owner: welcomeBot._id,
+         })
+
+        if(!welcomeEvent) {
+            console.log('Welcome event not found.')
             return;
         }
 
@@ -111,7 +161,7 @@ class BotService {
             message: welcomeMessage,
             timestamp: new Date()
         });
-S
+
         const post = new Post({
             post: welcomePost,
             owner: welcomeBot._id,
@@ -137,14 +187,23 @@ S
             read: false,
             type: 'newPost',
             triggeredBy: welcomeBot._id
-        })
+        });
 
+        const isAlreadyMember = welcomeEvent.members.some(member => {
+            return member.user.equals(newUser._id);
+        });
+
+        if(!isAlreadyMember) {
+            welcomeEvent.members.push({user: newUser._id, status: 'pending'});
+        }
+            
         try {
             await Promise.all([
                 message.save(),
                 messageNotification.save(),
                 post.save(),
                 postNotification.save(),
+                welcomeEvent.save(),
             ])
             
             console.log("Welcome message and post created successfully.");

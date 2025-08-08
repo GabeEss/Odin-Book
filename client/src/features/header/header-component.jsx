@@ -27,6 +27,8 @@ function HeaderComponent() {
     const [dropdown, setDropdown] = useState(false);
     const [searchComplete, setSearchComplete] = useState(false); // Opens the search results
 
+
+    // NOTE: notification socket does not send notification information, it is just a trigger
     useEffect(() => {
         if(!currentUser) {
             return; 
