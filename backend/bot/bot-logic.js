@@ -115,6 +115,16 @@ class BotService {
 
         const firstPost = "Enjoy your stay at Name Book!";
 
+        existingPost = await Post.findOne({
+            post: firstPost,
+            owner: welcomeBot._id
+        });
+
+        if(existingPost) {
+            console.log('First post exists.');
+            return;
+        }
+
         const post = new Post({
             post: firstPost,
             owner: welcomeBot._id,
