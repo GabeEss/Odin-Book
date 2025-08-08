@@ -71,6 +71,19 @@ function LoginPage() {
         }
     }, [isAuthenticated, isRegistered, sendToSignup]);
 
+    // Break cold starts with 
+    useEffect(() => {
+        const warmUpBackend = async () => {
+            try {
+                await fetch(`${import.meta.env.VITE_API_URL}/health`);
+            } catch (error) {
+                console.log("Warm up failed.")
+            }
+        }
+
+        warmUpBackend();
+    }, []);
+
     if(loadingWheel) return <div className="spinner"></div>
 
     return(
