@@ -84,10 +84,6 @@ function HeaderComponent() {
         nav('/home');
     }
 
-    const handleMessages = () => {
-        nav('/conversations');
-    }
-
     const handleUser = () => {
         nav(`/user/${currentUser._id}`);
     }
@@ -114,7 +110,6 @@ function HeaderComponent() {
             </div>
             <div className="header-dropdown">
                 <div className='header-navigation-group'>
-                    <button className='convos-nav header-button' onClick={handleMessages}>Convos</button>
                     <button className="friends-nav header-button" onClick={handleFriends}>Friends</button>
                     <button className="events-nav header-button" onClick={handleEvents}>Events</button>
                     <button className="home-nav header-button" onClick={handleHome}>Home</button>

@@ -76,6 +76,7 @@ function LoginPage() {
         const warmUpBackend = async () => {
             try {
                 await fetch(`${import.meta.env.VITE_API_URL}/health`);
+                console.log("Warm up successful.");
             } catch (error) {
                 console.log("Warm up failed.")
             }

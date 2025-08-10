@@ -35,10 +35,10 @@ app.set('io', io);
 (async () => {
   try {
     await BotService.initializeBots();
-    console.log('Bots initialized successfully.');
+    console.log('Bots initialization complete.');
 
     await BotService.initializeWelcomeEvent();
-    console.log('Welcome event initialized successfully.');
+    console.log('Welcome event initialization complete.');
     await BotService.firstPostWelcomeEvent();
     console.log('Welcome event first post handled.')
 

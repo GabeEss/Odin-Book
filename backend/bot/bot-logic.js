@@ -84,7 +84,7 @@ class BotService {
                 members: [{
                     user: welcomeBot._id,
                     status: 'going',
-                }]
+                }],
             });
 
             await welcomeEvent.save();
@@ -115,7 +115,7 @@ class BotService {
 
         const firstPost = "Enjoy your stay at Name Book!";
 
-        existingPost = await Post.findOne({
+        const existingPost = await Post.findOne({
             post: firstPost,
             owner: welcomeBot._id
         });

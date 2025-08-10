@@ -32,7 +32,8 @@ function ConversationsComponent() {
         <div className='home-sidebar'>
             <h1>Conversations</h1>
             <div className='convo-list'>
-                {isLoading ? <div>Loading...</div> : error ? <div>Error fetching convos...</div> : 
+                {isLoading ? <div>Loading...</div> : error ? <div>Error fetching convos...</div> : convos.length < 1
+                ? <div>No one has messaged you.</div> : 
                 convos.map((convo, index) => 
                     <div
                         key={index}

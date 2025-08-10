@@ -50,8 +50,11 @@ const EventSchema = new Schema({
         required: true,
         validate: {
             validator: function(members) {
-                const userIds = members.map(m => m.user.toString());
-                return userIds.length === new Set(userIds).size();
+                if(!Array.isArray(members)) return false;
+                const userIds = members.filter(m => m.user).map(m => m.user.toString());
+                const userSet = new Set(userIds);
+                if(userIds.length === userSet.size) return true;
+                return false;
             },
             message: 'Duplicate users not allowed in event members'
         }
