@@ -14,6 +14,7 @@ const determineUserType = require("../utils/determineUserType");
 const searchUserCollection = require("../utils/searchUserCollection");
 const generateGuestID = require("../utils/generateGuestID");
 
+// Handles sign up and sign in
 exports.user_register_post = asyncHandler(async (req, res, next) => {
     try {
         if(!req.headers.authorization) {
@@ -70,6 +71,7 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
     }
 });
 
+// Handles sign up and sign in
 exports.guest_register_post = asyncHandler(async (req, res, next) => {
     try {
         const guest = req.headers['x-guest'];
@@ -565,44 +567,87 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
         })
     }
 
-    // Get the posts by the user
-    const userPosts = (await Post.find({
-        owner: currentUser._id
-    }).populate('owner').
-    populate('likes').
-    populate('posted_to.id').exec()) || [];
-
-    // Get the posts on the user's page
-    const postsOnUserPage = (await Post.find({
-        posted_to: {id: currentUser._id, model: 'User'},
-    }).populate('owner').
-    populate('likes').
-    populate('posted_to.id').exec()) || [];
-
-    // Get the posts from event pages that the user has joined
-    const eventPosts = (await Post.find({
-        
-    })) || [];
-
     // Get users friends if not undefined, if undefined, will return an empty array
     const friends = currentUser?.friends || [];
 
-    // Get the posts of friends
-    const friendPosts = friends.length > 0 ? (await Post.find({
-        owner: { $in: friends }
+    const [userPosts, postsOnUserPage, userEvents, friendPosts] = await Promise.all([
+        // userPosts
+        Post.find({
+            owner: currentUser._id
+        }).populate('owner')
+            .populate('likes')
+            .populate('posted_to.id')
+            .exec()
+            .then(result => result || []),
+        // postsOnUserPage
+        Post.find({
+            'posted_to.id': currentUser._id,
+            'posted_to.model': 'User',
+        }).populate('owner')
+            .populate('likes')
+            .populate('posted_to.id')
+            .exec()
+            .then(result => result || []),
+        // userEvents
+        Event.find({'members.user': currentUser._id})
+            .then(result => result || []),
+        // friendPosts
+        friends.length > 0 ?
+            Post.find({
+            owner: { $in: friends }
+        }).populate('owner')
+        .populate('likes')
+        .populate('posted_to.id')
+        .exec()
+        .then(result => result || [])
+        : Promise.resolve([])
+    ])
+
+    // Get the posts by the user
+    // const userPosts = (await Post.find({
+    //     owner: currentUser._id
+    // }).populate('owner').
+    // populate('likes').
+    // populate('posted_to.id').exec()) || [];
+
+    // Get the posts on the user's page
+    // const postsOnUserPage = (await Post.find({
+    //     posted_to: {id: currentUser._id, model: 'User'},
+    // }).populate('owner').
+    // populate('likes').
+    // populate('posted_to.id').exec()) || [];
+
+    // Get all the events where the user is a member
+    // const userEvents = (await Event.find({
+    //    'members.user': currentUser._id,
+    // })) || [];
+
+    const eventIds = userEvents.map(e => e._id);
+
+    // Get the posts from event pages that the user has joined
+    const eventPosts = (await Post.find({
+        'posted_to.id': { $in: eventIds },
+        'posted_to.model': 'Event',
     }).populate('owner').
     populate('likes').
-    populate('posted_to.id').
-    exec()) : [];
+    populate('posted_to.id').exec()) || [];
 
-    const combinedPosts = [...userPosts, ...postsOnUserPage, ...friendPosts];
+    // Get the posts of friends
+    // const friendPosts = friends.length > 0 ? (await Post.find({
+    //     owner: { $in: friends }
+    // }).populate('owner').
+    // populate('likes').
+    // populate('posted_to.id').
+    // exec()) : [];
+
+    const combinedPosts = [...userPosts, ...postsOnUserPage, ...friendPosts, ...eventPosts];
 
     // Remove duplicates
     const postsMap = new Map(combinedPosts.map(post => [post._id, post]));
 
     const uniquePosts = Array.from(postsMap.values());
 
-    console.log(uniquePosts);
+    // console.log(uniquePosts);
 
     return res.status(200).json({
         success: true,
