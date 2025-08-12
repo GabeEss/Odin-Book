@@ -1,19 +1,23 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { makeAuthenticatedRequest } from "../auth/make-authenticated-request";
 import { useAuth0 } from "@auth0/auth0-react";
 import { GuestInitializeContext } from "../guest/guest-initialize-context";
 import { GuestContext } from "../guest/guestid-context";
+import {SocketContext} from '../sockets/socket-context';
+import {UserContext} from '../user/context/user-context';
+import handleSendPost from '../posts/create-post';
 
 function FeedDisplayList() {
     const {getAccessTokenSilently} = useAuth0();
     const [userItems, setUserItems] = useState([]);
     const [eventItems, setEventItems] = useState([]);
+    const [post, setPost] = useState('');
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
+    const {socket} = useContext(SocketContext);
+    const {currentUser} = useContext(UserContext);
     const [loadingWheel, setLoadingWheel] = useState(true);
-
-    const nav = useNavigate();
 
     useEffect(() => {
         const fetchFeed = async () => {
@@ -41,15 +45,10 @@ function FeedDisplayList() {
         }
 
         fetchFeed();
-    }, []);
+    }, [post]);
 
-    // const handleItemClick = (item) => {
-    //     if(item.posted_to.model === "User") {
-    //         nav(`/user/${item.posted_to.id._id}`);
-    //     } else if (item.posted_to.model === "Event") {
-    //         nav(`/event/${item.posted_to.id._id}`);
-    //     }
-    // }
+    const sendPost = async (event) =>
+      await handleSendPost(event, socket, setPost, currentUser.userId, currentUser._id, post);
 
     if(loadingWheel) return <div className="spinner"></div>
 
@@ -57,6 +56,18 @@ function FeedDisplayList() {
         <div className="newsfeed-container">
             <div className="userfeed-container">
                 <h2 className="feed-title">User Posts</h2>
+                <form className='post-submit-container' onSubmit={sendPost}>
+                    <textarea
+                    className='post-submit'
+                    rows="4"
+                    cols="50"
+                    maxLength={100}
+                    value={post}
+                    onChange={(e) => setPost(e.target.value)}
+                    placeholder="What's on your mind?"
+                    />
+                    <button className='post-submit-button' type="submit">Post</button>
+                </form>
                 {userItems.length > 0 ?
                     userItems.map((item, index) => (
                         <div className="feed-item-container" key={index}>

@@ -567,7 +567,6 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
         })
     }
 
-    // Get users friends if not undefined, if undefined, will return an empty array
     const friends = currentUser?.friends || [];
 
     const [userPosts, postsOnUserPage, userEvents, friendPosts] = await Promise.all([
@@ -603,25 +602,6 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
         : Promise.resolve([])
     ])
 
-    // Get the posts by the user
-    // const userPosts = (await Post.find({
-    //     owner: currentUser._id
-    // }).populate('owner').
-    // populate('likes').
-    // populate('posted_to.id').exec()) || [];
-
-    // Get the posts on the user's page
-    // const postsOnUserPage = (await Post.find({
-    //     posted_to: {id: currentUser._id, model: 'User'},
-    // }).populate('owner').
-    // populate('likes').
-    // populate('posted_to.id').exec()) || [];
-
-    // Get all the events where the user is a member
-    // const userEvents = (await Event.find({
-    //    'members.user': currentUser._id,
-    // })) || [];
-
     const eventIds = userEvents.map(e => e._id);
 
     // Get the posts from event pages that the user has joined
@@ -632,18 +612,10 @@ exports.user_newsfeed = asyncHandler(async (req, res, next) => {
     populate('likes').
     populate('posted_to.id').exec()) || [];
 
-    // Get the posts of friends
-    // const friendPosts = friends.length > 0 ? (await Post.find({
-    //     owner: { $in: friends }
-    // }).populate('owner').
-    // populate('likes').
-    // populate('posted_to.id').
-    // exec()) : [];
-
     const combinedPosts = [...userPosts, ...postsOnUserPage, ...friendPosts, ...eventPosts];
 
     // Remove duplicates
-    const postsMap = new Map(combinedPosts.map(post => [post._id, post]));
+    const postsMap = new Map(combinedPosts.map(post => [post._id.toString(), post]));
 
     const uniquePosts = Array.from(postsMap.values());
 
