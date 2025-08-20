@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 const BotService = require('../bot/bot-logic');
+const UsernameMigration = require('../scripts/migration-logic');
 
 /**
  * Get port from environment and store in Express.
@@ -34,19 +35,27 @@ app.set('io', io);
  */
 (async () => {
   try {
+    console.log("Initializing bots...");
     await BotService.initializeBots();
     console.log('Bots initialization complete.');
 
+    console.log("Initializing welcome event...");
     await BotService.initializeWelcomeEvent();
     console.log('Welcome event initialization complete.');
+    
+    console.log("Handling first post on the welcome event...");
     await BotService.firstPostWelcomeEvent();
     console.log('Welcome event first post handled.')
 
+    console.log("Handling username uniqueness migration...");
+    await UsernameMigration.runMigration();
+    console.log("Username migration handled.");
+    
     server.listen(port);
     server.on('error', onError);
     server.on('listening', onListening);
   } catch (error) {
-    console.error('Failed to initialize bots: ', error);
+    console.error('Failed to initialize application: ', error);
     process.exit(1); // shut down
   }
 })();
