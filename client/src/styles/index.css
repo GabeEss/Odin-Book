@@ -1064,6 +1064,10 @@ textarea:focus {
     justify-content: center;
 }
 
+.error-message {
+    padding: .5em;
+}
+
 /* EVENT LIST PAGE */
 
 .events-main {

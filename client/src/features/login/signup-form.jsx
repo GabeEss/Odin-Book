@@ -89,11 +89,11 @@ function SignUpForm () {
                 if(response.data.success === true) {
                     navigate('/home');
                 } else {
-                    setError('Failed to update user information. Please try again.');
+                    setError(`Failed to update with username: ${username}`);
                 }
             } catch (error) {
                 console.log(error);
-                setError(error.message);
+                setError(`Failed to update with username: ${username}`);
             }
         }
 
