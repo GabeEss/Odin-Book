@@ -88,12 +88,15 @@ function SignUpForm () {
                 );
                 if(response.data.success === true) {
                     navigate('/home');
-                } else {
-                    setError(`Failed to update with username: ${username}`);
                 }
             } catch (error) {
-                console.log(error);
-                setError(`Failed to update with username: ${username}`);
+                if(error.response.status === 400) {
+                    setError(`Failed to update with username: ${username}`);
+                } else if (error.response.status === 500) {
+                    setError('Failed to update user information.');
+                } else {
+                    setError(`Failed to connect to user update.`);
+                }   
             }
         }
 
