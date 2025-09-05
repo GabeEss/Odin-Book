@@ -82,7 +82,14 @@ function LoginPage() {
             }
         }
 
+        // ping every 9 minutes
+        const intervalId = setInterval(warmUpBackend, 9 * 60 * 1000);
+
+        // run on mount
         warmUpBackend();
+
+        // remove interval on dismount
+        return () => clearInterval(intervalId);
     }, []);
 
     if(loadingWheel) return <div className="spinner"></div>
