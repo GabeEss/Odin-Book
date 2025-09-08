@@ -12,6 +12,7 @@ function FeedDisplayList() {
     const {getAccessTokenSilently} = useAuth0();
     const [userItems, setUserItems] = useState([]);
     const [eventItems, setEventItems] = useState([]);
+    const [refreshFeed, setRefreshFeed] = useState(false);
     const [post, setPost] = useState('');
     const {guestInit} = useContext(GuestInitializeContext);
     const {guest} = useContext(GuestContext);
@@ -45,10 +46,13 @@ function FeedDisplayList() {
         }
 
         fetchFeed();
-    }, [post]);
+    }, [refreshFeed]);
 
-    const sendPost = async (event) =>
-      await handleSendPost(event, socket, setPost, currentUser.userId, currentUser._id, post);
+    const sendPost = async (event) => {
+        await handleSendPost(event, socket, setPost, currentUser.userId, currentUser._id, post);
+        setRefreshFeed(!refreshFeed);
+    }
+      
 
     if(loadingWheel) return <div className="spinner"></div>
 

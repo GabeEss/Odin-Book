@@ -22,11 +22,11 @@ function ConversationsComponent() {
 
     useEffect(() => {
         refetch();
-    }, [location])
+    }, [location]);
 
     const handleMessageClick = (convo) => {
         nav(`/messages/${convo.id}`);
-    }
+    };
 
     return(
         <div className='home-sidebar'>

@@ -6,7 +6,7 @@ const Notification = require("../models/notification");
 const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
-const getUserInfo = require("../utils/getUserInfo");
+const { getUserInfo } = require("../utils/getUserInfo");
 const decodeToken = require("../utils/decodeTokenApiCall");
 const determineUserType = require('../utils/determineUserType');
 

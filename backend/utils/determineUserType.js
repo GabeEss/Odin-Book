@@ -1,5 +1,5 @@
 const decodeToken = require("./decodeToken");
-const getUserInfo = require("./getUserInfo");
+const {getUserInfo} = require("./getUserInfo");
 
 // Function to determine whether the user is a guest or a logged in user
 // Returns the user object from mongo if it exists, otherwise returns null

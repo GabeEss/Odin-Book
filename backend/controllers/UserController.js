@@ -9,7 +9,7 @@ const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
 const decodeTokenApiCall = require("../utils/decodeTokenApiCall");
-const getUserInfo = require("../utils/getUserInfo");
+const {getUserInfo, getUserInfoUsername} = require("../utils/getUserInfo");
 const determineUserType = require("../utils/determineUserType");
 const searchUserCollection = require("../utils/searchUserCollection");
 const generateGuestID = require("../utils/generateGuestID");
@@ -74,20 +74,23 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
 // Handles sign up and sign in
 exports.guest_register_post = asyncHandler(async (req, res, next) => {
     try {
-        const guest = req.headers['x-guest'];
-        const mongoUser = await getUserInfo(guest);
+        let mongoUser;
+        const guestName = req.body.username;
+        if(guestName) {
+            mongoUser = await getUserInfoUsername(guestName);
+        } else {
+            const guest = req.headers['x-guest'];
+            mongoUser = await getUserInfo(guest);
+        }
 
         if(mongoUser) {
             console.log("Guest user exists.");
-
-            // Set the guestId cookie
-            res.cookie('guestId', guest, { httpOnly: true });
 
             return res.status(200).json({
                 success: true,
                 message: 'Guest exists in database. Regular login.',
                 firstTimeLogin: false,
-                guestId: guest
+                guestId: mongoUser.userId,
             })
         } else {
             console.log("Creating guest");
@@ -97,7 +100,7 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
 
             const newGuest = new User({
                 userId: guestId,
-                username: guestId,
+                username: guestName,
                 email: `FakeMail${guestId}@guestaddress.com`,
                 worksAt: "Guest Factory",
                 livesIn: "Guestro City, Guestland",

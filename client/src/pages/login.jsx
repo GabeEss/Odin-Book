@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import LoginComponent from '../features/login/login-component';
-import CreateGuestComponent from '../features/guest/create-guest-component';
+import GuestLoginComponent from '../features/guest/guest-login-component';
 
 import { GuestInitializeContext } from '../features/guest/guest-initialize-context';
 import { GuestContext } from '../features/guest/guestid-context';
@@ -71,7 +71,7 @@ function LoginPage() {
         }
     }, [isAuthenticated, isRegistered, sendToSignup]);
 
-    // Break cold starts with 
+    // Break cold starts with hook
     useEffect(() => {
         const warmUpBackend = async () => {
             try {
@@ -102,7 +102,7 @@ function LoginPage() {
                     <LoginComponent 
                         isRegistered={isRegistered} 
                         setIsRegistered={setIsRegistered}/>
-                    <CreateGuestComponent setLoadingWheel={setLoadingWheel}/>
+                    <GuestLoginComponent setLoadingWheel={setLoadingWheel}/>
                 </div>
             : 
                 <div className='welcome-section section'>
