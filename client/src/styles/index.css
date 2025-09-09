@@ -137,6 +137,7 @@ textarea:focus {
 
 .header-button {
     background-color: var(--header);
+    height: 2.2em;
     color: var(--primary);
     border-left: 1px solid rgba(0, 0, 0, 0.08);
     border-right: 1px solid rgba(0, 0, 0, 0.08);
@@ -361,12 +362,27 @@ textarea:focus {
     gap: .5em;
 }
 
-.home-button {
-
+.textarea-guest-login {
+    color: black;
+    padding: .5em;
 }
 
-.logout-button {
+.login-button {
+    height: 2.5em;
+}
 
+.create-guest {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-guest-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+    gap: .5em;
 }
 
 @media (max-width: 600px) {

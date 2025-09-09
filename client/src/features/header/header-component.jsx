@@ -128,11 +128,11 @@ function HeaderComponent() {
                     <button className='header-button' onClick={handleDropdownClick}>...</button>
                     {dropdown ? 
                     <div className='dropdown-button-container dropdown'>
-                        {currentUser ? <button className="header-button dropdown-content" onClick={handleUser}>User Page</button> : null}
-                        <button className='logout-header header-button dropdown-content' onClick={handleLogout}>
+                        {currentUser ? <button className="dropdown-content" onClick={handleUser}>User Page</button> : null}
+                        <button className='logout-header dropdown-content' onClick={handleLogout}>
                             Log out
                         </button>
-                        <button className='signup-header header-button dropdown-content' onClick={() => nav('/signup')}>Update User</button>                    
+                        <button className='signup-header dropdown-content' onClick={() => nav('/signup')}>Update User</button>                    
                     </div> : null }
                 </div>
             </div>

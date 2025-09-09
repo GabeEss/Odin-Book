@@ -22,6 +22,7 @@ function LoginPage() {
     const [sendToSignup, setSendToSignup] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [loadingWheel, setLoadingWheel] = useState(false);
+    const [displayInputField, setDisplayInputField] = useState(false);
 
     const navigate = useNavigate();
 
@@ -30,6 +31,10 @@ function LoginPage() {
             navigate('/home');
         }
     }
+
+    const handleGuestClick = () => {
+        setDisplayInputField(true);
+    };
 
     // Check if user is registered once they log in with auth0
     useEffect(() => {
@@ -98,12 +103,18 @@ function LoginPage() {
         <div className='login-page page'>
             <h1 className='login-heading'>Welcome to Name Book</h1>
             {!isAuthenticated ? 
-                <div className='login-section section'>
-                    <LoginComponent 
-                        isRegistered={isRegistered} 
-                        setIsRegistered={setIsRegistered}/>
-                    <GuestLoginComponent setLoadingWheel={setLoadingWheel}/>
-                </div>
+                (displayInputField ? 
+                    <GuestLoginComponent 
+                        setLoadingWheel={setLoadingWheel}
+                        setDisplayInputField={setDisplayInputField}
+                    /> :
+                    <div className='login-section section'>
+                        <LoginComponent 
+                            isRegistered={isRegistered} 
+                            setIsRegistered={setIsRegistered}/>
+                        <button className='login-button' onClick={handleGuestClick}>Guest Log In</button>
+                    </div>
+                )                
             : 
                 <div className='welcome-section section'>
                     <button className='home-button' onClick={handleHome}>Home</button>

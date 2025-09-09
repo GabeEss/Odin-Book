@@ -5,21 +5,16 @@ import { useAuth0 } from '@auth0/auth0-react';
 import {useState, useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function GuestLoginComponent({setLoadingWheel}) {
+function GuestLoginComponent({setLoadingWheel, setDisplayInputField}) {
     const nav = useNavigate();
     const {guest, setGuest} = useContext(GuestContext);
     const {setGuestInit} = useContext(GuestInitializeContext);
     const [username, setUsername] = useState('');
-    const [displayInputField, setDisplayInputField] = useState(false);
 
     const {
         isAuthenticated,
         getAccessTokenSilently,
     } = useAuth0();
-
-    const handleGuestClick = () => {
-        setDisplayInputField(true);
-    };
 
     const handleGuestLogin = async (e) => {
         e.preventDefault();
@@ -43,28 +38,35 @@ function GuestLoginComponent({setLoadingWheel}) {
         }
     }
 
+    const handleCancel = (e) => {
+        e.preventDefault();
+        setDisplayInputField(false);
+    }
+
 return (
         <div className='create-guest'>
-            {
-                displayInputField ? 
-                <div> 
-                <textarea 
-                    className='textarea-guest-login'
-                    rows="4"
-                    cols="50"
-                    maxLength={100}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter a Name"/>
+            <textarea 
+                className='textarea-guest-login'
+                rows="4"
+                cols="50"
+                maxLength={100}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter a Name"/>
+            <div className="create-guest-buttons">
                 <button
-                    className='create-guest-button'
-                    onClick={handleGuestLogin}
+                // className='create-guest-button'
+                onClick={handleGuestLogin}
                 >
-                    Login GUEST PLS
+                    Login as Guest
                 </button>
-                </div>
-                : <button className='create-guest-button' onClick={handleGuestClick}>Enter as Guest User</button>
-            }
+                <button
+                    // className='create-guest-button'
+                    onClick={handleCancel}
+                >
+                    Cancel
+                </button>
+            </div>
         </div>
     )
 }
