@@ -5,11 +5,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import {useState, useContext} from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function GuestLoginComponent({setLoadingWheel, setDisplayInputField}) {
+function GuestLoginComponent({setLoadingWheel}) {
     const nav = useNavigate();
     const {guest, setGuest} = useContext(GuestContext);
     const {setGuestInit} = useContext(GuestInitializeContext);
-    const [username, setUsername] = useState('');
 
     const {
         isAuthenticated,
@@ -20,7 +19,7 @@ function GuestLoginComponent({setLoadingWheel, setDisplayInputField}) {
         e.preventDefault();
         setLoadingWheel(true);
         try {
-            const response = await guestLogin({guest, getAccessTokenSilently, isAuthenticated, username});
+            const response = await guestLogin({guest, getAccessTokenSilently, isAuthenticated});
             // Initialize guest user
             if(response.data.success === true) {
                 setGuestInit(true);
@@ -38,35 +37,13 @@ function GuestLoginComponent({setLoadingWheel, setDisplayInputField}) {
         }
     }
 
-    const handleCancel = (e) => {
-        e.preventDefault();
-        setDisplayInputField(false);
-    }
-
 return (
         <div className='create-guest'>
-            <textarea 
-                className='textarea-guest-login'
-                rows="4"
-                cols="50"
-                maxLength={100}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter a Name"/>
-            <div className="create-guest-buttons">
-                <button
-                // className='create-guest-button'
-                onClick={handleGuestLogin}
-                >
-                    Login as Guest
-                </button>
-                <button
-                    // className='create-guest-button'
-                    onClick={handleCancel}
-                >
-                    Cancel
-                </button>
-            </div>
+            <button
+            onClick={handleGuestLogin}
+            >
+                Login as Guest
+            </button>
         </div>
     )
 }

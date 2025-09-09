@@ -11,18 +11,6 @@ const getUserInfo = async (userId) => {
     return mongoUser;
 }
 
-// Function to get user info from MongoDB using the username
-const getUserInfoUsername = async (username) => {
-    if(!username) {
-        return;
-    }
-
-    let mongoUser = await User.findOne({username: username}).exec();
-
-    return mongoUser;
-}
-
 module.exports = { 
     getUserInfo,
-    getUserInfoUsername,
 };

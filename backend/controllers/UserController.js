@@ -1,15 +1,12 @@
 const Post = require("../models/post");
-const Comment = require("../models/comment");
 const User = require("../models/user");
-const Notification = require("../models/notification");
 const Event = require("../models/event");
 const BotService = require('../bot/bot-logic');
 
-const { DateTime } = require("luxon");
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
 const decodeTokenApiCall = require("../utils/decodeTokenApiCall");
-const {getUserInfo, getUserInfoUsername} = require("../utils/getUserInfo");
+const {getUserInfo} = require("../utils/getUserInfo");
 const determineUserType = require("../utils/determineUserType");
 const searchUserCollection = require("../utils/searchUserCollection");
 const generateGuestID = require("../utils/generateGuestID");
@@ -74,15 +71,9 @@ exports.user_register_post = asyncHandler(async (req, res, next) => {
 // Handles sign up and sign in
 exports.guest_register_post = asyncHandler(async (req, res, next) => {
     try {
-        let mongoUser;
-        const guestName = req.body.username;
-        if(guestName) {
-            mongoUser = await getUserInfoUsername(guestName);
-        } else {
-            const guest = req.headers['x-guest'];
-            mongoUser = await getUserInfo(guest);
-        }
-
+        const guest = req.headers['x-guest'];
+        const mongoUser = await getUserInfo(guest);
+        
         if(mongoUser) {
             console.log("Guest user exists.");
 
