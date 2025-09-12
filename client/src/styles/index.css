@@ -223,6 +223,11 @@ textarea:focus {
     /* border-bottom: 1px solid rgba(0, 0, 0, 0.2); */
 }
 
+.search-button:hover {
+    background-color: var(--header);
+    text-decoration: underline;
+}
+
 .search-header {
     color: var(--primary);
 }
@@ -273,11 +278,6 @@ textarea:focus {
 
     .searchbar {
         margin-right: .3em;
-    }
-
-    .search-button {
-        border-left: 0;
-        border-right: 0;
     }
 
     .user-nav {

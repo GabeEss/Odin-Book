@@ -8,10 +8,12 @@ import { GuestContext } from '../guest/guestid-context';
 function SignUpForm () {
     const {
         getAccessTokenSilently,
+        logout,
+        isAuthenticated,
     } = useAuth0();
     const [isLoading, setIsLoading] = useState(true);
-    const { guestInit } = useContext(GuestInitializeContext);
-    const { guest } = useContext(GuestContext);
+    const { guestInit, setGuestInit } = useContext(GuestInitializeContext);
+    const { guest, setGuest } = useContext(GuestContext);
 
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
@@ -104,6 +106,45 @@ function SignUpForm () {
             navigate('/home');
         };
 
+        const handleDelete = async () => {
+            const verify = confirm("Do you want to delete this user?");
+            if(verify) {
+                try {
+                    const response = await makeAuthenticatedRequest(
+                    getAccessTokenSilently,
+                    'delete',
+                    `${import.meta.env.VITE_API_URL}/user`,
+                    {   
+                        username,
+                        worksAt,
+                        livesIn,
+                        from,
+                        displayColor,
+                        coverColor
+                    },
+                    guest,
+                    guestInit
+                );
+
+                if(response.data.success === true) {
+                    if(isAuthenticated) {
+                        logout({ returnTo: window.location.origin });
+                    }
+                    if(guestInit) {
+                        setGuestInit(false);
+                        setGuest("");
+                        nav('/');
+                    }
+                } else {
+                    setError(`Failed to delete user.`);
+                }
+                } catch (error) {
+                    console.error('error', error);
+                    setError(`Failed to connect to user delete.`);
+                }
+            }
+        }
+
     if(isLoading) return (<h2 className='loading-heading spinner'></h2>);
 
     return(
@@ -175,6 +216,7 @@ function SignUpForm () {
                 <div className='signup-submit-buttons'>
                     <button className='signup-button' type='submit'>Update Information</button>
                     <button className='skip-button' onClick={handleSkip}>Skip</button>
+                    <button className='delete-button' onClick={handleDelete}>Delete</button>
                 </div>
                 <p className="error-message">{error}</p>
         </form>

@@ -2,6 +2,7 @@ const Post = require("../models/post");
 const User = require("../models/user");
 const Event = require("../models/event");
 const BotService = require('../bot/bot-logic');
+const UserCleanUp = require("../utils/cleanup/user-cleanup");
 
 const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
@@ -91,7 +92,7 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
 
             const newGuest = new User({
                 userId: guestId,
-                username: guestName,
+                username: guestId,
                 email: `FakeMail${guestId}@guestaddress.com`,
                 worksAt: "Guest Factory",
                 livesIn: "Guestro City, Guestland",
@@ -108,13 +109,6 @@ exports.guest_register_post = asyncHandler(async (req, res, next) => {
 
             // Bot sends a message
             await BotService.handleSignUp(newGuest);
-
-            // Set the guestId cookie
-            res.cookie('guestId', guestId, { 
-                httpOnly: true,
-                maxAge: 24 * 60 * 60 * 1000,
-                sameSite: 'lax'
-             });
 
             return res.status(201).json({
                 success: true,
@@ -719,5 +713,29 @@ exports.user_update = asyncHandler(async (req, res, next) => {
 });
 
 exports.user_delete = asyncHandler(async (req, res, next) => {
-    res.send("NOT IMPLEMENTED: User delete");
+    try {
+        const mongoUser = await determineUserType(req);
+
+        if(!mongoUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            })
+        }
+
+        await UserCleanUp.cleanUpSingleUser(mongoUser._id);
+
+        return res.status(200).json({
+            success: true,
+            message: 'User deleted',
+        })
+
+    } catch(error) {
+        console.error(`Error deleting user:`, error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Error deleting user, try again later.'
+        })
+    }
 });

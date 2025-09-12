@@ -280,6 +280,47 @@ class BotService {
         }
     }
 
+    static async cleanUpWelcomeEvent() {
+        console.log("Starting welcome event cleanup...");
+
+        const welcomeBot = await User.findOne({
+            userId: this.BOTS.WELCOME.userId,
+        })
+
+        if(!welcomeBot) {
+            console.error("Welcome bot not found.");
+            return;
+        }
+
+        const welcomeEvent = await Event.findOne({
+            event: this.EVENTS.WELCOME.event,
+            owner: welcomeBot._id,
+        })
+
+        if(!welcomeEvent) {
+            console.error("Welcome event not found.");
+            return;
+        }
+
+        const validMembers = [];
+        let removedCount = 0;
+
+        for(const member of welcomeEvent.members) {
+            const userExists = await User.findById(member.user);
+            if(userExists) {
+                validMembers.push(member);
+            } else {
+                console.log(`Removing non-existent member: ${member.user}`);
+                removedCount++;
+            }
+        }
+
+        welcomeEvent.members = validMembers;
+        await welcomeEvent.save();
+
+        console.log(`Removed ${removedCount} members. ${validMembers.length} remaining.`);
+    }
+
     // Doesn't check mongo for existence of bot, only checks userId
     static isBot(userId) {
         return userId.startsWith('bot_');

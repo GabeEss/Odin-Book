@@ -104,7 +104,7 @@ function FeedDisplayList() {
                                 </div>
                             </div>
                         </div>
-                    )) : null }
+                    )) : <div className='item-container'>You haven't joined any events. Why not try joining the 'Welcome To Name Book' event?</div> }
             </div>
         </div>
     )

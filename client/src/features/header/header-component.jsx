@@ -56,8 +56,6 @@ function HeaderComponent() {
             socket.emit('userLeft', currentUser.userId);
             setGuestInit(false);
             nav('/');
-            // Clear the guestId cookie, which is set in the backend
-            Cookies.remove('guestId');
         }
     }
 
@@ -132,7 +130,7 @@ function HeaderComponent() {
                         <button className='logout-header dropdown-content' onClick={handleLogout}>
                             Log out
                         </button>
-                        <button className='signup-header dropdown-content' onClick={() => nav('/signup')}>Update User</button>                    
+                        <button className='signup-header dropdown-content' onClick={() => nav('/signup')}>Update User</button>
                     </div> : null }
                 </div>
             </div>

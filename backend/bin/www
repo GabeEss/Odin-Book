@@ -45,11 +45,15 @@ app.set('io', io);
     
     console.log("Handling first post on the welcome event...");
     await BotService.firstPostWelcomeEvent();
-    console.log('Welcome event first post handled.')
+    console.log('Welcome event first post handled.');
 
     console.log("Handling username uniqueness migration...");
     await UsernameMigration.runMigration();
     console.log("Username migration handled.");
+
+    console.log("Handling welcome event clean up...");
+    await BotService.cleanUpWelcomeEvent();
+    console.log("Welcome event clean up handled.");
     
     server.listen(port);
     server.on('error', onError);

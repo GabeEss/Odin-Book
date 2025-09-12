@@ -17,7 +17,7 @@ class UserCleanUp {
                 _id: {
                     $lt: this.createObjectIdFromDate(sixMonthsAgo)
                 }
-            })
+            });
 
             console.log(`Found ${staleGuestUsers.length} stale users...`);
 
@@ -43,17 +43,40 @@ class UserCleanUp {
         try {
             console.log(`Cleaning up user: ${mongoId}`);
 
-            const [deletedMessages, deletedPosts, deletedComments, deletedEvents] = await Promise.all([
+            const [
+                deletedMessages, 
+                deletedPosts, 
+                deletedComments, 
+                deletedEvents, 
+                updatedEvents, 
+                updatedFriends, 
+                updatedFriendRequests
+            ] = await Promise.all([
                 Message.deleteMany({ $or: [{sender: mongoId}, {receiver: mongoId}] }),
                 Post.deleteMany({owner: mongoId}),
                 Comment.deleteMany({owner: mongoId}),
                 Event.deleteMany({owner: mongoId}),
+                Event.updateMany(
+                    {'members.user': mongoId},
+                    { $pull: { members: {user: mongoId} }}
+                ),
+                User.updateMany(
+                    {friends: mongoId},
+                    {$pull: {friends: mongoId}}
+                ),
+                User.updateMany(
+                    {$or: [{friendRequests: mongoId}, {sentRequests: mongoId}]},
+                    {$pull:{friendRequests: mongoId, sentRequests: mongoId}}
+                )
             ]);
 
         console.log(`Deleted ${deletedMessages.deletedCount} messages`);
         console.log(`Deleted ${deletedPosts.deletedCount} posts`);
         console.log(`Deleted ${deletedComments.deletedCount} comments`);
         console.log(`Deleted ${deletedEvents.deletedCount} events`);
+        console.log(`Removed user from ${updatedEvents.modifiedCount} event memberships`);
+        console.log(`Removed user from ${updatedFriends.modifiedCount} friend lists.`);
+        console.log(`Removed user from ${updatedFriendRequests.modifiedCount} sent and received friend requests.`);
 
         await User.findByIdAndDelete(mongoId);
         console.log(`Deleted user: ${mongoId}`);
