@@ -40,6 +40,7 @@ function GuestLoginComponent({setLoadingWheel}) {
 return (
         <div className='create-guest'>
             <button
+            className='login-button'
             onClick={handleGuestLogin}
             >
                 Login as Guest

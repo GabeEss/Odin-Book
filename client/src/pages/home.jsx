@@ -18,7 +18,7 @@ function HomePage () {
             <HeaderComponent/>
             <div className="home-main">
                 <h1 className="home-header">Your Feed</h1>
-                { guestInit ? <p className="guest-init">Welcome Guest!</p> : null}
+                { guestInit ? <p className="guest-init">Welcome Guest! Guest users are deleted every 6 months.</p> : null}
                 <div className="home-content">
                     <FeedDisplayList/>
                     <ConversationsComponent/>

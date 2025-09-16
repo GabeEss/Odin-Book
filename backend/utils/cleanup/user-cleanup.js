@@ -12,6 +12,9 @@ class UserCleanUp {
             const sixMonthsAgo = new Date();
             sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
+            // const oneWeekAgo = new Date();
+            // oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
             const staleGuestUsers = await User.find({
                 userId: { $regex: /^guest/ },
                 _id: {

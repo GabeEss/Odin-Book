@@ -7,8 +7,10 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
+const cron = require('node-cron');
 const BotService = require('../bot/bot-logic');
 const UsernameMigration = require('../scripts/migration-logic');
+const UserCleanUp = require('../utils/cleanup/user-cleanup');
 
 /**
  * Get port from environment and store in Express.
@@ -63,6 +65,37 @@ app.set('io', io);
     process.exit(1); // shut down
   }
 })();
+
+// Runs at 2:00am, on Jan 1st and July 1st
+cron.schedule('0 2 1 1,7 *', async () => {
+  console.log("Running scheduled guest user clean up...");
+  try {
+    await UserCleanUp.cleanUpStaleUsers();
+    await BotService.cleanUpWelcomeEvent();
+    console.log("Scheduled cleanup complete.");
+  } catch(error) {
+    console.error("Scheduled clean up failed: ", error);
+  }
+}, {
+  scheduled: true,
+  timezone: "America/New_York"
+});
+
+
+// Runs at 5pm every day
+// cron.schedule('0 17 * * *', async () => {
+//   console.log("Running scheduled guest user clean up...");
+//   try {
+//     await UserCleanUp.cleanUpStaleUsers();
+//     await BotService.cleanUpWelcomeEvent();
+//     console.log("Scheduled cleanup complete.");
+//   } catch(error) {
+//     console.error("Scheduled clean up failed: ", error);
+//   }
+// }, {
+//   scheduled: true,
+//   timezone: "America/New_York"
+// });
 
 /**
  * Normalize a port into a number, string, or false.
