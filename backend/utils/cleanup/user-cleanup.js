@@ -53,7 +53,8 @@ class UserCleanUp {
                 deletedEvents, 
                 updatedEvents, 
                 updatedFriends, 
-                updatedFriendRequests
+                updatedFriendRequests,
+                updatedNotifications
             ] = await Promise.all([
                 Message.deleteMany({ $or: [{sender: mongoId}, {receiver: mongoId}] }),
                 Post.deleteMany({owner: mongoId}),
@@ -70,6 +71,10 @@ class UserCleanUp {
                 User.updateMany(
                     {$or: [{friendRequests: mongoId}, {sentRequests: mongoId}]},
                     {$pull:{friendRequests: mongoId, sentRequests: mongoId}}
+                ),
+                User.updateMany(
+                    {},
+                    {$pull: {notifications: {from: mongoId}}}
                 )
             ]);
 
@@ -80,6 +85,7 @@ class UserCleanUp {
         console.log(`Removed user from ${updatedEvents.modifiedCount} event memberships`);
         console.log(`Removed user from ${updatedFriends.modifiedCount} friend lists.`);
         console.log(`Removed user from ${updatedFriendRequests.modifiedCount} sent and received friend requests.`);
+        console.log(`Removed ${updatedNotifications.modifiedCount} notifications from the deleted user.`);
 
         await User.findByIdAndDelete(mongoId);
         console.log(`Deleted user: ${mongoId}`);
