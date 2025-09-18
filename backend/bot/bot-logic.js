@@ -166,7 +166,7 @@ class BotService {
         const welcomePost = 'Thanks for using Name Book!';
 
         const message = new Message({
-            sender: welcomeBot._id,
+            sender: welcomeBot,
             receiver: newUser._id,
             message: welcomeMessage,
             timestamp: new Date()
@@ -250,7 +250,7 @@ class BotService {
         const response = responses[Math.floor(Math.random() * responses.length)];
 
         const message = new Message({
-            sender: welcomeBot._id,
+            sender: welcomeBot,
             receiver: user._id,
             message: response,
             timestamp: new Date(),

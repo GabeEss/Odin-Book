@@ -35,7 +35,8 @@ function initializeSocket(server) {
       origin: corsDeploy,
       methods: ["GET", "POST"],
       credentials: true
-    }
+    },
+    transports: ['websocket', 'polling']
   });
 
   // Find the user associated with the disconnected socket and remove them from the caches
