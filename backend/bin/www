@@ -56,6 +56,10 @@ app.set('io', io);
     console.log("Handling welcome event clean up...");
     await BotService.cleanUpWelcomeEvent();
     console.log("Welcome event clean up handled.");
+
+    console.log("Cleaning up stale users...");
+    await UserCleanUp.cleanUpStaleUsers();
+    console.log("Stale user clean up handled.");
     
     server.listen(port);
     server.on('error', onError);
