@@ -29,10 +29,10 @@ const socketCache = new Map();
 function initializeSocket(server) {
   const corsDeploy = "https://my-name-book.netlify.app";
   // Different addresses work for different browsers while testing
-  const corsTest = [ "http://127.0.0.1:5173", "http://localhost:5173" ];
+  // const corsTest = [ "http://127.0.0.1:5173", "http://localhost:5173" ];
   const io = socketIo(server, {
     cors: {
-      origin: corsTest,
+      origin: corsDeploy,
       methods: ["GET", "POST"],
       credentials: true
     }
