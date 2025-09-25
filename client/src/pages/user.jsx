@@ -13,6 +13,8 @@ import UserOptions from '../features/user/user-options-component';
 import PostListDisplay from '../features/posts/post-list-display';
 import CurrentUserOptions from '../features/user/current-user-options-component';
 
+import { LoadingDotsContainer, LoadingSpinnerContainer } from '../features/loading/loading-container';
+
 function UserPage() {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
     const { id } = useParams();
@@ -27,9 +29,9 @@ function UserPage() {
     const location = useLocation();
 
     useEffect(() => {
+        const fetchUserInfo = async () => {
         try {
             setLoading(true);
-            const fetchUserInfo = async () => {
                 if(isAuthenticated || guestInit) {
                     const userInfo = await getUserProfile(
                         id,
@@ -41,19 +43,20 @@ function UserPage() {
                         setSelf(userInfo.self);
                         setUser(userInfo);
                     }
-                }
-            }
-            fetchUserInfo();
-            setLoading(false);
+                } else setError('Failed to fetch user information');
         } catch (error) {
             console.error('error', error);
-            // setError('Failed to fetch user information');
+            setError('Failed to fetch user information');
+        } finally {
             setLoading(false);
         }
+    };
+
+    fetchUserInfo();
     }, [friendChange, location]);
 
     if(loading) {
-        return <div className="spinner"></div>
+        return <LoadingSpinnerContainer/>;
     }
 
     return(

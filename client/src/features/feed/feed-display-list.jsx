@@ -7,6 +7,7 @@ import { GuestContext } from "../guest/guestid-context";
 import {SocketContext} from '../sockets/socket-context';
 import {UserContext} from '../user/context/user-context';
 import handleSendPost from '../posts/create-post';
+import { LoadingSpinnerContainer } from "../loading/loading-container";
 
 function FeedDisplayList() {
     const {getAccessTokenSilently} = useAuth0();
@@ -52,9 +53,8 @@ function FeedDisplayList() {
         await handleSendPost(event, socket, setPost, currentUser.userId, currentUser._id, post);
         setRefreshFeed(!refreshFeed);
     }
-      
 
-    if(loadingWheel) return <div className="spinner"></div>
+    // if(loadingWheel) return <LoadingSpinnerContainer/>;
 
     return(
         <div className="newsfeed-container">
@@ -70,7 +70,9 @@ function FeedDisplayList() {
                     onChange={(e) => setPost(e.target.value)}
                     placeholder="What's on your mind?"
                     />
-                    <button className='post-submit-button' type="submit">Post</button>
+                    <button className='post-submit-button' type="submit">
+                        Post
+                    </button>
                 </form>
                 {userItems.length > 0 ?
                     userItems.map((item, index) => (

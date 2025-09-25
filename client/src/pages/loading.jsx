@@ -1,8 +1,8 @@
+import {LoadingDotsContainer, LoadingSpinnerContainer} from "../features/loading/loading-container";
+
 function LoadingPage () {
     return (
-        <div className="loading-container">
-            <h1 className="spinner"></h1>
-        </div>
+        <LoadingSpinnerContainer/>
     )
 }
 

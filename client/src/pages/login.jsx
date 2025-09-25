@@ -10,6 +10,8 @@ import { GuestContext } from '../features/guest/guestid-context';
 
 import { makeAuthenticatedRequest } from '../features/auth/make-authenticated-request';
 
+import {LoadingSpinnerContainer, LoadingDotsContainer} from '../features/loading/loading-container';
+
 function LoginPage() {
     const {
         logout,
@@ -92,7 +94,9 @@ function LoginPage() {
         return () => clearInterval(intervalId);
     }, []);
 
-    if(loadingWheel) return <div className="spinner"></div>
+    if(loadingWheel) {
+        <LoadingSpinnerContainer/>
+    }
 
     return(
         <div className='login-page page'>
