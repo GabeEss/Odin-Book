@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { GuestInitializeContext } from '../guest/guest-initialize-context';
 import { GuestContext } from '../guest/guestid-context';
+import { LoadingDotsContainer } from '../loading/loading-container';
 
 function SignUpForm () {
     const {
@@ -145,7 +146,7 @@ function SignUpForm () {
             }
         }
 
-    if(isLoading) return (<h2 className='loading-heading spinner'></h2>);
+    if(isLoading) return <LoadingDotsContainer/>;
 
     return(
         <form className='signup-form form' onSubmit={handleSignUp}>

@@ -7,6 +7,7 @@ import { makeAuthenticatedRequest } from "../features/auth/make-authenticated-re
 import FriendRequestList from "../features/friends/friend-request-list";
 import FriendListDisplay from "../features/friends/friend-list-display";
 import HeaderComponent from "../features/header/header-component";
+import {LoadingDotsContainer, LoadingSpinnerContainer} from '../features/loading/loading-container';
 
 function FriendsPage() {
     const [friends, setFriends] = useState([]);
@@ -47,7 +48,7 @@ function FriendsPage() {
         nav('/home');
     }
 
-    if(loadingWheel) return <div className="spinner"></div>
+    if(loadingWheel) return <LoadingSpinnerContainer/>;
 
   return (
     <div className="friends-page page">

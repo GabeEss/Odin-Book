@@ -9,6 +9,7 @@ import { UserContext } from "../user/context/user-context";
 import { useMessages } from "./use-messages-hook";
 import handleDeleteMessage from "./delete-message";
 import handleSendMessage from "./create-message";
+import {LoadingDotsContainer} from '../loading/loading-container';
 
 // modalUserId is the mongo _id of the non-current user in the message exchange when using the modal
 function MessageList({modalUserId}) {
@@ -105,7 +106,7 @@ function MessageList({modalUserId}) {
     }
 
     if (isLoading) {
-        return <div className='spinner'></div>;
+        return <LoadingDotsContainer/>
     }
 
     if (error) {
@@ -115,7 +116,7 @@ function MessageList({modalUserId}) {
     return(
         <div className='messages-and-send-message'>
             <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
-                {isRendering && <div className='spinner'></div>}
+                {isRendering && <LoadingDotsContainer/>}
                 {messages.slice(numItems).map((message, index) => (
                     <div key={index}>
                         {message.sender && (message.sender.userId === (user?.sub || guest) ? 

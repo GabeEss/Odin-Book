@@ -8,6 +8,7 @@ import { GuestContext } from "../features/guest/guestid-context";
 import HeaderComponent from "../features/header/header-component";
 import CreateEventComponent from '../features/events/create-event-component';
 import EventListDisplay from '../features/events/event-list-display';
+import {LoadingDotsContainer} from '../features/loading/loading-container';
 
 function EventsPage() {
     const { getAccessTokenSilently } = useAuth0();
@@ -47,7 +48,7 @@ function EventsPage() {
                 <h1 className='events-header'>Events</h1>
                 <div className='event-create-and-list'>
                     <CreateEventComponent/>
-                    {loading ? <p className="loading">Loading...</p> : events.length > 0 ? 
+                    {loading ? <LoadingDotsContainer/> : events.length > 0 ? 
                         <EventListDisplay events={events}/> :
                         <p className='no events'>No events to display</p>
                     }

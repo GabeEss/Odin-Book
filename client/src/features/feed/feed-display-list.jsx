@@ -7,7 +7,7 @@ import { GuestContext } from "../guest/guestid-context";
 import {SocketContext} from '../sockets/socket-context';
 import {UserContext} from '../user/context/user-context';
 import handleSendPost from '../posts/create-post';
-import { LoadingSpinnerContainer } from "../loading/loading-container";
+import { LoadingSpinnerContainer, LoadingDotsContainer } from "../loading/loading-container";
 
 function FeedDisplayList() {
     const {getAccessTokenSilently} = useAuth0();
@@ -54,7 +54,7 @@ function FeedDisplayList() {
         setRefreshFeed(!refreshFeed);
     }
 
-    // if(loadingWheel) return <LoadingSpinnerContainer/>;
+    if(loadingWheel) return <LoadingDotsContainer/>;
 
     return(
         <div className="newsfeed-container">

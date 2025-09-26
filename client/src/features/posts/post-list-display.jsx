@@ -11,6 +11,7 @@ import handleDeletePost from './post-delete';
 import handleEditPost from './post-edit';
 import handlePostLike from './post-like';
 import CommentListDisplay from '../comments/comment-list-display';
+import {LoadingSpinnerContainer, LoadingDotsContainer} from '../loading/loading-container';
 
 function PostListDisplay({location}) {
     const {getAccessTokenSilently} = useAuth0();
@@ -144,7 +145,7 @@ function PostListDisplay({location}) {
     }
 
     if (isLoading) {
-      return <div className='spinner'></div>;
+      return <LoadingDotsContainer/>
     }
 
     if (error) {
