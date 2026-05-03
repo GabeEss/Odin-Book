@@ -4,7 +4,7 @@ import { useNotifications } from './use-notifications-hook';
 import { useAuth0 } from '@auth0/auth0-react';
 import { GuestInitializeContext } from "../../guest/guest-initialize-context";
 import { GuestContext } from "../../guest/guestid-context";
-import { OpenMessagesContext } from '../../messages/bottom-messages/open-messages-context';
+import { UsersWithOpenMessagesContext } from '../../messages/bottom-messages/users-with-open-messages-context';
 
 function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     const {
@@ -12,7 +12,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     } = useAuth0();
     const {guest} = useContext(GuestContext);
     const {guestInit} = useContext(GuestInitializeContext);
-    const {openMessages, setOpenMessages} = useContext(OpenMessagesContext);
+    const {openUsers, setOpenUsers} = useContext(UsersWithOpenMessagesContext);
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(5);
     const nav = useNavigate();
@@ -32,8 +32,8 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     };
 
     const handleUserMessageClick = (triggeredBy) => {
-        let tempArr = [triggeredBy, ...openMessages];
-        setOpenMessages(tempArr);
+        let tempArr = [triggeredBy, ...openUsers];
+        setOpenUsers(tempArr);
     }
 
     // Fetches previous notifications

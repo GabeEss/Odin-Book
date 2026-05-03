@@ -4,7 +4,7 @@ import { GuestProvider } from './features/guest/guestid-context';
 import { GuestInitializeProvider } from './features/guest/guest-initialize-context';
 import { SocketProvider } from './features/sockets/socket-context';
 import { UserProvider } from './features/user/context/user-context';
-import { OpenMessagesProvider } from './features/messages/bottom-messages/open-messages-context';
+import { UsersWithOpenMessagesProvider } from './features/messages/bottom-messages/users-with-open-messages-context';
 import { NotificationsProvider } from './features/header/notifications/notifications-context';
 import { useAuth0 } from '@auth0/auth0-react';
 import { default as PR } from './features/auth/protected-route';
@@ -39,7 +39,7 @@ function App() {
             <SocketProvider>
               <UserProvider>
                 <NotificationsProvider>
-                  <OpenMessagesProvider>
+                  <UsersWithOpenMessagesProvider>
                     <Suspense fallback={<LoadingPage/>}>
                       <Routes>
                         <Route path="/" element={<LoginPage/>}/>
@@ -54,7 +54,7 @@ function App() {
                         <Route path='/messages/:id' element={<PR><MessagingPage/></PR>}/>
                       </Routes>
                     </Suspense>
-                  </OpenMessagesProvider>
+                  </UsersWithOpenMessagesProvider>
                 </NotificationsProvider>
               </UserProvider>
             </SocketProvider>

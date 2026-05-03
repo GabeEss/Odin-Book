@@ -1,19 +1,19 @@
 import { useState, useContext } from 'react';
-import { OpenMessagesContext } from './open-messages-context';
+import { UsersWithOpenMessagesContext } from './users-with-open-messages-context';
 import MessageListContainer from './message-list-container';
 
-function BottomMessagesContainer() {
-    const {openMessages, setOpenMessages} = useContext(OpenMessagesContext);
+function BottomMessagesDisplay() {
+    const {openUsers, setOpenUsers} = useContext(UsersWithOpenMessagesContext);
     const [numItems, setNumItems] = useState(3); // max number of message containers to display
 
     return(
         <div className='bottom-messages-display'>
-            {openMessages ? openMessages.slice(0, numItems).map((notification, index) => 
-                <MessageListContainer/>
+            {openUsers ? openUsers.slice(0, numItems).map((openUser, index) => 
+                <MessageListContainer openUser={openUser} openUsers={openUsers} setOpenUsers={setOpenUsers}/>
             )
             : null}
         </div>
     )
 }
 
-export default BottomMessagesContainer;
+export default BottomMessagesDisplay;
