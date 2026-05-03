@@ -4,6 +4,8 @@ import { GuestInitializeContext } from "../features/guest/guest-initialize-conte
 import HeaderComponent from "../features/header/header-component";
 import FeedDisplayList from "../features/feed/feed-display-list";
 import ConversationsComponent from "../features/conversations/conversations-component";
+import MessageListContainer from "../features/messages/bottom-messages/message-list-container";
+import BottomMessagesContainer from "../features/messages/bottom-messages/bottom-messages-container";
 
 function HomePage () {
     const {
@@ -24,6 +26,8 @@ function HomePage () {
                     <ConversationsComponent/>
                 </div>
             </div>
+            {/* <MessageListContainer/> */}
+            {/* <BottomMessagesContainer/> */}
         </div>
          : null
         }

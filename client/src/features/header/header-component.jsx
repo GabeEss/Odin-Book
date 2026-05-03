@@ -134,8 +134,8 @@ function HeaderComponent() {
                     </div> : null }
                 </div>
             </div>
-            {isOpen ? <MessageModal isOpen={isOpen} modalUser={modalUser} onRequestClose={onRequestClose}/> 
-            : null }
+            {/* {isOpen ? <MessageModal isOpen={isOpen} modalUser={modalUser} onRequestClose={onRequestClose}/> 
+            : null } */}
         </div>
     )
 }

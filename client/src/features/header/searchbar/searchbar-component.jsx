@@ -56,7 +56,7 @@ function SearchbarComponent({searchComplete, setSearchComplete, setDropdown, set
             <form onSubmit={handleSearch}>
                 <input 
                 type='text' 
-                placeholder='Search' 
+                placeholder='Type here...' 
                 className='searchbar' 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)}/>

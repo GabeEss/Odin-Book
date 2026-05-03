@@ -4,7 +4,7 @@ import { useNotifications } from './use-notifications-hook';
 import { useAuth0 } from '@auth0/auth0-react';
 import { GuestInitializeContext } from "../../guest/guest-initialize-context";
 import { GuestContext } from "../../guest/guestid-context";
-
+import { OpenMessagesContext } from '../../messages/bottom-messages/open-messages-context';
 
 function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     const {
@@ -17,6 +17,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     const nav = useNavigate();
     const { data, error, isLoading, refetch } = useNotifications(getAccessTokenSilently, guest, guestInit);
     const [notifications, setNotifications] = useState([]);
+    const [openMessages, setOpenMessages] = useContext(OpenMessagesContext);
 
     // Handle scrolling down to render more posts
     const handleScroll = (e) => {
@@ -29,6 +30,11 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
           }, 1000);
       }
     };
+
+    const handleUserMessageClick = (triggeredBy) => {
+        let tempArr = [triggeredBy, ...openMessages];
+        setOpenMessages(tempArr);
+    }
 
     // Fetches previous notifications
     useEffect(() => {
@@ -49,6 +55,7 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
             if(location.pathname !== `/messages/${notification.triggeredBy._id}`) {
                 setModalUser(notification.triggeredBy);
                 setIsOpen(true);
+                handleUserMessageClick(notification.triggeredBy);
             }
         } else if (notification.type === "newPost") {
             nav(`/user/${notification.user}`);

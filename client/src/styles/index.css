@@ -1414,23 +1414,6 @@ textarea:focus {
 
 /* MESSAGES */
 
-.messages-page {
-    width: 100%;
-    height: 100%;
-}
-
-.message-modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.5);
-    overflow-y: auto;
-    margin-top: .2em;
-    z-index: 2000;
-}
 
 .messages-and-send-messages {
     display: flex;
@@ -1519,14 +1502,43 @@ textarea:focus {
     width: 30em;
 }
 
-.close-modal-button {
+/* MESSAGES PAGE */
+
+.messages-page {
+    width: 100%;
+    height: 100%;
+}
+
+/* MESSAGES MODAL */
+
+/* .close-modal-button {
     position: absolute;
-    bottom: 10px; 
+    bottom: 10px;
     right: 10px;
     background: none; 
     border: none; 
     font-size: 1.5em; 
     cursor: pointer; 
+} */
+
+.close-modal-button {
+    background: none; 
+    border: none; 
+    font-size: 1.5em; 
+    cursor: pointer; 
+}
+
+.message-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    overflow-y: auto;
+    margin-top: .4em;
+    z-index: 2000;
 }
 
 @media (max-width: 845px) {
@@ -1544,6 +1556,17 @@ textarea:focus {
         overflow-wrap: break-word;
         word-break: break-word;
     }
+}
+
+/* MESSAGE LIST CONTAINER */
+
+.message-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
 }
 
 /* FRIENDS LIST PAGE */
