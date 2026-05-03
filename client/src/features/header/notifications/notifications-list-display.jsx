@@ -12,13 +12,13 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     } = useAuth0();
     const {guest} = useContext(GuestContext);
     const {guestInit} = useContext(GuestInitializeContext);
+    const {openMessages, setOpenMessages} = useContext(OpenMessagesContext);
     const [rendering, setIsRendering] = useState(false);
     const [numItems, setNumItems] = useState(5);
     const nav = useNavigate();
     const { data, error, isLoading, refetch } = useNotifications(getAccessTokenSilently, guest, guestInit);
     const [notifications, setNotifications] = useState([]);
-    const [openMessages, setOpenMessages] = useContext(OpenMessagesContext);
-
+    
     // Handle scrolling down to render more posts
     const handleScroll = (e) => {
         const {scrollTop, clientHeight, scrollHeight } = e.target;
