@@ -7,8 +7,8 @@ export const UsersWithOpenMessagesProvider = ({ children }) => {
     const [openUsers, setOpenUsers] = useState([]);
 
     return (
-        <UsersWithOpenMessagesProvider.Provider value={{ openUsers, setOpenUsers }}>
+        <UsersWithOpenMessagesContext.Provider value={{ openUsers, setOpenUsers }}>
             {children}
-        </UsersWithOpenMessagesProvider.Provider>
+        </UsersWithOpenMessagesContext.Provider>
     );
 };

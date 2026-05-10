@@ -11,7 +11,7 @@ import handleDeleteMessage from "./delete-message";
 import handleSendMessage from "./create-message";
 import {LoadingDotsContainer} from '../loading/loading-container';
 
-// modalUserId is the mongo _id of the non-current user in the message exchange when using the modal
+// modalUserId is the mongo _id of the non-current user in the message exchange when using the modal/message container
 function MessageList({modalUserId}) {
     const {getAccessTokenSilently, user} = useAuth0();
     const {guestInit} = useContext(GuestInitializeContext);
@@ -114,36 +114,41 @@ function MessageList({modalUserId}) {
     }
 
     return(
-        <div className='messages-and-send-message'>
-            <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
-                {isRendering && <LoadingDotsContainer/>}
-                {messages.slice(numItems).map((message, index) => (
-                    <div key={index}>
-                        {message.sender && (message.sender.userId === (user?.sub || guest) ? 
-                        <div className='rightside-message-container'>
-                            <div className='message-fit-content right-message'>
-                                <p className='message-info'>{message.message}</p> 
-                                <div className='message-other-details'>
-                                    <p>Sent by you.</p>
-                                    <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+        <div>
+            { modalUserId ?
+                <div className="bottom-messages-container"></div>
+                :
+                <div className='messages-and-send-message'>
+                <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
+                    {isRendering && <LoadingDotsContainer/>}
+                    {messages.slice(numItems).map((message, index) => (
+                        <div key={index}>
+                            {message.sender && (message.sender.userId === (user?.sub || guest) ? 
+                            <div className='rightside-message-container'>
+                                <div className='message-fit-content right-message'>
+                                    <p className='message-info'>{message.message}</p> 
+                                    <div className='message-other-details'>
+                                        <p>Sent by you.</p>
+                                        <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div> :
-                        <div className='leftside-message-container'>
-                            <div className='message-fit-content left-message'>
-                                <p className='message-info'>{message.message}</p>
-                                <div className='message-other-details'>
-                                    <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                            </div> :
+                            <div className='leftside-message-container'>
+                                <div className='message-fit-content left-message'>
+                                    <p className='message-info'>{message.message}</p>
+                                    <div className='message-other-details'>
+                                        <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>)}
-                    </div>
-                ))}
-            </div>
-            <form className="send-message-container" onSubmit={sendMessage}>
-                <textarea className='send-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
-                <button className='submit-message-button' type="submit">Send Message</button>
-            </form>
+                            </div>)}
+                        </div>
+                    ))}
+                </div>
+                <form className="send-message-container" onSubmit={sendMessage}>
+                    <textarea className='send-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
+                    <button className='submit-message-button' type="submit">Send Message</button>
+                </form>
+            </div> }
         </div>
     )
 }

@@ -4,11 +4,11 @@ import MessageListContainer from './message-list-container';
 
 function BottomMessagesDisplay() {
     const {openUsers, setOpenUsers} = useContext(UsersWithOpenMessagesContext);
-    const [numItems, setNumItems] = useState(3); // max number of message containers to display
+    const NUM_ITEMS = 3;
 
     return(
         <div className='bottom-messages-display'>
-            {openUsers ? openUsers.slice(0, numItems).map((openUser, index) => 
+            {openUsers ? openUsers.slice(0, NUM_ITEMS).map((openUser, index) => 
                 <MessageListContainer openUser={openUser} openUsers={openUsers} setOpenUsers={setOpenUsers}/>
             )
             : null}

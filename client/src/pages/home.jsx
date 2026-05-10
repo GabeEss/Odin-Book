@@ -27,7 +27,7 @@ function HomePage () {
                 </div>
             </div>
             {/* <MessageListContainer/> */}
-            {/* <BottomMessagesDisplay/> */}
+            <BottomMessagesDisplay/>
         </div>
          : null
         }

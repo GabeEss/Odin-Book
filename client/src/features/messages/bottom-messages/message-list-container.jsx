@@ -1,6 +1,7 @@
 import MessageList from '../message-list-display';
 
 function MessageListContainer({ openUser, openUsers, setOpenUsers }) {
+
     const handleCloseContainer = () => {
         let tempArr = openUsers.filter(user => user._id != openUser._id);
         setOpenUsers(tempArr);
@@ -12,7 +13,6 @@ function MessageListContainer({ openUser, openUsers, setOpenUsers }) {
         <button
             className='close-message-list-button'
             title='Close'
-            isOpen={isOpen}
             onClick={handleCloseContainer}>
                 X
         </button>
