@@ -114,41 +114,72 @@ function MessageList({modalUserId}) {
     }
 
     return(
-        <div>
+        <div className="message-page-or-bottom-messages">
             { modalUserId ?
-                <div className="bottom-messages-container"></div>
+                <div className='bottom-messages-and-send-message'>
+                    <div className="bottom-messages-container" onScroll={handleScroll} ref={messagesEndRef}>
+                        {isRendering && <LoadingDotsContainer/>}
+                        {messages.slice(numItems).map((message, index) => (
+                            <div key={index}>
+                                {message.sender && (message.sender.userId === (user?.sub || guest) ? 
+                                <div className='rightside-bottom-message-container'>
+                                    <div className='bottom-message-fit-content right-bottom-message'>
+                                        <p className='bottom-message-info'>{message.message}</p> 
+                                        <div className='bottom-message-other-details'>
+                                            <p>Sent by you.</p>
+                                            <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+                                        </div>
+                                    </div>
+                                </div> :
+                                <div className='leftside-bottom-message-container'>
+                                    <div className='bottom-message-fit-content left-bottom-message'>
+                                        <p className='bottom-message-info'>{message.message}</p>
+                                        <div className='bottom-message-other-details'>
+                                            <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                                        </div>
+                                    </div>
+                                </div>)}
+                            </div>
+                        ))}
+                    </div>
+                    <form className="send-bottom-message-container" onSubmit={sendMessage}>
+                        <textarea className='send-bottom-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
+                        <button className='submit-bottom-message-button' type="submit">Send Message</button>
+                    </form>
+                </div>
                 :
                 <div className='messages-and-send-message'>
-                <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
-                    {isRendering && <LoadingDotsContainer/>}
-                    {messages.slice(numItems).map((message, index) => (
-                        <div key={index}>
-                            {message.sender && (message.sender.userId === (user?.sub || guest) ? 
-                            <div className='rightside-message-container'>
-                                <div className='message-fit-content right-message'>
-                                    <p className='message-info'>{message.message}</p> 
-                                    <div className='message-other-details'>
-                                        <p>Sent by you.</p>
-                                        <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+                    <div className="messages-container" onScroll={handleScroll} ref={messagesEndRef}>
+                        {isRendering && <LoadingDotsContainer/>}
+                        {messages.slice(numItems).map((message, index) => (
+                            <div key={index}>
+                                {message.sender && (message.sender.userId === (user?.sub || guest) ? 
+                                <div className='rightside-message-container'>
+                                    <div className='message-fit-content right-message'>
+                                        <p className='message-info'>{message.message}</p> 
+                                        <div className='message-other-details'>
+                                            <p>Sent by you.</p>
+                                            <button title="Delete message" onClick={() => handleDeleteClick(message._id)}>🗑️</button>
+                                        </div>
                                     </div>
-                                </div>
-                            </div> :
-                            <div className='leftside-message-container'>
-                                <div className='message-fit-content left-message'>
-                                    <p className='message-info'>{message.message}</p>
-                                    <div className='message-other-details'>
-                                        <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                                </div> :
+                                <div className='leftside-message-container'>
+                                    <div className='message-fit-content left-message'>
+                                        <p className='message-info'>{message.message}</p>
+                                        <div className='message-other-details'>
+                                            <p>Sent by <Link to={`/user/${message.sender._id}`}>{message.sender.username}</Link></p>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>)}
-                        </div>
-                    ))}
-                </div>
-                <form className="send-message-container" onSubmit={sendMessage}>
-                    <textarea className='send-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
-                    <button className='submit-message-button' type="submit">Send Message</button>
-                </form>
-            </div> }
+                                </div>)}
+                            </div>
+                        ))}
+                    </div>
+                    <form className="send-message-container" onSubmit={sendMessage}>
+                        <textarea className='send-textarea' maxLength={250} value={message} onChange={handleMessageChange} />
+                        <button className='submit-message-button' type="submit">Send Message</button>
+                    </form>
+                </div> 
+            }
         </div>
     )
 }

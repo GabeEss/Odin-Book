@@ -1412,8 +1412,10 @@ textarea:focus {
     }
 }
 
-/* MESSAGES */
+/* MESSAGES (PAGE)*/
 
+/* Probably shouldn't mess with the styling for this. */
+.message-page-or-bottom-messages{}
 
 .messages-and-send-messages {
     display: flex;
@@ -1561,19 +1563,75 @@ textarea:focus {
 /* MESSAGE LIST CONTAINER */
 
 .bottom-messages-display {
+    position: fixed;
+    bottom: 0;
+    right: 20px;
+
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height:100%;
-    width:100%;
+    align-items: flex-end;
+    gap: 12px;
+
+    display: grid;
+    grid-template-columns: 3fr 40%;
+    z-index: 2000;
 }
 
-.message-list-container {
-    display: grid;
-    grid-template-columns: 3fr;
-    width: 100%;
-    height: 100%;
+.bottom-message-list-container {
+    width: 320px;
+}
+
+.close-bottom-message-list-button {
+
+}
+
+.bottom-messages-and-send-message {
+
+}
+
+.bottom-messages-container {
+
+}
+
+.rightside-bottom-message-container {
+
+}
+
+.leftside-bottom-message-container {
+
+}
+
+.bottom-message-fit-content {
+
+}
+
+.left-bottom-message{
+    background-color: var(--secondary);
+    color: var(--primary);
+}
+
+.right-bottom-message {
+    background-color: var(--header);
+    color: var(--primary);
+}
+
+.bottom-message-info {
+
+}
+
+.bottom-message-other-details {
+
+}
+
+.send-bottom-message-container {
+
+}
+
+.send-bottom-textarea {
+
+}
+
+.submit-bottom-message-button {
+    
 }
 
 /* FRIENDS LIST PAGE */

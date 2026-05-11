@@ -6,7 +6,7 @@ import { GuestInitializeContext } from "../../guest/guest-initialize-context";
 import { GuestContext } from "../../guest/guestid-context";
 import { UsersWithOpenMessagesContext } from '../../messages/bottom-messages/users-with-open-messages-context';
 
-function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
+function NotificationsList({setOpenNotifications, setIsOpen }) {
     const {
         getAccessTokenSilently,
     } = useAuth0();
@@ -32,8 +32,10 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
     };
 
     const handleUserMessageClick = (triggeredBy) => {
-        let tempArr = [triggeredBy, ...openUsers];
-        setOpenUsers(tempArr);
+        if(!openUsers.includes(triggeredBy)) {
+            let tempArr = [triggeredBy, ...openUsers];
+            setOpenUsers(tempArr);
+        }
     }
 
     // Fetches previous notifications
@@ -53,7 +55,6 @@ function NotificationsList({setOpenNotifications, setIsOpen, setModalUser}) {
         setOpenNotifications(false);
         if(notification.type === "newMessage") {
             if(location.pathname !== `/messages/${notification.triggeredBy._id}`) {
-                setModalUser(notification.triggeredBy);
                 setIsOpen(true);
                 handleUserMessageClick(notification.triggeredBy);
             }

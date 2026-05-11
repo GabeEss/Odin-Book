@@ -8,14 +8,14 @@ function MessageListContainer({ openUser, openUsers, setOpenUsers }) {
     }
     
   return (
-    <div className='message-list-container'>
-        <MessageList modalUserId={openUser._id}/>
+    <div className='bottom-message-list-container'>
         <button
-            className='close-message-list-button'
+            className='close-bottom-message-list-button'
             title='Close'
             onClick={handleCloseContainer}>
                 X
         </button>
+        <MessageList modalUserId={openUser._id}/>
     </div>
   );
 }

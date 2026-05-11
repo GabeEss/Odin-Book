@@ -7,6 +7,7 @@ const asyncHandler = require("express-async-handler");
 const mongoose = require('mongoose');
 const determineUserType = require("../utils/determineUserType");
 const searchEventCollection = require("../utils/searchEventCollection");
+const EventCleanUp = require("../utils/cleanup/event.cleanup");
 
 exports.event_create_post = asyncHandler(async (req, res, next) => {
     const mongoUser = await determineUserType(req);
@@ -237,6 +238,10 @@ exports.event_delete = asyncHandler(async (req, res, next) => {
     }
 
     try {
+
+        // Delete posts and comments from event to prevent staling
+        await EventCleanUp.cleanUpSingleEvent(currentEvent);
+
         await Event.findByIdAndDelete(req.params.id).exec();
 
         return res.status(200).json({

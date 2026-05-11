@@ -23,7 +23,6 @@ function HeaderComponent() {
     const nav = useNavigate();
     const [openNotifications, setOpenNotifications] = useState(false); // opens notification display component
     const [isOpen, setIsOpen] = useState(false); // Determines if the message modal is open
-    const [modalUser, setModalUser] = useState(null);
     const [dropdown, setDropdown] = useState(false);
     const [searchComplete, setSearchComplete] = useState(false); // Opens the search results
 
@@ -118,7 +117,7 @@ function HeaderComponent() {
                     <button className="notifications-nav header-button" onClick={handleNotificationClick}>Notifications</button>
                     }
                     {openNotifications ?
-                      <NotificationsList setOpenNotifications={setOpenNotifications} setIsOpen={setIsOpen} setModalUser={setModalUser}/>
+                      <NotificationsList setOpenNotifications={setOpenNotifications} setIsOpen={setIsOpen}/>
                        : null
                     }
                 </div>
@@ -134,8 +133,6 @@ function HeaderComponent() {
                     </div> : null }
                 </div>
             </div>
-            {/* {isOpen ? <MessageModal isOpen={isOpen} modalUser={modalUser} onRequestClose={onRequestClose}/> 
-            : null } */}
         </div>
     )
 }
