@@ -180,7 +180,7 @@ textarea:focus {
     right: 0;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     border: 1px solid rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    z-index: 1000;
     border-radius: .2em;
 }
 
@@ -1540,7 +1540,7 @@ textarea:focus {
     background-color: rgba(255, 255, 255, 0.5);
     overflow-y: auto;
     margin-top: .4em;
-    z-index: 2000;
+    z-index: 2;
 }
 
 @media (max-width: 845px) {
@@ -1560,28 +1560,41 @@ textarea:focus {
     }
 }
 
-/* MESSAGE LIST CONTAINER */
+/* BOTTOM MESSAGE LIST CONTAINER */
 
 .bottom-messages-display {
     position: fixed;
     bottom: 0;
     right: 20px;
+    padding: .5em;
 
     display: flex;
     align-items: flex-end;
-    gap: 12px;
-
-    display: grid;
-    grid-template-columns: 3fr 40%;
-    z-index: 2000;
+    gap: .2em;
+    z-index: 100;
 }
 
 .bottom-message-list-container {
-    width: 320px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    padding: 1em;
+    border-radius: 1em;
+    border: black solid 1px;
+    color: var(--primary);
+    background-color: var(--header);
+    overflow-y: auto;
+    box-shadow: 0 0 .2em var(--primary);
+    transition: all 0.3s ease;
+    width: 18em;
+    height: 18em;
 }
 
 .close-bottom-message-list-button {
-
+    position: sticky;
+    width: max-content;
+    top: -20px;    /* Threshold where it becomes "stuck" */
+    transform: translateX(-100%); /* Adjusts for its own width */
 }
 
 .bottom-messages-and-send-message {
