@@ -1567,7 +1567,6 @@ textarea:focus {
     bottom: 0;
     right: 20px;
     padding: .5em;
-
     display: flex;
     align-items: flex-end;
     gap: .2em;
@@ -1578,11 +1577,11 @@ textarea:focus {
     display: flex;
     flex-direction: column-reverse;
     align-items: flex-end;
-    padding: 1em;
+    /* padding: 1em; */
     border-radius: 1em;
     border: black solid 1px;
     color: var(--primary);
-    background-color: var(--header);
+    background-color: var(--font);
     overflow-y: auto;
     box-shadow: 0 0 .2em var(--primary);
     transition: all 0.3s ease;
@@ -1590,11 +1589,15 @@ textarea:focus {
     height: 18em;
 }
 
+.bottom-message-header-container {
+    display: flex;
+    width: 100%;
+    background-color: var(--header);
+    justify-content: flex-end;
+}
+
 .close-bottom-message-list-button {
-    position: sticky;
-    width: max-content;
-    top: -20px;    /* Threshold where it becomes "stuck" */
-    transform: translateX(-100%); /* Adjusts for its own width */
+    
 }
 
 .bottom-messages-and-send-message {
@@ -1614,7 +1617,16 @@ textarea:focus {
 }
 
 .bottom-message-fit-content {
-
+    /* display: inline; */
+    width: fit-content;
+    /* word-break: break-all; */
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin: 1em;
+    padding: 1em;
+    border-radius: 1em;
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+    border: black solid 1px;
 }
 
 .left-bottom-message{
@@ -1636,7 +1648,7 @@ textarea:focus {
 }
 
 .send-bottom-message-container {
-
+    display: flex;
 }
 
 .send-bottom-textarea {

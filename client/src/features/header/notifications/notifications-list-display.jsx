@@ -31,11 +31,19 @@ function NotificationsList({setOpenNotifications, setIsOpen }) {
       }
     };
 
+    // Handle adding user object to users with open messages array context
     const handleUserMessageClick = (triggeredBy) => {
-        if(!openUsers.includes(triggeredBy)) {
+        const alreadyExists = openUsers.some(openUser => openUser._id === triggeredBy._id);
+
+        // Don't add if user already exists
+        if(!alreadyExists) {
             let tempArr = [triggeredBy, ...openUsers];
             setOpenUsers(tempArr);
-        }
+        } else {
+            // Remove after testing
+            let tempArr = [triggeredBy, ...openUsers];
+            setOpenUsers(tempArr);
+        }   
     }
 
     // Fetches previous notifications
